@@ -41,6 +41,7 @@ export default function LoginPage(): JSX.Element {
 
         setLoading(true);
         try {
+            console.log("url",API_BASE_URL)
             const res = await fetch(`${API_BASE_URL}/user/login`, {
                 method: "POST",
                 credentials: "include",
