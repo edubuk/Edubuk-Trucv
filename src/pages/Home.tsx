@@ -13,10 +13,29 @@ import ProfilePopup from "@/components/ui/Profile";
 import { Link } from "react-router-dom";
 import { useUserData } from "@/context/AuthContext";
 import { Crown } from "lucide-react";
+import toast from "react-hot-toast";
+import { API_BASE_URL } from "@/main";
 
 const Home:React.FC = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const {user} = useUserData();
+
+  const handlerLogout = async () => {
+    try {
+      const logoutData = await fetch(`${API_BASE_URL}/user/logout`,{
+        method:"PUT",
+        credentials: "include"
+      })
+      const logoutResult = await logoutData.json();
+      console.log("logoutResult",logoutResult);
+      if(logoutResult.success){
+        window.location.href="/login";
+      }
+        } catch (error) {
+            console.error("Logout failed:", error);
+            toast.error("Logout failed");
+        }
+  };
 
   return (
     <div className="flex justify-center items-center flex-col gap-8 overflow-hidden">
@@ -37,10 +56,10 @@ const Home:React.FC = () => {
           <p className="text-white bg-[#006666] px-6 py-4 font-bold rounded-lg text-2xl sm:text-3xl md:text-4xl" data-aos="fade-right">
             TruCV
           </p>
-          {localStorage.getItem("googleIdToken")?<div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]" data-aos="fade-left">
+          {user?<div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]" data-aos="fade-left">
               <button
                 className="w-full bg-white text-[20px] px-6 py-4 font-bold text-center rounded-lg text-[#03257e] hover:text-[#f14419]"
-                
+                onClick={handlerLogout}
               >
                 Logout
               </button>

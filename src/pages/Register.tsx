@@ -134,7 +134,7 @@ export default function RegistrationPage(): JSX.Element {
     // };
 
     return (
-        <div className="h-screen flex items-center justify-center bg-white px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-white px-2 md:px-2 py-3 md:py-12">
             <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 {/* Left - illustration / marketing */}
                 <div className="hidden md:flex flex-col gap-6 p-8 rounded-2xl">
@@ -154,12 +154,16 @@ export default function RegistrationPage(): JSX.Element {
 
                 {/* Right - form card */}
                 <div className="p-8 bg-white rounded-2xl w-full" data-aos="fade-left">
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between gap-2 mb-6 flex-col">
+                        <div className="flex justify-start items-center md:hidden gap-2 p-2 rounded-2xl mb-6">
+                                                    <Link to="/" className="text-black flex items-center gap-2 hover:text-[#03257e]"> <ArrowLeftSquare /></Link>
+                                                    <h3 className="text-2xl text-center font-semibold text-[#03257e]">Welcome to <span className="bg-gradient-to-r from-[#03257e] via-[#f14419] to-[#006666] text-transparent bg-clip-text">Edubuk</span></h3>
+                                                </div>
                         <div>
                             <h2 className="text-2xl font-bold text-[#03257e]">Create an account</h2>
                             {/* <p className="text-sm text-slate-500 mt-1">Sign up quickly or continue with Google</p> */}
                         </div>
-                        <div className="text-sm text-slate-400">Already have an account? <Link to="/login" className="font-medium text-[#03257e] font-semibold hover:underline">Log in</Link></div>
+                        <div className="text-slate-400">Already have an account? <Link to="/login" className="font-lg text-[#03257e] font-bold hover:underline">Log in</Link></div>
                     </div>
 
                     {/* Social / Google button - replace with <GoogleLogin /> if using the package */}
@@ -198,25 +202,25 @@ export default function RegistrationPage(): JSX.Element {
                         <div className="grid grid-cols-1 gap-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <label className="block">
-                                    <span className="text-sm font-medium text-slate-700">Full name</span>
+                                    <span className="text-sm font-medium text-slate-700">Full name*</span>
                                     <input
                                         name="fullName"
                                         value={form.fullName}
                                         onChange={handleChange}
                                         className={`mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-200 focus:ring-red-300' : 'border-slate-200 focus:ring-[#03257e]'}`}
-                                        placeholder="Jane Doe"
+                                        placeholder="Tyrion Lannister"
                                         aria-invalid={errors.fullName ? 'true' : 'false'}
                                     />
                                     {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>}
                                 </label>
                                 <label className="block">
-                                    <span className="text-sm font-medium text-slate-700">Address</span>
+                                    <span className="text-sm font-medium text-slate-700">Address*</span>
                                     <input
                                         name="address"
                                         value={form.address}
                                         onChange={handleChange}
                                         className={`mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 ${errors.address ? 'border-red-200 focus:ring-red-300' : 'border-slate-200 focus:ring-[#03257e]'}`}
-                                        placeholder="Janki Vihar Colony, Lucknow, India"
+                                        placeholder="King's Landing, India"
                                         aria-invalid={errors.address ? 'true' : 'false'}
                                     />
                                     {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
@@ -224,7 +228,7 @@ export default function RegistrationPage(): JSX.Element {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <label className="block">
-                                    <span className="text-sm font-medium text-slate-700">Email</span>
+                                    <span className="text-sm font-medium text-slate-700">Email*</span>
                                     <input
                                         name="email"
                                         type="email"
@@ -239,7 +243,7 @@ export default function RegistrationPage(): JSX.Element {
                                 <label className="block">
                                     <div className="flex justify-center items-center gap-2">
                                         <div>
-                                            <span className="text-sm font-medium text-slate-700">Verify Email through OTP</span>
+                                            <span className="text-sm font-medium text-slate-700">Verify Email through OTP*</span>
                                             <input
                                                 type="text"
                                                 placeholder="Enter OTP"
@@ -251,7 +255,7 @@ export default function RegistrationPage(): JSX.Element {
                                         </div>
                                         <button
                                         disabled={otpSent}
-                                            className="mt-8 block rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
+                                            className="mt-8 block w-[110px] md:w-auto rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
                                             onClick={otpHandler}
                                             style={{opacity: otpSent ? 0.7 : 1}}
                                         >{otpSent ? "wait..":"Get OTP"}</button>
@@ -260,7 +264,7 @@ export default function RegistrationPage(): JSX.Element {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <label className="block">
-                                    <span className="text-sm font-medium text-slate-700">Password</span>
+                                    <span className="text-sm font-medium text-slate-700">Password*</span>
                                     <input
                                         name="password"
                                         type="password"
@@ -274,7 +278,7 @@ export default function RegistrationPage(): JSX.Element {
                                 </label>
 
                                 <label className="block">
-                                    <span className="text-sm font-medium text-slate-700">Confirm password</span>
+                                    <span className="text-sm font-medium text-slate-700">Confirm password*</span>
                                     <input
                                         name="confirmPassword"
                                         type="password"
@@ -289,7 +293,7 @@ export default function RegistrationPage(): JSX.Element {
                             </div>
 
                             <label className="block">
-                                <span className="text-sm font-medium text-slate-700">Phone</span>
+                                <span className="text-sm font-medium text-slate-700">Phone*</span>
                                 <input
                                     name="phone"
                                     value={form.phone}

@@ -1,17 +1,9 @@
 import React, { useState } from "react";
-// import { GoogleLogin } from "@react-oauth/google";
-// import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom"
 import loginImg from "../assets/login.avif"
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import { ArrowLeftSquare } from "lucide-react";
-// interface UserLoginData {
-//     name: string;
-//     email: string;
-//     picture: string;
-//     exp: number;
-// }
 
 type FormState = {
     email: string;
@@ -72,20 +64,8 @@ export default function LoginPage(): JSX.Element {
         }
     };
 
-
-    // const handleGoogleLogin = (credentialResponse: any) => {
-    //     setLoading(true);
-    //     const userData: UserLoginData = jwtDecode(credentialResponse.credential);
-    //     localStorage.setItem('userName', userData.name.split("")[0]);
-    //     localStorage.setItem('userMailId', userData.email);
-    //     localStorage.setItem('userImage', userData.picture);
-    //     localStorage.setItem('googleIdToken', credentialResponse.credential);
-    //     localStorage.setItem('tokenExpiry', userData.exp.toString());
-    //     window.location.href = '/';
-    // };
-
     return (
-        <div className="h-screen flex items-center justify-center bg-white px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-white px-2 md:px-4 py-3 md:py-12">
             <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 {/* Left - illustration / marketing */}
                 <div className="hidden md:flex flex-col gap-6 p-8 rounded-2xl">
@@ -98,19 +78,24 @@ export default function LoginPage(): JSX.Element {
                         data-aos="fade-down"
                     >
                         <div>
-                            <img src={loginImg} className="w-full h-full" alt="login-img" data-aos="zoom-in"/>
+                            <img src={loginImg} className="w-full h-full" alt="login-img" data-aos="zoom-in" />
                         </div>
                     </div>
                 </div>
 
                 {/* Right - form card */}
-                <div className="p-8 bg-white rounded-2xl w-full" data-aos="fade-left">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
+                <div className="p-4 bg-white rounded-2xl w-full" data-aos="fade-left">
+                    <div className="flex flex-col items-center justify-between mb-2">
+                        <div className="flex justify-start items-center md:hidden gap-2 p-2 rounded-2xl mb-6">
+                            <Link to="/" className="text-black flex items-center gap-2 hover:text-[#03257e]"> <ArrowLeftSquare /></Link>
+                            <h3 className="text-2xl text-center font-semibold text-[#03257e]">Welcome to <span className="bg-gradient-to-r from-[#03257e] via-[#f14419] to-[#006666] text-transparent bg-clip-text">Edubuk</span></h3>
+                        </div>
+                        <div className="flex justify-between items-center w-full">
                             <h2 className="text-2xl font-bold text-[#03257e]">Create an account</h2>
+                            <div className="text-slate-400">New User? <Link to="/register" className="font-xl text-[#03257e] font-bold hover:underline">Register Here</Link></div>
+
                             {/* <p className="text-sm text-slate-500 mt-1">Sign up quickly or continue with Google</p> */}
                         </div>
-                        <div className="text-sm text-slate-400">New User? <Link to="/register" className="font-medium text-[#03257e] font-semibold hover:underline">Register Here</Link></div>
                     </div>
 
                     {/* Social / Google button - replace with <GoogleLogin /> if using the package */}
