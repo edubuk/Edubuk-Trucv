@@ -24,6 +24,7 @@ interface SidebarProps {
   handlerLogout: () => void;
   currentPath: string;
   user:any;
+  loading:boolean;
 }
 
 
@@ -35,6 +36,7 @@ const Navbar:React.FC = () => {
   const {user} = useUserData();
   const location = useLocation();
   const currentPath = location.pathname;
+  const [loading,setLoading] = useState(false);
 console.log("currentPath",currentPath);
 
 
@@ -46,6 +48,7 @@ console.log("currentPath",currentPath);
 
   const handlerLogout = async () => {
     try {
+      setLoading(true);
       const logoutData = await fetch(`${API_BASE_URL}/user/logout`,{
         method:"PUT",
         credentials: "include"
@@ -64,6 +67,8 @@ console.log("currentPath",currentPath);
         } catch (error) {
             console.error("Logout failed:", error);
             toast.error("Logout failed");
+        }finally{
+          setLoading(false);
         }
   };
 
@@ -152,9 +157,11 @@ console.log("currentPath",currentPath);
            <div className="relative hidden lg:flex rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
               <button
                 onClick={handlerLogout}
+                disabled={loading}
                 className="w-full bg-white py-1 text-[20px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
+                style={{opacity:loading?0.7:1}}
               >
-                Logout
+                {loading?"Please Wait...":"Logout"}
               </button>
             </div>
           )}
@@ -193,6 +200,7 @@ console.log("currentPath",currentPath);
         handlerLogout={handlerLogout}
         currentPath={currentPath}
         user={user}
+        loading={loading}
       />
       <img src={truCv} alt="trucv-logo" className="w-32 h-16 sm:h-24 sm:w-48 md:w-60 md:h-24"></img>
     </div>
@@ -205,7 +213,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   setIsSidebarOpen,
   handlerLogout,
   currentPath,
-  user
+  user,
+  loading
 }) => {
   return (
     <div
@@ -257,6 +266,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={handlerLogout}
               className=" w-full bg-white py-2 px-4 rounded-full text-[#03257e] hover:font-bold"
+              style={{opacity:loading?0.7:1}}
             >
               Logout
             </button>

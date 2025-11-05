@@ -107,7 +107,7 @@ const PaymentPopup: React.FC<Props> = ({ showPopup, setShowPopup}) => {
 
   const verifyCoupon = async () => {
     try {
-      const query = `?couponCode=${coupon}&currType=${currType}&userMailId=${localStorage.getItem("email")}`
+      const query = `?couponCode=${coupon}&currType=${currType}`
       const res = await axios.get(
         `${API_BASE_URL}/cv/coupon_verify${query}`,
         {withCredentials:true}
@@ -132,8 +132,9 @@ const PaymentPopup: React.FC<Props> = ({ showPopup, setShowPopup}) => {
         setErrorMsg(res.data.message);
         setCouponValid(false);
       }
-    } catch (error) {
-      console.log("error while coupon verification");
+    } catch (error:any) {
+      console.log("error while coupon verification",error);
+      setErrorMsg(error.response.data.message);
     }
   };
 

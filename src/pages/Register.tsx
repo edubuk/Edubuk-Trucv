@@ -4,6 +4,8 @@ import loginImg from "../assets/login.avif"
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import { ArrowLeftSquare } from "lucide-react";
+import PhoneInput from "react-phone-input-2";
+import 'react-phone-input-2/lib/style.css';
 // interface UserLoginData {
 //     name: string;
 //     email: string;
@@ -117,7 +119,7 @@ export default function RegistrationPage(): JSX.Element {
             toast.error("Something went wrong. Try again.")
             console.log(error)
         }
-        finally{
+        finally {
             setOtpSent(false)
         }
     }
@@ -134,8 +136,8 @@ export default function RegistrationPage(): JSX.Element {
     // };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white px-2 md:px-2 py-3 md:py-12">
-            <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div className="min-h-screen lg:h-screen flex items-center justify-center bg-white">
+            <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center md:px-2">
                 {/* Left - illustration / marketing */}
                 <div className="hidden md:flex flex-col gap-6 p-8 rounded-2xl">
                     <div className="flex items-center gap-2">
@@ -147,7 +149,7 @@ export default function RegistrationPage(): JSX.Element {
                         data-aos="fade-down"
                     >
                         <div>
-                            <img src={loginImg} className="w-full h-full" alt="login-img" data-aos="zoom-in" />
+                            <img src={loginImg} className="w-full h-full" alt="login-img" loading="lazy" data-aos="zoom-in" />
                         </div>
                     </div>
                 </div>
@@ -156,9 +158,9 @@ export default function RegistrationPage(): JSX.Element {
                 <div className="p-8 bg-white rounded-2xl w-full" data-aos="fade-left">
                     <div className="flex items-center justify-between gap-2 mb-6 flex-col">
                         <div className="flex justify-start items-center md:hidden gap-2 p-2 rounded-2xl mb-6">
-                                                    <Link to="/" className="text-black flex items-center gap-2 hover:text-[#03257e]"> <ArrowLeftSquare /></Link>
-                                                    <h3 className="text-2xl text-center font-semibold text-[#03257e]">Welcome to <span className="bg-gradient-to-r from-[#03257e] via-[#f14419] to-[#006666] text-transparent bg-clip-text">Edubuk</span></h3>
-                                                </div>
+                            <Link to="/" className="text-black flex items-center gap-2 hover:text-[#03257e]"> <ArrowLeftSquare /></Link>
+                            <h3 className="text-2xl text-center font-semibold text-[#03257e]">Welcome to <span className="bg-gradient-to-r from-[#03257e] via-[#f14419] to-[#006666] text-transparent bg-clip-text">Edubuk</span></h3>
+                        </div>
                         <div>
                             <h2 className="text-2xl font-bold text-[#03257e]">Create an account</h2>
                             {/* <p className="text-sm text-slate-500 mt-1">Sign up quickly or continue with Google</p> */}
@@ -226,7 +228,7 @@ export default function RegistrationPage(): JSX.Element {
                                     {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
                                 </label>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                                 <label className="block">
                                     <span className="text-sm font-medium text-slate-700">Email*</span>
                                     <input
@@ -241,7 +243,7 @@ export default function RegistrationPage(): JSX.Element {
                                     {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                                 </label>
                                 <label className="block">
-                                    <div className="flex justify-center items-center gap-2">
+                                    <div className="flex justify-between items-center gap-2">
                                         <div>
                                             <span className="text-sm font-medium text-slate-700">Verify Email through OTP*</span>
                                             <input
@@ -250,15 +252,15 @@ export default function RegistrationPage(): JSX.Element {
                                                 name="otp"
                                                 value={form.otp}
                                                 onChange={handleChange}
-                                                className="mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2"
+                                                className="mt-2 w-full xl:block rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2"
                                             ></input>
                                         </div>
                                         <button
-                                        disabled={otpSent}
-                                            className="mt-8 block w-[110px] md:w-auto rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
+                                            disabled={otpSent}
+                                            className="mt-8 w-[170px] lg:w-[110px] rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
                                             onClick={otpHandler}
-                                            style={{opacity: otpSent ? 0.7 : 1}}
-                                        >{otpSent ? "wait..":"Get OTP"}</button>
+                                            style={{ opacity: otpSent ? 0.7 : 1 }}
+                                        >{otpSent ? "wait.." : "Get OTP"}</button>
                                     </div>
                                 </label>
                             </div>
@@ -292,18 +294,34 @@ export default function RegistrationPage(): JSX.Element {
                                 </label>
                             </div>
 
-                            <label className="block">
+                            <label className="block w-full">
                                 <span className="text-sm font-medium text-slate-700">Phone*</span>
-                                <input
-                                    name="phone"
+
+                                <PhoneInput
+                                    country="in"
                                     value={form.phone}
-                                    onChange={handleChange}
-                                    className={`mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 ${errors.phone ? 'border-red-200 focus:ring-red-300' : 'border-slate-200 focus:ring-[#03257e]'}`}
-                                    placeholder="+91 99999 99999"
-                                    aria-invalid={errors.phone ? 'true' : 'false'}
+                                    onChange={(phone) => setForm((prev) => ({ ...prev, phone }))}
+                                    placeholder="Phone Number"
+                                    // Outer wrapper styles (acts like your input's border + focus ring)
+                                    containerClass={`mt-2 w-full rounded-lg border px-0 focus-within:ring-2 ${errors.phone
+                                            ? 'border-red-200 focus-within:ring-red-300'
+                                            : 'border-slate-200 focus-within:ring-[#03257e]'
+                                        }`}
+                                    inputClass="!w-full !bg-transparent !text-[#006666] !placeholder-slate-400 !pl-10 !py-6 !focus:outline-none !border-0 !shadow-none"
+                                    buttonClass="!border-0 !shadow-none"
+                                    dropdownClass="!text-black"
+                                    inputProps={{
+                                        name: 'phone',
+                                        required: true,
+                                        'aria-invalid': errors.phone ? 'true' : 'false',
+                                    }}
                                 />
-                                {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
+
+                                {errors.phone && (
+                                    <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
+                                )}
                             </label>
+
 
                             <label className="flex items-start gap-3 mt-1">
                                 <input name="agree" type="checkbox" checked={form.agree} onChange={handleChange} className="mt-1" />

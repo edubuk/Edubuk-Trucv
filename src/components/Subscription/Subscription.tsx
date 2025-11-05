@@ -106,7 +106,8 @@ const SubscriptionPlans = () => {
   const proFeatures = [
     { label: "Sharable Link of Edubuk design CV", available: true },
     { label: "Sharable Link of Template CV", available: true },
-    { label: "Downloadable", available: true },
+    { label: "Downloadable in PDF format", available: true },
+    { label: "Access of mutiple job opportunity", available: true },
   ];
 
   return (

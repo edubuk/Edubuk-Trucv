@@ -66,7 +66,7 @@ export default function LoginPage(): JSX.Element {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white px-2 md:px-4 py-3 md:py-12">
+        <div className="min-h-screen lg:h-screen flex items-center justify-center bg-white px-2 md:px-4 py-3">
             <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 {/* Left - illustration / marketing */}
                 <div className="hidden md:flex flex-col gap-6 p-8 rounded-2xl">
@@ -79,7 +79,7 @@ export default function LoginPage(): JSX.Element {
                         data-aos="fade-down"
                     >
                         <div>
-                            <img src={loginImg} className="w-full h-full" alt="login-img" data-aos="zoom-in" />
+                            <img src={loginImg} className="w-full h-full" alt="login-img" data-aos="zoom-in" loading="lazy"/>
                         </div>
                     </div>
                 </div>
