@@ -21,6 +21,7 @@ interface IUSER {
 interface UserContextType {
   user: IUSER | null;
   loading:boolean;
+  subscriptionDataLoading:boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -28,6 +29,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUSER | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [subscriptionDataLoading,setSubscriptionDataLoading]= useState<boolean>(false);
   //const [userData, setUserData] = useState<ISubscriptionData | null>(null);
 
   const getUser = async()=>{
@@ -52,6 +54,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
 
   const userSubscription = async () => {
     try {
+      setSubscriptionDataLoading(true)
       const res = await fetch(`${API_BASE_URL}/user/subscription`, {
         method: "GET",
         credentials: "include",
@@ -69,7 +72,8 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
     } catch (error) {
       console.error("Error fetching user subscription:", error);
     }
-  };
+    finally{setSubscriptionDataLoading(false)};
+  }
 
   useEffect(() => {
     // load both — order doesn't strictly matter because subscription update uses functional setUser
@@ -79,7 +83,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
   }, []);
 
   return (
-    <UserContext.Provider value={{user,loading }}>
+    <UserContext.Provider value={{user,loading,subscriptionDataLoading}}>
       {children}
     </UserContext.Provider>
   );

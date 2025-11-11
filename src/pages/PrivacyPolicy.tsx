@@ -6,26 +6,24 @@ const PrivacyPolicy: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-gray-800 bg-white shadow-lg rounded-lg p-8">
             <Link to="/"><FaArrowLeft className="text-black w-6 h-6 mb-4 cursor-pointer"/></Link>
-      <p className="text-2xl sm:text-3xl md:text-4xl text-[#006666] font-bold mb-6">Privacy Policy – Edubuk CETA Olympiad</p>
+      <p className="text-2xl sm:text-3xl md:text-4xl text-[#006666] font-bold mb-6">Privacy Policy – Edubuk TruCV</p>
 
       <p className="mb-4">
-        At Edubuk, we are committed to safeguarding your privacy. This Privacy Policy outlines how we collect,
-        use, store, and protect your personal information when you use our website and participate in the
-        AI & Emerging Technologies Olympiad.
+        At Edubuk TruCV, we are committed to safeguarding your privacy. This Privacy Policy outlines how we collect,
+        use, store, and protect your personal information when you use our website.
       </p>
 
       <h2 className="text-2xl font-semibold mt-8 mb-2">Information We Collect</h2>
       <ul className="list-disc list-inside space-y-2 mb-4">
-        <li>We collect personal details such as name, email address, phone number, school name, grade/class, and parent or guardian contact information during the registration process.</li>
-        <li>We may collect academic details including student interests, Olympiad answers, and performance scores.</li>
+        <li>We collect personal details such as name, email address, phone number, and address during the registration process.</li>
         <li>We automatically collect certain technical data such as IP address, device type, browser information, pages visited, time spent on the site, and referral sources using cookies and analytics tools.</li>
       </ul>
 
       <h2 className="text-2xl font-semibold mt-8 mb-2">Use of Information</h2>
       <ul className="list-disc list-inside space-y-2 mb-4">
-        <li>To register and manage your participation in the Olympiad.</li>
+        <li>To register and manage user profile in their cv</li>
         <li>To deliver relevant learning content and updates.</li>
-        <li>To evaluate Olympiad performance and issue certificates, prizes, or recognition.</li>
+        <li>To create CV and make it verifiable</li>
         <li>To send event-related communications, results, and reminders via email, SMS, or phone calls.</li>
         <li>To improve the website experience and personalize user content.</li>
         <li>To reach out to parents or guardians for consent or information verification.</li>

@@ -53,7 +53,7 @@ export default function LoginPage(): JSX.Element {
             const data = await res.json()
             if (data && data.success) {
                 toast.success(data.message)
-                window.location.href = "/"
+                window.location.href = "/create-cv"
             } else {
                 toast.error(data.message)
             }

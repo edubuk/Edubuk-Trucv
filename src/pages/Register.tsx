@@ -81,10 +81,12 @@ export default function RegistrationPage(): JSX.Element {
             if (data && data.success) {
                 toast.success(data.message)
                 window.location.href = "/login"
+            }else{
+                toast.error(data.message);
             }
             console.log(data)
-        } catch (err) {
-            toast.error("Something went wrong. Try again.")
+        } catch (err:any) {
+            toast.error(err.message||err||"something went wrong")
         } finally {
             setLoading(false);
         }
@@ -210,7 +212,7 @@ export default function RegistrationPage(): JSX.Element {
                                         value={form.fullName}
                                         onChange={handleChange}
                                         className={`mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-200 focus:ring-red-300' : 'border-slate-200 focus:ring-[#03257e]'}`}
-                                        placeholder="Tyrion Lannister"
+                                        placeholder="Alice Johnson"
                                         aria-invalid={errors.fullName ? 'true' : 'false'}
                                     />
                                     {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>}
@@ -222,7 +224,7 @@ export default function RegistrationPage(): JSX.Element {
                                         value={form.address}
                                         onChange={handleChange}
                                         className={`mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 ${errors.address ? 'border-red-200 focus:ring-red-300' : 'border-slate-200 focus:ring-[#03257e]'}`}
-                                        placeholder="King's Landing, India"
+                                        placeholder="Jankipuram,Lucknow,India"
                                         aria-invalid={errors.address ? 'true' : 'false'}
                                     />
                                     {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
@@ -256,6 +258,7 @@ export default function RegistrationPage(): JSX.Element {
                                             ></input>
                                         </div>
                                         <button
+                                        type="button"
                                             disabled={otpSent}
                                             className="mt-8 w-[170px] lg:w-[110px] rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
                                             onClick={otpHandler}
