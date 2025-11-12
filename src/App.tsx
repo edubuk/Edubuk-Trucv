@@ -27,6 +27,7 @@ import InvalidTokenModal from "./pages/InvalidTokenModel";
 import Layout from "./Layout/Layout";
 import Register from "./pages/Register";
 import PasswordResetUI from "./pages/ForgotPassword";
+import CVBuilder from "./CvBuilder/CvBuilder";
 
 
 function App() {
@@ -61,6 +62,7 @@ useEffect(() => {
               <Route path="/pprivacy-policy" element={<AppPrivacyPolicy />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/login" element={<GoogleLoginModal />} />
+              <Route path="cv-builder" element={<CVBuilder />}> </Route>
               <Route path="/password-reset" element={<PasswordResetUI />} />
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />
               <Route path="/admin" element={<Layout><AdminUsersPage/></Layout>} />

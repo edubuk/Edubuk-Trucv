@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/main";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext,useLayoutEffect, useState } from "react";
 
 
 // interface ISubscriptionData {
@@ -13,7 +13,15 @@ interface IUSER {
   phoneNumber: string;
   roles:string;                       // array of roles
   uuid: string;
-  _id?: string;                          // optional because it may be missing in some flows
+  address:string;
+  userImageUrl:string;
+  yearOfExp:string;
+  githubUrl:string;
+  linkedInUrl:string;
+  selfAttested:boolean;
+  updatedAt:string;
+  profession:"student" | "employee";
+  _id?: string;                    // optional because it may be missing in some flows
   subscriptionPlan?: "free" | "basic" | "pro"; // optional union syntax fixed
   endDate?: string;
 }
@@ -42,7 +50,8 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
       const userData = await user.json();
       if(userData && userData.success)
       {
-        setUser({name:userData?.user?.name,email:userData?.user?.email,phoneNumber:userData?.user?.phoneNumber,roles:userData?.user?.roles,uuid:userData?.user?.uuid,_id:userData?.user?._id})
+        // setUser({name:userData?.user?.name,email:userData?.user?.email,phoneNumber:userData?.user?.phoneNumber,address:userData.user.address,roles:userData?.user?.roles,uuid:userData?.user?.uuid,_id:userData?.user?._id})
+        setUser(userData.user);
       }
       console.log("userData", userData);
     } catch (error) {
@@ -75,7 +84,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
     finally{setSubscriptionDataLoading(false)};
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // load both — order doesn't strictly matter because subscription update uses functional setUser
     getUser();
     userSubscription();
