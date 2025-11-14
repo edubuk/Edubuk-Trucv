@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StepCard } from "./StepCard"
-import { Briefcase, BriefcaseBusiness, Building, Calendar, ExternalLink, FileText, Paperclip, PlusCircle, Trash2 } from "lucide-react"
+import { Briefcase, BriefcaseBusiness, Building, Calendar, ExternalLink, FileText, Paperclip, PlusCircle, Replace, Trash2 } from "lucide-react"
 import { ExperienceSchema, ExperienceFormValues } from "./cvSchema";
 import {
     Form,
@@ -18,8 +18,12 @@ import { IStepCard } from "./PersonalDetails";
 import { Button } from "@/components/ui/button";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
 import { handleProofUploaded } from "./uploadProof";
+import { API_BASE_URL } from "@/main";
+import toast from "react-hot-toast";
+import LoadingButton from "@/components/LoadingButton";
+import { isMongoId } from "@/lib/utils";
 
-export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
+export const ExperienceDetails = ({ step, setStep, uid,docId}: IStepCard) => {
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const form = useForm<ExperienceFormValues>({
         resolver: zodResolver(ExperienceSchema),
@@ -27,26 +31,28 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
             experiences: [
                 {
                     id: uid("exp"),
-                    company: "",
-                    position: "",
+                    expDocId:docId(),
+                    companyName: "",
+                    jobRole: "",
                     duration: {
                         from: "",
                         to: ""
                     },
                     description: "",
+                    selfAttested: false,
                     isEmailSend: false,
-                    skills: "",
-                    proof: "",
-                    selfAttested: false
+                    verified: false,
+                    status: "pending",
                 }
             ]
 
         },
     });
-    const { control, setValue, handleSubmit } = form;
+    const { control, setValue, handleSubmit,getValues} = form;
     const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [isCurrentlyWorking, setIsCurrentlyWorking] = useState<boolean>(false);
+    const [loading,setLoading] = useState<boolean>(false);
 
     const { fields, append, remove } = useFieldArray({
         control,
@@ -59,14 +65,16 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
         append(
             {
                 id: uid("exp"),
-                company: "",
-                position: "",
+                expDocId:docId(),
+                companyName: "",
+                jobRole: "",
                 duration: { from: "", to: "" },
-                description: "",
                 skills: "",
+                description: "",
+                selfAttested: false,
                 isEmailSend: false,
-                proof: "",
-                selfAttested: false
+                verified: false,
+                status: "pending",
             }
         );
     }
@@ -83,10 +91,94 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
         setValue(`experiences.${index}.selfAttested`, true, { shouldValidate: true, shouldDirty: true });
     };
 
-    const submitFormHandler = (data: ExperienceFormValues) => {
-        //console.log("error", errors)
-        console.log("form submit", data);
-    };
+   const submitFormHandler = async (data: ExperienceFormValues) => {
+            console.log("form submit", data.experiences);
+            try {
+                setLoading(true);
+                const payload = { data: data.experiences };
+                const result = await fetch(`${API_BASE_URL}/doc/save-expDoc`, {
+                    method: "POST",
+                    credentials: "include",
+                    body: JSON.stringify(payload),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                const res = await result.json();
+                if (!res.success) {
+                    toast.error(res.message);
+                    setLoading(false);
+                    return;
+                }
+                toast.success(res.message);
+                setLoading(false);
+            } catch (error: any) {
+                toast.error(error.message ?? error ?? "Something went wrong");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+    const fetchExpDocs = async () => {
+            try {
+                const data = await fetch(`${API_BASE_URL}/doc/experience-docs`, {
+                    method: "GET",
+                    credentials: "include",
+                })
+                const res = await data.json();
+                console.log("data", res);
+                if (res.success) {
+                        const experiences    = res.documents.map((doc: any) => ({
+                            id: doc._id ?? uid("exp"), // ensure unique id for RHF key
+                            expDocId:doc.expDocId ?? "",
+                            companyName: doc.companyName ?? "",
+                            jobRole: doc.jobRole ?? "",
+                            duration: {
+                                from: doc.duration?.from ?? "",
+                                to: doc.duration?.to ?? "",
+                            },
+                            skills: doc.skills ?? "",
+                            description: doc.description ?? "",
+                            selfAttested: doc.selfAttested ?? false,
+                            isEmailSend: doc.isEmailSend ?? false,
+                            verified: doc.verified ?? false,
+                            status: doc.status ?? "pending",
+                        }));
+    
+                        // Update form values
+                        form.reset({ experiences });
+                }
+            } catch (error) {
+                toast.error("something went wrong");
+            }
+        }
+    
+        useEffect(() => {
+            fetchExpDocs();
+        }, [step === 3])
+
+    const updateHandler = async(index:number)=>{
+            try {
+                const payload = getValues(`experiences.${index}`);
+                console.log("payload",payload);
+                const data = await fetch(`${API_BASE_URL}/doc/update-expDoc/${payload.id}`,{
+                    method:"PUT",
+                    credentials:"include",
+                    body:JSON.stringify({data:payload}),
+                    headers:{
+                        "Content-Type":"application/json"
+                    }
+                })
+                const res = await data.json();
+                if(!res.success){
+                    toast.error(res.message);
+                    return;
+                }
+                toast.success(res.message);
+            } catch (error) {
+                toast.error("something went wrong");
+            }
+        }
 
 
     return (
@@ -117,13 +209,20 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
                                                     </FormItem>
                                                 )}
                                             />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeExperience(index)}
-                                                className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
-                                            >
-                                                <Trash2 size={14} /> Remove
-                                            </button>
+                                            {isMongoId(field.id)? <button
+                                                    type="button"
+                                                    onClick={()=>updateHandler(index)}
+                                                    className="mt-2 px-3 py-1 rounded border border-green-600 text-green-600 flex items-center shadow-lg gap-2 hover:bg-green-600/10 active:scale-[0.99] transition"
+                                                >
+                                                    <Replace size={14} /> Update
+                                                </button>:
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeExperience(index)}
+                                                    className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                                                >
+                                                    <Trash2 size={14} /> Remove
+                                                </button>}
                                         </div>
                                     </div>
                                     <div className="flex justify-start items-center gap-1">
@@ -132,7 +231,7 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                                         <FormField
                                             control={control}
-                                            name={`experiences.${index}.company`}
+                                            name={`experiences.${index}.companyName`}
                                             render={({ field }) => (
                                                 <FormItem className="w-full">
                                                     <FormLabel>
@@ -154,7 +253,7 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
                                         />
                                         <FormField
                                             control={control}
-                                            name={`experiences.${index}.position`}
+                                            name={`experiences.${index}.jobRole`}
                                             render={({ field }) => (
                                                 <FormItem className="w-full">
                                                     <FormLabel>
@@ -259,7 +358,7 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
                                         {/* Upload / proof column */}
                                         <FormField
                                             control={form.control}
-                                            name={`experiences.${index}.proof`}
+                                            name={`experiences.${index}.docUri`}
                                             render={() => (
                                                 <FormItem className="flex-1">
                                                     <FormLabel>
@@ -285,7 +384,7 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
                                                                             if (!file) return;
                                                                             setSelectedFileName(file.name);
                                                                             const url = await handleProofUploaded({file, setIsUploading, setUploadError, setSelectedFileName });
-                                                                            setValue(`experiences.${index}.proof`, url, {
+                                                                            setValue(`experiences.${index}.docUri`, url, {
                                                                                 shouldValidate: true,
                                                                                 shouldDirty: true,
                                                                             });
@@ -305,7 +404,7 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
                                                                 </div>
 
                                                                 <div className="flex items-center gap-2">
-                                                                    {form.getValues(`experiences.${index}.proof`)&&<span className="text-green-600">File Uploaded</span>}
+                                                                    {form.getValues(`experiences.${index}.docUri`)&&<span className="text-green-600">File Uploaded</span>}
 
                                                                     {selectedFileName && (
                                                                         <button
@@ -337,9 +436,9 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
                                                     )}
 
                                                     {/* If you have a stored URL in the form value, show a preview link */}
-                                                    {form.getValues(`experiences.${index}.proof`) && (
+                                                    {form.getValues(`experiences.${index}.docUri`) && (
                                                         <a
-                                                            href={form.getValues(`experiences.${index}.proof`)}
+                                                            href={form.getValues(`experiences.${index}.docUri`)}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="mt-3 flex w-32 justify-center items-center text-sm text-[#008888] rounded border border-[#008888] px-2 py-1 gap-1"
@@ -397,7 +496,7 @@ export const ExperienceDetails = ({ step, setStep, uid }: IStepCard) => {
                         <div>
                             <button onClick={addExperience} className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"><PlusCircle size={16} /> Add Experience</button>
                         </div>
-                        <Button type="submit" className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition">Save</Button>
+                        {loading?<LoadingButton />:<Button type="submit" className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition">Save</Button>}
                     </div>
                 </StepCard>
             </form>

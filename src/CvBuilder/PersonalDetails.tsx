@@ -25,6 +25,7 @@ export interface IStepCard {
     step: number;
     setStep: React.Dispatch<React.SetStateAction<number>>;
     uid: (prefix?: string) => string;
+    docId:()=>string;
 }
 
 export const PersonalDetails = ({ step, setStep }: IStepCard) => {

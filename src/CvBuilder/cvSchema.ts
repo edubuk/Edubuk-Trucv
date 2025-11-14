@@ -25,86 +25,26 @@ export type PersonalDetailsItem = z.infer<typeof personalDetailsSchema>;
 
 export const EducationItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
-  level: z.enum(["school", "college"], { required_error: "Level is required" }),
-
-  // School-specific fields
-  board: z.string().optional(),
-  schoolName: z.string().optional(),
-
-  // College-specific fields
-  collegeName: z.string().optional(),
-  degree: z.string().optional(),
-
-  // Common optional fields
-  percentage: z.string().optional(),
-  gpa: z.string().optional(),
-
-  issuerEmail:z.string().email({message:"Invalid email"}).optional(),
-  status:z.enum(["pending","rejected","verified","inprogress"]),
-  verifiedThrough:z.string().optional(),
-  verified:z.boolean().optional(),
-  isEmailSend:z.boolean().optional(),
+  eduDocId:z.string(),
+  level: z.enum(["Secondary School","Higher Secondary School", "Graduation","PostGraduation","Other"], { required_error: "Level is required" }),
+  boardNameOrDegree: z.string().min(1,"This field is required"),
+  institutionName: z.string().min(1,"Institution name is required"),
+  gpa: z.string().min(1,"This field is required"),
   duration: z.object({
-    startDate: z.string().min(1, { message: "Start date is required" }),
-    endDate: z.string().min(1, { message: "End date is required" }),
+    to: z.string().min(1, { message: "End date is required" }),
+    from: z.string().min(1, { message: "Start date is required" }),
   }),
-
-  proof: z.string().optional(),
-
   selfAttested: z
-    .boolean()
-    .refine((v) => v === true, { message: "All data should be self attested" }),
-}).superRefine((data, ctx) => {
-  // Validate school-specific requirements
-  if (data.level === "school") {
-    if (!data.schoolName) {
-      ctx.addIssue({
-        path: ["schoolName"],
-        message: "School name is required for school level",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-    if (!data.board) {
-      ctx.addIssue({
-        path: ["board"],
-        message: "Board is required for school level",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-    if(!data.percentage)[
-      ctx.addIssue({
-        path:["percentage"],
-        message:"Percentage is required for school level",
-        code:z.ZodIssueCode.custom
-      })
-    ]
-  }
+  .boolean()
+  .refine((v) => v === true, { message: "All data should be self attested" }),
+   isEmailSend:z.boolean().optional(),
+  issuerEmailId:z.string().email({message:"Invalid email"}).optional(),
+  verified:z.boolean().optional(),
+  status:z.enum(["pending","verified","rejected","inProgress"]),
+  verifiedThrough:z.string().optional(),
+  docUri: z.string().optional(),
+})
 
-  // Validate college-specific requirements
-  if (data.level === "college") {
-    if (!data.collegeName) {
-      ctx.addIssue({
-        path: ["collegeName"],
-        message: "College name is required for college level",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-    if (!data.degree) {
-      ctx.addIssue({
-        path: ["degree"],
-        message: "Degree is required for college level",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-    if (!data.gpa) {
-      ctx.addIssue({
-        path: ["gpa"],
-        message: "GPA is required for college level",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-  }
-});
 
 // ✅ The array version (root schema)
 export const EducationSchema = z.object({
@@ -117,18 +57,22 @@ export type EducationFormValues = z.infer<typeof EducationSchema>;
 
 export const ExperienceItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
-  company: z.string().min(1, "Company name is required"),
-  position: z.string().min(1, "Position is required"),
+  expDocId:z.string().uuid(),
+  companyName: z.string().min(1, "Company name is required"),
+  jobRole: z.string().min(1, "Position is required"),
   duration: z.object({
     from:z.string().min(1,"start date is required"),
     to:z.string().min(1,"end date is required")
   }),
-  issuerEmail:z.string().email().optional(),
-  isEmailSend:z.boolean(),
-  description: z.string().min(1, "Description is required"),
   skills:z.string().min(1,"skill is required").refine((s)=>s.includes(","),"Separate multiple skills using commas (e.g., React, Node.js)"),
-  proof: z.string().optional(),
+  description: z.string().min(1, "Description is required"),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
+  isEmailSend:z.boolean(),
+  issuerEmail:z.string().email().optional(),
+  verified:z.boolean().optional(),
+  status:z.enum(["pending","verified","rejected","inProgress"]),
+  verifiedThrough:z.string().optional(),
+  docUri: z.string().optional(),
 });
 
 export const ExperienceSchema = z.object({

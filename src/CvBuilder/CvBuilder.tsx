@@ -6,12 +6,12 @@ import { SkillDetails } from "./SkillsDetails";
 import { ProjectDetails } from "./ProjectsDetails";
 import { AwardDetails } from "./AwardDetails";
 import { ProfileSummary } from "./ProfileSummary";
-
+import { v4 as uuidv4 } from "uuid";
 
 
 // --- Helpers ---
 const uid = (prefix = "id") => `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
-
+const docId = ()=>uuidv4();
 
 // function StepCard({
 //   index,
@@ -154,19 +154,19 @@ export default function CVBuilder() {
             <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a>.</p>
             {/* Step 1 */}
             
-            <PersonalDetails step={step} setStep={setStep} uid={uid}/>
+            <PersonalDetails step={step} setStep={setStep} uid={uid} docId={docId}/>
             {/* Step 2 */}
-            <EducationDetails step={step} setStep={setStep} uid={uid}/>
+            <EducationDetails step={step} setStep={setStep} uid={uid} docId={docId}/>
             
-            <ExperienceDetails step={step} setStep={setStep} uid={uid}/>
+            <ExperienceDetails step={step} setStep={setStep} uid={uid} docId = {docId}/>
             
-            <SkillDetails step={step} setStep={setStep} uid={uid}/>
+            <SkillDetails step={step} setStep={setStep} uid={uid} docId = {docId}/>
             
-            <ProjectDetails step={step} setStep={setStep} uid={uid}/>
+            <ProjectDetails step={step} setStep={setStep} uid={uid} docId = {docId}/>
             
-            <AwardDetails step={step} setStep={setStep} uid={uid}/>
+            <AwardDetails step={step} setStep={setStep} uid={uid} docId = {docId}/>
            
-            <ProfileSummary step={step} setStep={setStep} uid={uid}/>
+            <ProfileSummary step={step} setStep={setStep} uid={uid} docId = {docId}/>
            
             <div className="pt-4 border-t mt-6 flex items-center justify-between">
               <div className="text-sm text-slate-500">{step ? `Open: Step ${step} of 7` : "No step open"}</div>
