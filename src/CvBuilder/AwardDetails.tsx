@@ -1,379 +1,658 @@
-import { useState } from "react";
-import { StepCard } from "./StepCard"
-import { Award, Badge, Building2, Calendar,ExternalLink,FileText, Paperclip, PlusCircle, Trash2 } from "lucide-react"
+import { useEffect, useState, useMemo } from "react";
+import { StepCard } from "./StepCard";
+import {
+  Award,
+  Badge,
+  Building2,
+  Calendar,
+  ExternalLink,
+  FileText,
+  Paperclip,
+  PlusCircle,
+  Replace,
+  Trash2,
+} from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { AwardFormValues,AwardSchema } from "./cvSchema";
+import { AwardFormValues, AwardSchema } from "./cvSchema";
 
 import { IStepCard } from "./PersonalDetails";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
 import { handleProofUploaded } from "./uploadProof";
+import { API_BASE_URL } from "@/main";
+import toast from "react-hot-toast";
+import { useUserData } from "@/context/AuthContext";
+import LoadingButton from "@/components/LoadingButton";
+import { isMongoId } from "@/lib/utils";
 
-export const AwardDetails = ({ step, setStep, uid }: IStepCard) => {
-    const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
-    const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [uploadError, setUploadError] = useState<string | null>(null);
+export const AwardDetails = ({
+  step,
+  setStep,
+  uid,
+  cvData,
+  setCvData,
+}: IStepCard) => {
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const { user } = useUserData();
+  const form = useForm<AwardFormValues>({
+    resolver: zodResolver(AwardSchema),
+    defaultValues: {
+      awards: [
+        {
+          id: uid("awd"),
+          level: "Award",
+          name: "",
+          organisation: "",
+          duration: { from: "", to: "" },
+          description: "",
+          selfAttested: false,
+          isEmailSend: false,
+          verified: false,
+          status: "pending",
+          verifiedThrough: "",
+        },
+      ],
+    },
+  });
+  const { control, setValue, handleSubmit, getValues } = form;
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: "awards",
+    keyName: "rhfKey", // so we can use fields.map safely
+  });
+  function addAward(e: React.MouseEvent) {
+    e.preventDefault();
+    append({
+      id: uid("awd"),
+      level: "Award",
+      name: "",
+      organisation: "",
+      duration: { from: "", to: "" },
+      description: "",
+      isEmailSend: false,
+      selfAttested: false,
+      verified: false,
+      status: "pending",
+      verifiedThrough: "",
+    });
+  }
 
-    const form = useForm<AwardFormValues>({
-        resolver: zodResolver(AwardSchema),
-        defaultValues: {
-            awards: [{
-                id: uid("awd"),
-                level:"Award",
-                name: "",
-                organisation: "",
-                duration: { from: "", to: "" },
-                proof:"",
-                description: "",
-                isEmailSend:false,
-                selfAttested: false
-            }]
+  const removeAward = (index: number) => remove(index);
+
+  const handleSelfAttest = (index: number) => {
+    setValue(`awards.${index}.selfAttested`, true);
+  };
+
+  const submitFormHandler = async (data: AwardFormValues) => {
+    console.log("form submit", data.awards);
+    try {
+      setLoading(true);
+      const payload = { data: data.awards };
+      const result = await fetch(`${API_BASE_URL}/doc/save-awards`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res = await result.json();
+      if (!res.success) {
+        toast.error(res.message);
+        setLoading(false);
+        return;
+      }
+      toast.success(res.message);
+      setLoading(false);
+      setRefresh((prev) => !prev);
+    } catch (error: any) {
+      toast.error(error.message ?? error ?? "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchExpDocs = async () => {
+    try {
+      const data = await fetch(`${API_BASE_URL}/doc/award-docs`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const res = await data.json();
+      console.log("data", res);
+      if (res.success) {
+        const awards = res.awards.map((doc: any) => ({
+          id: doc._id ?? uid("awd"), // ensure unique id for RHF key
+          awardDocId: doc.awardDocId ?? "",
+          level: doc.level,
+          name: doc.name ?? "",
+          organisation: doc.organisation ?? "",
+          duration: {
+            from: doc.duration?.from ?? "",
+            to: doc.duration?.to ?? "",
+          },
+          description: doc.description ?? "",
+          selfAttested: doc.selfAttested ?? false,
+          isEmailSend: doc.isEmailSend ?? false,
+          verified: doc.verified ?? false,
+          status: doc.status ?? "pending",
+        }));
+
+        // Update form values
+        form.reset({ awards });
+      }
+    } catch (error) {
+      toast.error("something went wrong");
+    }
+  };
+
+  useEffect(() => {
+    fetchExpDocs();
+  }, [step === 3, refresh]);
+
+  const updateHandler = async (index: number) => {
+    try {
+      const payload = getValues(`awards.${index}`);
+      console.log("payload", payload);
+      const data = await fetch(
+        `${API_BASE_URL}/doc/update-awardDoc/${payload.id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          body: JSON.stringify({ data: payload }),
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
+      );
+      const res = await data.json();
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+      toast.success(res.message);
+      setRefresh((prev) => !prev);
+    } catch (error) {
+      toast.error("something went wrong");
+    }
+  };
+
+  const emailHandler = async (index: number) => {
+    try {
+      const emailId = getValues(`awards.${index}.issuerEmail`);
+      const applicantName = user?.name;
+      const documentName = getValues(`awards.${index}.name`);
+      const documentType = getValues(`awards.${index}.organisation`);
+      const documentViewUrl = getValues(`awards.${index}.docUri`);
+      if (!emailId || !documentViewUrl || !documentName || !documentType)
+        return toast.error("Please fill first above all the input fields");
+      setLoading(true);
+      const result = await fetch(`${API_BASE_URL}/doc/email-issuer`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
+          emailId: emailId,
+          documentViewUrl: documentViewUrl,
+          documentName: documentName,
+          documentType: documentType,
+          applicantName: applicantName,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await result.json();
+      if (!data.success) {
+        toast.error(data.message);
+        setLoading(false);
+      }
+
+      if (data.status === "Succeeded") {
+        toast.success(`${data.message} to entered email id`);
+        setLoading(false);
+      }
+    } catch (error: any) {
+      toast.error(error.message ?? error ?? "something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const includedIds = useMemo(
+    () => new Set(cvData.educations.map((e: any) => e.id)),
+    [cvData]
+  );
+
+  function buildEducationPayload(index: number) {
+    // grab the whole education row from RHF form values
+    const row = getValues(`awards.${index}`) || {};
+    // ensure a stable id — prefer existing ID from the form if present
+    const id = row.id || uid("exp");
+    return { ...row, id };
+  }
+
+  function handleToggleInclude(index: number) {
+    const payload = buildEducationPayload(index);
+
+    setCvData((prev: any) => {
+      const exists = prev.awards.some((e: any) => e.id === payload.id);
+      if (exists) {
+        // remove
+        return {
+          ...prev,
+          awards: prev.awards.filter((e: any) => e.id !== payload.id),
+        };
+      } else {
+        // add (append)
+        return { ...prev, awards: [...prev.awards, payload] };
+      }
     });
-    const { control,setValue,handleSubmit } = form;
-    const { fields, append, remove,update} = useFieldArray({
-        control,
-        name: "awards",
-        keyName: "rhfKey", // so we can use fields.map safely
-    });
-    function addAward(e: React.MouseEvent) {
-        e.preventDefault();
-        append({
-            id: uid("awd"),
-            level:"Award",
-            name: "",
-            organisation: "",
-            duration: { from: "", to: "" },
-            proof:"",
-            description: "",
-            isEmailSend:false,
-            selfAttested: false
-        })
-    }
+  }
 
-
-    const removeAward = (index: number) => remove(index);
-
-    const handleSelfAttest = (index: number) => {
-        setValue(`awards.${index}.selfAttested`,true,)
-    }
-    const formSubmitHandler = (data:AwardFormValues)=>{
-        console.log("form submit",data)
-    }
-
-    return (
-        <Form {...form}>
-            <form onSubmit={handleSubmit(formSubmitHandler)}>
-                <StepCard index={6} title="Certificates/Courses/Awards" icon={Award} open={step === 6} onToggle={() => setStep(step === 6 ? 0 : 6)}>
-                    <p className="text-sm text-slate-500">Add projects. Make them stand out with URL and short description. Each item can be removed.</p>
-                    <div className="mt-4 space-y-4">
-                        {fields.map((a,index) => (
-                            <>
-                                <div className="flex justify-start items-center gap-2"><input type="checkbox" className="border-[#008888]" /><p className="text-[#008888]">Select to include this data in your resume</p></div>
-                                <div key={a.id} className="border p-4 rounded bg-white">
-                                    <div className="flex justify-between flex-wrap items-center">
-                                        <div className="text-sm font-medium text-[#03257e]">{a.level} Entry</div>
-                                        <div className="flex gap-1">
-                                        <FormField
-                                            control={control}
-                                            name={`awards.${index}.selfAttested`}
-                                            render={() => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <SelfAttestButton
-                                                            isAttested={form.watch(`awards.${index}.selfAttested`) as boolean}
-                                                            onClick={() => handleSelfAttest(index)}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => removeAward(index)}
-                                            className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
-                                        >
-                                            <Trash2 size={14} /> Remove
-                                        </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                                        <div>
-                                            <label className="">Select your relevant field</label>
-                                            <select
-                                                value={a.level}
-                                                onChange={(e) => update(index, { ...a, level: e.target.value as "Award" | "Certificate" | "Course" })}
-                                                className="border text-[#03257e] bg-gray-100 h-9 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#006666]"
-                                            >
-                                                <option value="Award">Award</option>
-                                                <option value="Certificate">Certificate</option>
-                                                <option value="Course">Course</option>
-                                            </select>
-                                        </div>
-                                        <FormField
-                                            control={form.control}
-                                            name={`awards.${index}.name`}
-                                            render={({ field }) => (
-                                                <FormItem className="w-full">
-                                                    <FormLabel>
-                                                        <div className="flex items-center gap-1">
-                                                            <Badge className="text-[#006666] size-4" />
-                                                            {a.level}
-                                                        </div>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder={`${a.level} name`}
-                                                            className="w-full"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={control}
-                                            name={`awards.${index}.organisation`}
-                                            render={({ field }) => (
-                                                <FormItem className="w-full">
-                                                    <FormLabel>
-                                                        <div className="flex items-center gap-1">
-                                                            <Building2 className="text-[#006666] size-4" />
-                                                            Organisation
-                                                        </div>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder="Organisation"
-                                                            className="w-full"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                           control={control}
-                                            name={`awards.${index}.duration.from`}
-                                            render={({ field: innerField }) => (
-                                                <FormItem className="w-full">
-                                                    <FormLabel>
-                                                        <div className="flex items-center gap-1">
-                                                            <Calendar className="text-[#006666] size-4" />
-                                                            {a.level==="Course"?"From (eg. 10/11/2015):":"Date of achievement"}
-                                                        </div>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input type="date" {...innerField} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                           )}
-                                       />
-                                       {a.level==="Course" && (
-                                       <FormField
-                                           control={control}
-                                           name={`awards.${index}.duration.to`}
-                                           render={({ field: innerField }) => (
-                                               <FormItem className="w-full">
-                                                   <FormLabel>
-                                                       <div className="flex items-center gap-1">
-                                                           <Calendar className="text-[#006666] size-4" />
-                                                           To (eg. 10/11/2018)
-                                                       </div>
-                                                   </FormLabel>
-                                                   <FormControl>
-                                                       <Input type="date" {...innerField} />
-                                                   </FormControl>
-                                                   <FormMessage />
-                                               </FormItem>
-                                           )}
-                                       />)}
-                                        <FormField
-                                            control={control}
-                                            name={`awards.${index}.description`}
-                                            render={({ field }) => (
-                                                <FormItem className="w-full">
-                                                    <FormLabel>
-                                                        <div className="flex items-center gap-1">
-                                                            <FileText className="text-[#006666] size-4" />
-                                                            Description
-                                                        </div>
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="Description"
-                                                            className="w-full"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center mt-1">
-                                        {/* Upload / proof column */}
-                                        <FormField
-                                            control={control}
-                                            name={`awards.${index}.proof`}
-                                            render={() => (
-                                                <FormItem className="flex-1">
-                                                    <FormLabel>
-                                                        <div className="flex items-start md:items-center gap-2">
-                                                            <Paperclip className="h-5 w-5 text-gray-700" />
-                                                            <div className="text-sm text-gray-700">
-                                                                Upload your document and send an email to the issuer for verification.
-                                                            </div>
-                                                        </div>
-                                                    </FormLabel>
-
-                                                    <FormControl>
-                                                        {/* Styled drop area / button */}
-                                                        <div
-                                                            className="relative w-full bg-white"
-                                                        >
-                                                            <input
-                                                                id={`proof-file-${index}`}
-                                                                type="file"
-                                                                accept=".jpg,.jpeg,.png,.pdf"
-                                                                onChange={async(event) => {
-                                                                            const file = event.target.files?.[0];
-                                                                            if (!file) return;
-                                                                            setSelectedFileName(file.name);
-                                                                            const url = await handleProofUploaded({file, setIsUploading, setUploadError, setSelectedFileName });
-                                                                            setValue(`awards.${index}.proof`, url, {
-                                                                                shouldValidate: true,
-                                                                                shouldDirty: true,
-                                                                            });
-                                                                        }}
-                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                                aria-label={`Upload proof for experience ${index + 1}`}
-                                                            />
-
-                                                            {/* Visible content */}
-                                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                                                                <div className="flex flex-col gap-2">
-                                                                    <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
-                                                                        <Paperclip className="h-4 w-4 text-[#171515]" />
-                                                                        <span className="text-sm text-gray-800">{selectedFileName ?? "Upload File"}</span>
-                                                                    </div>
-                                                                    <p className="text-start text-[#f14419] text-sm">Accepted: .jpg .jpeg .png .pdf — max 5MB</p>
-                                                                </div>
-
-                                                                <div className="flex items-center gap-2">
-                                                                    {form.getValues(`awards.${index}.proof`)&&<span className="text-green-600">File Uploaded</span>}
-
-                                                                    {selectedFileName && (
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() => {
-                                                                                // clear file input visually — if you need to clear the actual input element value, you can
-                                                                                // keep a ref to the input and set inputRef.current.value = ""
-                                                                                setSelectedFileName(null);
-                                                                                // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
-                                                                            }}
-                                                                            className="text-sm px-3 py-1 rounded-md border border-transparent hover:bg-gray-100"
-                                                                        >
-                                                                            Clear
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </FormControl>
-
-                                                    <FormMessage />
-
-                                                    {/* upload / error states already in your codebase */}
-                                                    {uploadError && (
-                                                        <p className="mt-2 text-sm text-red-600 font-medium">{uploadError}</p>
-                                                    )}
-                                                    {isUploading && (
-                                                        <p className="mt-2 text-sm text-green-600">Uploading document — please wait…</p>
-                                                    )}
-
-                                                    {/* If you have a stored URL in the form value, show a preview link */}
-                                                    {form.getValues(`awards.${index}.proof`) && (
-                                                        <a
-                                                            href={form.getValues(`awards.${index}.proof`)}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="mt-3 flex w-32 justify-center items-center text-sm text-[#008888] rounded border border-[#008888] px-2 py-1 gap-1"
-                                                        >
-                                                            View proof {" "}<ExternalLink className="size-4" />
-                                                        </a>
-                                                    )}
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        {/* Issuer email + send button column */}
-                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
-                                            <FormField
-                                                control={control}
-                                                name={`awards.${index}.issuerEmail`}
-                                                render={({ field: f }) => (
-                                                    <>
-                                                        <label
-                                                            htmlFor={`issuerEmail-${index}`}
-                                                            className="min-w-[110px] text-sm font-medium text-gray-700"
-                                                        >
-                                                            Issuer Email:
-                                                        </label>
-
-                                                        <div className="flex-1 flex gap-2 items-center">
-                                                            <Input
-                                                                id={`issuerEmail-${index}`}
-                                                                placeholder="Enter issuer's email address"
-                                                                className="w-full rounded-lg px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6334FA] focus:border-[#6334FA]"
-                                                                {...f}
-                                                            />
-                                                            <FormMessage />
-                                                        </div>
-                                                    </>
-                                                )}
-                                            />
-
-                                            <Button
-                                                type="button"
-                                                onClick={() => {
-                                                    // call your email send routine. don't call on render:
-                                                    // sendIssuerEmail(index, form.getValues(`educations.${index}.issuerEmail`))
-                                                }}
-                                                className="whitespace-nowrap"
-                                            >
-                                                Send Email To Issuer
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        ))}
-
-                        <div>
-                            <button onClick={addAward} className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"><PlusCircle size={16} /> Add Award/Certificate</button>
-                        </div>
-                        <Button type="submit" className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition">Save</Button>
-
+  return (
+    <Form {...form}>
+      <form onSubmit={handleSubmit(submitFormHandler)}>
+        <StepCard
+          index={6}
+          title="Certificates/Courses/Awards"
+          icon={Award}
+          open={step === 6}
+          onToggle={() => setStep(step === 6 ? 0 : 6)}
+        >
+          <p className="text-sm text-slate-500">
+            Add projects. Make them stand out with URL and short description.
+            Each item can be removed.
+          </p>
+          <div className="mt-4 space-y-4">
+            {fields.map((a, index) => (
+              <>
+                {isMongoId(a.id) && (
+                  <div className="flex justify-start items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="border-[#008888] h-4 w-4"
+                      // checked if this row's id exists in cvData.educations
+                      checked={
+                        includedIds.has(a.id) ||
+                        cvData.awards.some(
+                          (e: any) =>
+                            e.id ===
+                            (form.getValues(`awards.${index}.id`) || a.id)
+                        )
+                      }
+                      onChange={() => handleToggleInclude(index)}
+                      aria-label={`Include education ${index + 1} in CV`}
+                    />
+                    <p className="text-[#008888]">
+                      Select to include this data in your resume
+                    </p>
+                  </div>
+                )}
+                <div key={a.id} className="border p-4 rounded bg-white">
+                  <div className="flex justify-between flex-wrap items-center">
+                    <div className="text-sm font-medium text-[#03257e]">
+                      {a.level} Entry
                     </div>
-                </StepCard>
-            </form>
-        </Form>
-    )
-}
+                    <div className="flex gap-1">
+                      <FormField
+                        control={control}
+                        name={`awards.${index}.selfAttested`}
+                        render={() => (
+                          <FormItem>
+                            <FormControl>
+                              <SelfAttestButton
+                                isAttested={
+                                  form.watch(
+                                    `awards.${index}.selfAttested`
+                                  ) as boolean
+                                }
+                                onClick={() => handleSelfAttest(index)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {isMongoId(a.id) ? (
+                        <button
+                          type="button"
+                          onClick={() => updateHandler(index)}
+                          className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                        >
+                          <Replace size={14} /> Update
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => removeAward(index)}
+                          className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                        >
+                          <Trash2 size={14} /> Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <label className="">Select your relevant field</label>
+                      <select
+                        value={a.level}
+                        onChange={(e) =>
+                          update(index, {
+                            ...a,
+                            level: e.target.value as
+                              | "Award"
+                              | "Certificate"
+                              | "Course",
+                          })
+                        }
+                        className="border text-[#03257e] bg-gray-100 h-9 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#006666]"
+                      >
+                        <option value="Award">Award</option>
+                        <option value="Certificate">Certificate</option>
+                        <option value="Course">Course</option>
+                      </select>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name={`awards.${index}.name`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>
+                            <div className="flex items-center gap-1">
+                              <Badge className="text-[#006666] size-4" />
+                              {a.level}
+                            </div>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={`${a.level} name`}
+                              className="w-full"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={control}
+                      name={`awards.${index}.organisation`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>
+                            <div className="flex items-center gap-1">
+                              <Building2 className="text-[#006666] size-4" />
+                              Organisation
+                            </div>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Organisation"
+                              className="w-full"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={control}
+                      name={`awards.${index}.duration.from`}
+                      render={({ field: innerField }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="text-[#006666] size-4" />
+                              {a.level === "Course"
+                                ? "From (eg. 10/11/2015):"
+                                : "Date of achievement"}
+                            </div>
+                          </FormLabel>
+                          <FormControl>
+                            <Input type="date" {...innerField} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {a.level === "Course" && (
+                      <FormField
+                        control={control}
+                        name={`awards.${index}.duration.to`}
+                        render={({ field: innerField }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="text-[#006666] size-4" />
+                                To (eg. 10/11/2018)
+                              </div>
+                            </FormLabel>
+                            <FormControl>
+                              <Input type="date" {...innerField} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                    <FormField
+                      control={control}
+                      name={`awards.${index}.description`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>
+                            <div className="flex items-center gap-1">
+                              <FileText className="text-[#006666] size-4" />
+                              Description
+                            </div>
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Description"
+                              className="w-full"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center mt-1">
+                    {/* Upload / proof column */}
+                    <FormField
+                      control={control}
+                      name={`awards.${index}.docUri`}
+                      render={() => (
+                        <FormItem className="flex-1">
+                          <FormLabel>
+                            <div className="flex items-start md:items-center gap-2">
+                              <Paperclip className="h-5 w-5 text-gray-700" />
+                              <div className="text-sm text-gray-700">
+                                Upload your document and send an email to the
+                                issuer for verification.
+                              </div>
+                            </div>
+                          </FormLabel>
+
+                          <FormControl>
+                            {/* Styled drop area / button */}
+                            <div className="relative w-full bg-white">
+                              <input
+                                id={`proof-file-${index}`}
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                onChange={async (event) => {
+                                  const file = event.target.files?.[0];
+                                  if (!file) return;
+                                  setSelectedFileName(file.name);
+                                  const url = await handleProofUploaded({
+                                    file,
+                                    setIsUploading,
+                                    setUploadError,
+                                    setSelectedFileName,
+                                  });
+                                  setValue(`awards.${index}.docUri`, url, {
+                                    shouldValidate: true,
+                                    shouldDirty: true,
+                                  });
+                                }}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                aria-label={`Upload proof for experience ${
+                                  index + 1
+                                }`}
+                              />
+
+                              {/* Visible content */}
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                                <div className="flex flex-col gap-2">
+                                  <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
+                                    <Paperclip className="h-4 w-4 text-[#171515]" />
+                                    <span className="text-sm text-gray-800">
+                                      {selectedFileName ?? "Upload File"}
+                                    </span>
+                                  </div>
+                                  <p className="text-start text-[#f14419] text-sm">
+                                    Accepted: .jpg .jpeg .png .pdf — max 5MB
+                                  </p>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  {form.getValues(`awards.${index}.docUri`) && (
+                                    <span className="text-green-600">
+                                      File Uploaded
+                                    </span>
+                                  )}
+
+                                  {selectedFileName && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        // clear file input visually — if you need to clear the actual input element value, you can
+                                        // keep a ref to the input and set inputRef.current.value = ""
+                                        setSelectedFileName(null);
+                                        // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
+                                      }}
+                                      className="text-sm px-3 py-1 rounded-md border border-transparent hover:bg-gray-100"
+                                    >
+                                      Clear
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </FormControl>
+
+                          <FormMessage />
+
+                          {/* upload / error states already in your codebase */}
+                          {uploadError && (
+                            <p className="mt-2 text-sm text-red-600 font-medium">
+                              {uploadError}
+                            </p>
+                          )}
+                          {isUploading && (
+                            <p className="mt-2 text-sm text-green-600">
+                              Uploading document — please wait…
+                            </p>
+                          )}
+
+                          {/* If you have a stored URL in the form value, show a preview link */}
+                          {form.getValues(`awards.${index}.docUri`) && (
+                            <a
+                              href={form.getValues(`awards.${index}.docUri`)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-3 flex w-32 justify-center items-center text-sm text-[#008888] rounded border border-[#008888] px-2 py-1 gap-1"
+                            >
+                              View proof <ExternalLink className="size-4" />
+                            </a>
+                          )}
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Issuer email + send button column */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+                      <FormField
+                        control={control}
+                        name={`awards.${index}.issuerEmail`}
+                        render={({ field: f }) => (
+                          <>
+                            <label
+                              htmlFor={`issuerEmail-${index}`}
+                              className="min-w-[110px] text-sm font-medium text-gray-700"
+                            >
+                              Issuer Email:
+                            </label>
+
+                            <div className="flex-1 flex gap-2 items-center">
+                              <Input
+                                id={`issuerEmail-${index}`}
+                                placeholder="Enter issuer's email address"
+                                className="w-full rounded-lg px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6334FA] focus:border-[#6334FA]"
+                                {...f}
+                              />
+                              <FormMessage />
+                            </div>
+                          </>
+                        )}
+                      />
+
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          emailHandler(index);
+                        }}
+                        className="whitespace-nowrap"
+                      >
+                        Send Email To Issuer
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ))}
+
+            <div>
+              <button
+                onClick={addAward}
+                className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
+              >
+                <PlusCircle size={16} /> Add Award/Certificate
+              </button>
+            </div>
+            {loading ? (
+              <LoadingButton />
+            ) : (
+              <Button
+                type="submit"
+                className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+              >
+                Save
+              </Button>
+            )}
+          </div>
+        </StepCard>
+      </form>
+    </Form>
+  );
+};

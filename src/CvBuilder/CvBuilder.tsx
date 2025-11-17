@@ -5,13 +5,31 @@ import { ExperienceDetails } from "./ExperienceDetails";
 import { SkillDetails } from "./SkillsDetails";
 import { ProjectDetails } from "./ProjectsDetails";
 import { AwardDetails } from "./AwardDetails";
-import { ProfileSummary } from "./ProfileSummary";
 import { v4 as uuidv4 } from "uuid";
+import Resume from "./ResumeTem";
+// import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
 
 
 // --- Helpers ---
 const uid = (prefix = "id") => `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
 const docId = ()=>uuidv4();
+
+export interface ICvData{
+      personal:{
+      fullName:string,
+      email:string,
+      phone:string,
+      city:string,
+      linkedin:string,
+      github:string,
+      summary:string,
+    },
+    educations:[],
+    experiences:[],
+    skills:[],
+    projects:[],
+    awards:[],
+}
 
 // function StepCard({
 //   index,
@@ -63,7 +81,25 @@ const docId = ()=>uuidv4();
 // --- Main Component ---
 export default function CVBuilder() {
   const [step, setStep] = useState<number>(1); // which accordion is open
+  const [previewCV,setPreviewCV] = useState<boolean>(false);
+  const [cvData,setCvData] = useState<ICvData>({
+    personal:{
+      fullName:"",
+      email:"",
+      phone:"",
+      city:"",
+      linkedin:"",
+      github:"",
+      summary:"",
+    },
+    educations:[],
+    experiences:[],
+    skills:[],
+    projects:[],
+    awards:[],
+  })
 
+  console.log("cvData",cvData);
 
   return (
     <div className="min-h-screen bg-gray-50 p-0 sm:p-6">
@@ -150,23 +186,24 @@ export default function CVBuilder() {
 
           {/* Right: Vertical Step Cards */}
           <div className="col-span-7 p-2 sm:p-6 bg-slate-50 space-y-3">
-            <button className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg">Preview CV</button>
+            <button className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg" onClick={()=>setPreviewCV(true)}>Preview CV</button>
+            {previewCV&&<Resume cvData={cvData} setPreviewCV={setPreviewCV}/>}
             <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a>.</p>
             {/* Step 1 */}
             
-            <PersonalDetails step={step} setStep={setStep} uid={uid} docId={docId}/>
+            <PersonalDetails step={step} setStep={setStep} uid={uid} docId={docId} setCvData = {setCvData} cvData={cvData}/>
             {/* Step 2 */}
-            <EducationDetails step={step} setStep={setStep} uid={uid} docId={docId}/>
+            <EducationDetails step={step} setStep={setStep} uid={uid} docId={docId} setCvData = {setCvData} cvData={cvData}/>
             
-            <ExperienceDetails step={step} setStep={setStep} uid={uid} docId = {docId}/>
+            <ExperienceDetails step={step} setStep={setStep} uid={uid} docId = {docId} setCvData = {setCvData} cvData={cvData}/>
             
-            <SkillDetails step={step} setStep={setStep} uid={uid} docId = {docId}/>
+            <SkillDetails step={step} setStep={setStep} uid={uid} docId = {docId} setCvData = {setCvData} cvData={cvData}/>
             
-            <ProjectDetails step={step} setStep={setStep} uid={uid} docId = {docId}/>
+            <ProjectDetails step={step} setStep={setStep} uid={uid} docId = {docId} setCvData = {setCvData} cvData={cvData}/>
             
-            <AwardDetails step={step} setStep={setStep} uid={uid} docId = {docId}/>
+            <AwardDetails step={step} setStep={setStep} uid={uid} docId = {docId} setCvData = {setCvData} cvData={cvData}/>
            
-            <ProfileSummary step={step} setStep={setStep} uid={uid} docId = {docId}/>
+            {/* <ProfileSummary step={step} setStep={setStep} uid={uid} docId = {docId}/> */}
            
             <div className="pt-4 border-t mt-6 flex items-center justify-between">
               <div className="text-sm text-slate-500">{step ? `Open: Step ${step} of 7` : "No step open"}</div>
@@ -183,8 +220,6 @@ export default function CVBuilder() {
                 >
                   Next
                 </button>
-                <button onClick={() => { /* plug in draft save */ }} className="px-3 py-1 rounded border">Save Draft</button>
-                <button onClick={() => alert("Export or Save - wire this up to create PDF or backend API") } className="px-4 py-1 rounded bg-[#f14419] text-white">Export CV</button>
               </div>
             </div>
           </div>

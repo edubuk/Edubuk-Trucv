@@ -21,6 +21,7 @@ interface IUSER {
   selfAttested:boolean;
   updatedAt:string;
   profession:"student" | "employee";
+  profileSummary:string;
   _id?: string;                    // optional because it may be missing in some flows
   subscriptionPlan?: "free" | "basic" | "pro"; // optional union syntax fixed
   endDate?: string;

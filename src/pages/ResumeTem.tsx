@@ -66,35 +66,7 @@ const Resume: React.FC = () => {
     );
   }
 
-  // const downloadPdfHandler = async()=>{
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(`http://localhost:8000/cv/pdfmaker`,{
-  //       method:"POST",
-  //       headers:{
-  //         "Content-Type":"application/json",
-  //         "Authorization": `Bearer ${localStorage.getItem("googleIdToken")}`
-  //       },
-  //       body:JSON.stringify({url:`http://:5173/new-cv/${id}`,selector:"#cv-preview-wrapper",loginMailId:localStorage.getItem("email")})
-  //     })
-  //     if(!response.ok){
-  //       throw new Error("Failed to generate PDF");
-  //     }
-  //     const blob = await response.blob();
-  //     const url = URL.createObjectURL(blob);
-  //     const link = document.createElement("a");
-  //     link.href = url;
-  //     link.download = `${cvData.personalDetails.name}.pdf`;
-  //     link.click();
-  //     URL.revokeObjectURL(url);
-  //     toast.success("PDF downloaded successfully");
-  //   } catch (error) {
-  //     console.log(error);
-  //     toast.error("Failed to download PDF");
-  //   }finally{
-  //     setLoading(false);
-  //   }
-  // }
+
 
   const copyResumeLink = async (link: string) => {
     await navigator.clipboard

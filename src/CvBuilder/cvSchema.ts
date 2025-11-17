@@ -14,9 +14,11 @@ export const personalDetailsSchema = z.object({
   linkedin: z.union([z.string().url({ message: "Invalid url" }), z.literal("")]),
   github: z.union([z.string().url({ message: "Invalid url" }), z.literal("")]),
   imageUrl: z.string().min(1, { message: "Image is required" }),
+  profileSummary:z.string().min(1,{message:"Profile summary is required"}).optional(),
   // Require the checkbox to be checked
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
 });
+
 
 
 export type PersonalDetailsItem = z.infer<typeof personalDetailsSchema>;
@@ -43,6 +45,7 @@ export const EducationItemSchema = z.object({
   status:z.enum(["pending","verified","rejected","inProgress"]),
   verifiedThrough:z.string().optional(),
   docUri: z.string().optional(),
+  orgId:z.string().optional(),
 })
 
 
@@ -54,6 +57,7 @@ export const EducationSchema = z.object({
 });
 
 export type EducationFormValues = z.infer<typeof EducationSchema>;
+export type TypeEducation = z.infer<typeof EducationItemSchema>;
 
 export const ExperienceItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
@@ -72,7 +76,7 @@ export const ExperienceItemSchema = z.object({
   verified:z.boolean().optional(),
   status:z.enum(["pending","verified","rejected","inProgress"]),
   verifiedThrough:z.string().optional(),
-  docUri: z.string().optional(),
+  docUri: z.string().optional()
 });
 
 export const ExperienceSchema = z.object({
@@ -81,16 +85,17 @@ export const ExperienceSchema = z.object({
 })
 
 export type ExperienceFormValues = z.infer<typeof ExperienceSchema>;
-
+export type TypeExperience = z.infer<typeof ExperienceItemSchema>;
 
 export const ProjectItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
-  name: z.string().min(1, "Project name is required"),
-  url: z.string().url("Invalid project URL").optional(),
+  projectName: z.string().min(1, "Project name is required"),
+  projectUrl: z.string().url().optional().or(z.literal("")),
   duration: z.object({
     from:z.string().min(1,"start date is required"),
     to:z.string().min(1,"end date is required")
   }),
+  skills:z.string().min(1,"skill is required").refine((s)=>s.includes(","),"Separate multiple skills using commas (e.g., React, Node.js)"),
   description: z.string().optional(),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
 });
@@ -100,6 +105,7 @@ export const ProjectSchema = z.object({
 })
 
 export type ProjectFormValues = z.infer<typeof ProjectSchema>;
+export type TypeProject = z.infer<typeof ProjectItemSchema>;
 
 export const AwardItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
@@ -110,12 +116,14 @@ export const AwardItemSchema = z.object({
     from:z.string().optional(),
     to:z.string().optional()
   }),
-  isEmailSend:z.boolean().optional(),
-  issuerEmail:z.string().email().optional(),
-  proof:z.string().optional(),
   description: z.string().min(1,"description is required"),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
-
+  isEmailSend:z.boolean(),
+  issuerEmail:z.string().email().optional(),
+  docUri: z.string().optional(),
+  verified:z.boolean().optional(),
+  status:z.enum(["pending","verified","rejected","inProgress"]),
+  verifiedThrough:z.string().optional(),
 }).superRefine((data,ctx)=>{
   if(data.level==="Award" || data.level==="Certificate")
   {
@@ -139,7 +147,7 @@ export const AwardSchema = z.object({
 })
 
 export type AwardFormValues = z.infer<typeof AwardSchema>;
-
+export type TypeAward = z.infer<typeof AwardItemSchema>;
 
 export const ProfileSummarySchema = z.object({
     id: z.string().uuid().or(z.string().min(1, "ID is required")),

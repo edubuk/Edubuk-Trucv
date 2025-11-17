@@ -112,7 +112,7 @@ console.log("currentPath",currentPath);
 
 
   return (
-    <div className="flex justify-between items-center sm:px-3 w-full border-b-2 border-gray-200" data-aos="fade-right">
+    <div className="flex justify-between items-center sm:px-3 w-full border-b-2 border-gray-200 bg-white" data-aos="fade-right">
       <img src={logo} alt="Logo" className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 " />
       <div className="flex gap-3 justify-between items-center">
           {links?.map((link, i) =>

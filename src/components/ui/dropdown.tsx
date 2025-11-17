@@ -10,6 +10,7 @@ export type DropDownProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
   options?: Option[]; // initial options
   searchable?: boolean;
   classOrgId?:string;
+  index:number;
   onSearch?: (q: string) => void | Promise<void>;
   fetcher?: (q: string) => Promise<Option[]>;
 };
@@ -38,6 +39,7 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
       value: propValue,
       defaultValue,
       classOrgId,
+      index,
       onChange,
       ...props
     },
@@ -61,7 +63,9 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
 
     // keep internal state in sync with controlled prop (propValue now expected to be label)
     React.useEffect(() => {
-      if (isControlled) setSelectedValue(String(propValue));
+      if (isControlled) 
+        {setSelectedValue(String(propValue))
+        };
     }, [propValue, isControlled]);
 
     // Filtered list used for dropdown display
@@ -111,7 +115,7 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
         const resOptions = await fetcher(query);
         setOptions(resOptions);
         setHighlighted(0);
-      }, 500);
+      }, 300);
 
       return () => {
         if (debounceRef.current) window.clearTimeout(debounceRef.current);
@@ -121,11 +125,10 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
 
     // When a user selects an option from list — set label as selectedValue
     function handleSelectOption(opt: Option) {
+      console.log("option",opt)
       if (!isControlled) 
         {
           setSelectedValue(opt.name);
-          setValue(`${classOrgId}`, opt.orgId);
-
         }
 
       // ensure options include the selected item (so label lookup works later)
@@ -144,6 +147,12 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
       onChange?.(syntheticEvent);
 
       inputRef.current?.focus();
+
+      setValue(`educations.${index}.orgId`, opt.orgId, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
     }
 
     function onKeyDown(e: React.KeyboardEvent) {

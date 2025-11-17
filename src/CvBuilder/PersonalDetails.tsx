@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StepCard } from "./StepCard";
-import { Briefcase, Github, Image, Linkedin, Mail, MapPin, Phone, User } from "lucide-react";
+import { Briefcase, Github, Image, Info, Linkedin, Mail, MapPin, Phone, User } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -20,16 +20,22 @@ import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
 import { useUserData } from "@/context/AuthContext";
+import { Textarea } from "@/components/ui/textarea";
+import { ICvData } from "./CvBuilder";
+
 
 export interface IStepCard {
     step: number;
     setStep: React.Dispatch<React.SetStateAction<number>>;
     uid: (prefix?: string) => string;
     docId:()=>string;
+    setCvData: React.Dispatch<React.SetStateAction<any>>;
+    cvData:ICvData
 }
 
-export const PersonalDetails = ({ step, setStep }: IStepCard) => {
+export const PersonalDetails = ({ step, setStep,setCvData }: IStepCard) => {
     const {user} = useUserData();
+    const [refresh,setRefresh] = useState<boolean>(false);
     const [profession, setProfession] = useState<"student" | "employee">(user?.profession??"student");
     const [imagePreview, setImagePreview] = useState<string>("");
     const [imageError, setImageError] = useState<string>("");
@@ -47,6 +53,7 @@ export const PersonalDetails = ({ step, setStep }: IStepCard) => {
             github: "",
             linkedin: "",
             imageUrl: "",
+            profileSummary:"",
             selfAttested:false
         },
     });
@@ -67,10 +74,26 @@ useEffect(() => {
       github:user.githubUrl??"",
       linkedin: user.linkedInUrl??"",
       imageUrl:user.userImageUrl??"",
+      profileSummary:user.profileSummary??"",
       selfAttested: user.selfAttested??false,
     });
+    setCvData((prev:any)=>{
+      return {
+        ...prev,
+        personal:{
+          fullName: user.name ?? "",
+          email: user.email ?? "",
+          phone: user.phoneNumber ?? "",
+          city: user.address ?? "",
+          linkedin: user.linkedInUrl ?? "",
+          github: user.githubUrl ?? "",
+          summary: user.profileSummary ?? "",
+        },
+      }
+    })
+
   }
-}, [user, form]);
+}, [user, form,refresh]);
 
     // WATCH the selfAttested value so UI can reflect it
     const selfAttested = form.watch("selfAttested");
@@ -138,7 +161,7 @@ useEffect(() => {
             const updateUser = await fetch(`${API_BASE_URL}/user/update-userInfo`,{
                 method:"PUT",
                 credentials:"include",
-                body:JSON.stringify({name:data.fullName,phoneNumber:data.phoneNumber,address:data.location,userImageUrl:data.imageUrl,linkedInUrl:data.linkedin,githubUrl:data.github,selfAttested:data.selfAttested,yearOfExp:data.yearOfExp,profession:profession}),
+                body:JSON.stringify({name:data.fullName,phoneNumber:data.phoneNumber,address:data.location,userImageUrl:data.imageUrl,linkedInUrl:data.linkedin,githubUrl:data.github,selfAttested:data.selfAttested,yearOfExp:data.yearOfExp,profession:profession,profileSummary:data.profileSummary}),
                 headers:{
                     "Content-Type":"application/json"
                 }
@@ -148,6 +171,7 @@ useEffect(() => {
             if(res.success)
             {
                 toast.success(res.message);
+                setRefresh((prev)=>!prev);
             } 
         }
         catch(error:any){
@@ -332,6 +356,24 @@ useEffect(() => {
                                     </FormLabel>
                                     <FormControl>
                                         <Input type="text" placeholder="Year of Experience" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="profileSummary"
+                            render={({ field }) => (
+                                <FormItem className="flex-1">
+                                    <FormLabel>
+                                        <div className="flex items-center gap-1">
+                                            <Info className="text-[#171515] size-4" />
+                                            Profile Summary
+                                        </div>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="Profile Summary" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

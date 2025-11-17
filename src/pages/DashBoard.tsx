@@ -4,29 +4,14 @@ import { useState } from "react"
 import CvById from "./CvById";
 //import { connectWallet } from "@/api/contract.api";
 import toast from "react-hot-toast";
-import { useCvFromContext } from "@/context/CvForm.context";
 import { API_BASE_URL } from "@/main";
 //import { contractNFTAddress,abiNFT } from "@/contract/nft.contractData";
 //import NFTGallery from "./NFTData";
 import UserDocs from "./UserDocs";
-import { ExperienceFormValues } from "@/CvBuilder/cvSchema";
 
-interface IUserDoc{
-  _id:string;
-  docType:string;
-  title:string;
-  organisation:string;
-  docUrl:string;
-  meta:object;
-  status:"verified" | "pending" | "rejected";
-  createdAt:string;
-  verified:boolean;
-  verifiedThrough:"digilocker" | "email" | "third_party" | null;
-}
 
 const DashBoard = () => {
     //const [isActiveButton , setActiveButton] = useState<boolean>(true);
-    const {account,setAccount} = useCvFromContext();
     const [cvData, setCvData] = useState([]);
     const [educationDocs,setEducationDocs] = useState({
       educations:[]
@@ -38,7 +23,6 @@ const DashBoard = () => {
     //   experiences:[]
     // });
     //const [isNFT, setNFT] = useState<boolean>(false);
-    const [userDocs,setUserDocs] = useState<IUserDoc[]>([]);
 
     // new: which component is selected to render
     const [selected, setSelected] = useState<"cv" | "nft" | "docs">("cv");
@@ -147,9 +131,6 @@ const DashBoard = () => {
           Get Your CV
         </Button>
         </div>
-        {!account?
-        <Button type="button" >Connect Wallet</Button>:
-        <>
         <div className="relative rounded-lg p-[1px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
         <Button
           className={`text-center border border-slate-300 text-[#006666] hover:bg-slate-100 bg-white ${selected === "nft" ? "text-[#03257e] font-semibold" : "text-[#006666] border"}`}
@@ -158,8 +139,6 @@ const DashBoard = () => {
           Fetch your NFTs
         </Button>
         </div>
-        </>
-}
         </div>
 
         <div className="flex justify-center items-center gap-2 my-4 w-full">

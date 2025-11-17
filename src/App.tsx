@@ -62,7 +62,7 @@ useEffect(() => {
               <Route path="/pprivacy-policy" element={<AppPrivacyPolicy />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/login" element={<GoogleLoginModal />} />
-              <Route path="cv-builder" element={<CVBuilder />}> </Route>
+              <Route path="cv-builder" element={<Layout><CVBuilder /></Layout>}> </Route>
               <Route path="/password-reset" element={<PasswordResetUI />} />
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />
               <Route path="/admin" element={<Layout><AdminUsersPage/></Layout>} />

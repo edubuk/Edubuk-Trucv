@@ -2,7 +2,6 @@ import React, { useMemo} from "react";
 import { CheckCircle, Clock, ExternalLink, ShieldCheck, FileText, BadgeCheck,UserCircle} from "lucide-react";
 
 import { useUserData } from "@/context/AuthContext";
-import { EducationFormValues, ExperienceFormValues } from "@/CvBuilder/cvSchema";
 
 // Colors
 const COLOR_PRIMARY = "#03257e"; // deep blue

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CheckCircle, Clock, ShieldCheck, X, FileText, BadgeCheck, Loader2, Copy, Hash, ChevronDown, RefreshCwIcon, Crown, Edit, ExternalLink, User, Cross, XCircle } from "lucide-react";
+import { CheckCircle, Clock, ShieldCheck, X, FileText, BadgeCheck, Loader2, Copy, Hash, ChevronDown, RefreshCwIcon, Crown, Edit, ExternalLink, User, XCircle, Verified } from "lucide-react";
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
@@ -549,7 +549,7 @@ export default function AdminUserProfilesPage() {
             <div className="fixed inset-0 z-50">
               <div className="absolute inset-0 bg-black/30" onClick={() => { setActiveCert(null); setActiveUser(null); setMintResult(null); }} />
               <div className="absolute inset-0 flex items-end sm:items-center justify-center p-2 sm:p-4">
-                <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                   {/* Modal Header */}
                   <div className="flex items-center justify-between px-4 sm:px-6 py-3" style={{ backgroundColor: COLOR_PRIMARY, color: "white" }}>
                     <div className="flex items-center gap-2">
@@ -566,10 +566,14 @@ export default function AdminUserProfilesPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between"><span className="text-gray-500">Issued By</span><span className="font-medium">{activeCert?.companyName??activeCert?.institutionName}</span></div>
+                        <div className="flex items-center justify-between"><span className="text-gray-500">Issued To</span><span className="font-medium">{activeUser?.name}</span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Issued On</span><span className="font-medium">{formatDate(activeCert?.createdAt)}</span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Last Updated</span><span className="font-medium">{formatDate(activeCert?.updatedAt)}</span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Status</span><span><StatusBadge status={activeCert?.status || "pending"} /></span></div>
-                        <div className="flex items-center justify-between"><span className="text-gray-500">Method</span><span><MethodChip method={activeCert?.verifiedThrough ||null} /></span></div>
+                        <div className="flex items-center justify-between"><span className="text-gray-500">Verification Method</span><span><MethodChip method={activeCert?.verifiedThrough ||null} /></span></div>
+                        {!activeCert?.isEmailSend && activeCert.status!=="verified" && <div className="flex items-start justify-start gap-1"><span className="text-[#f14419]">Remark: </span><span>Email has been sent to issuer email id  <span className="font-medium text-[#008888]">{activeCert?.issuerEmailId}</span>. Once issuer accept or reject the status will update automatically here</span></div>}  
+                        {activeCert.status==="verified" && <div className="flex items-center justify-center text-green-600 text-lg font-semibold"><Verified className="h-6 w-6" />Verified</div>}  
+
                       </div>
                       <div className="bg-gray-50 rounded-xl p-3">
                         <div className="text-xs text-gray-500">Certificate link</div>

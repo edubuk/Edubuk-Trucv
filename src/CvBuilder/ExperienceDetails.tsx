@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState ,useMemo} from "react";
 import { StepCard } from "./StepCard"
 import { Briefcase, BriefcaseBusiness, Building, Calendar, ExternalLink, FileText, Paperclip, PlusCircle, Replace, Trash2 } from "lucide-react"
 import { ExperienceSchema, ExperienceFormValues } from "./cvSchema";
@@ -22,9 +22,12 @@ import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
+import { useUserData } from "@/context/AuthContext";
 
-export const ExperienceDetails = ({ step, setStep, uid,docId}: IStepCard) => {
+export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: IStepCard) => {
     const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [refresh,setRefresh] = useState<boolean>(false);
+    const {user} = useUserData();
     const form = useForm<ExperienceFormValues>({
         resolver: zodResolver(ExperienceSchema),
         defaultValues: {
@@ -112,6 +115,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId}: IStepCard) => {
                 }
                 toast.success(res.message);
                 setLoading(false);
+                setRefresh((prev)=>!prev)
             } catch (error: any) {
                 toast.error(error.message ?? error ?? "Something went wrong");
             } finally {
@@ -155,7 +159,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId}: IStepCard) => {
     
         useEffect(() => {
             fetchExpDocs();
-        }, [step === 3])
+        }, [step === 3,refresh])
 
     const updateHandler = async(index:number)=>{
             try {
@@ -175,10 +179,87 @@ export const ExperienceDetails = ({ step, setStep, uid,docId}: IStepCard) => {
                     return;
                 }
                 toast.success(res.message);
+                setRefresh((prev)=>!prev)
             } catch (error) {
                 toast.error("something went wrong");
             }
         }
+
+    const emailHandler = async (index: number) => {
+            try {
+                const emailId = getValues(`experiences.${index}.issuerEmail`);
+                const applicantName = user?.name;
+                const documentName = getValues(`experiences.${index}.jobRole`);
+                const documentType = getValues(`experiences.${index}.companyName`);
+                const documentViewUrl = getValues(`experiences.${index}.docUri`);
+                const skills = getValues(`experiences.${index}.skills`);
+    
+                if (!emailId || !documentViewUrl || !documentName || !documentType || !skills)
+                    return toast.error("Please fill first above all the input fields");
+                setLoading(true);
+                const result = await fetch(`${API_BASE_URL}/doc/email-issuer?skills=${skills}`, {
+                    method: "POST",
+                    credentials: "include",
+                    body: JSON.stringify({
+                        emailId: emailId,
+                        documentViewUrl: documentViewUrl,
+                        documentName: documentName,
+                        documentType: documentType,
+                        applicantName: applicantName
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                const data = await result.json();
+                if (!data.success) {
+                    toast.error(data.message);
+                    setLoading(false);
+                }
+    
+                if (data.status === "Succeeded") {
+                    toast.success(`${data.message} to entered email id`)
+                    setLoading(false);
+    
+                }
+            } catch (error: any) {
+                toast.error(error.message ?? error ?? "something went wrong")
+            } finally {
+                setLoading(false);
+            }
+        }
+
+
+          const includedIds = useMemo(
+            () => new Set(cvData.educations.map((e: any) => e.id)),
+            [cvData]
+          );
+        
+          function buildEducationPayload(index: number) {
+            // grab the whole education row from RHF form values
+            const row = getValues(`experiences.${index}`) || {};
+            // ensure a stable id — prefer existing ID from the form if present
+            const id = row.id || uid("edu");
+            return { ...row, id };
+          }
+        
+          function handleToggleInclude(index: number) {
+            const payload = buildEducationPayload(index);
+        
+            setCvData((prev: any) => {
+              const exists = prev.experiences.some((e: any) => e.id === payload.id);
+              if (exists) {
+                // remove
+                return {
+                  ...prev,
+                  experiences: prev.experiences.filter((e: any) => e.id !== payload.id),
+                };
+              } else {
+                // add (append)
+                return { ...prev, experiences: [...prev.experiences, payload] };
+              }
+            });
+          }
 
 
     return (
@@ -189,7 +270,27 @@ export const ExperienceDetails = ({ step, setStep, uid,docId}: IStepCard) => {
                     <div className="mt-4 space-y-4">
                         {fields.map((field, index) => (
                             <>
-                                <div className="flex justify-start items-center gap-2"><input type="checkbox" className="border-[#008888]" /><p className="text-[#008888]">Select to include this data in your resume</p></div>
+                            {isMongoId(field.id) && <div className="flex justify-start items-center gap-2">
+                      <input
+                        type="checkbox"
+                        className="border-[#008888] h-4 w-4"
+                        // checked if this row's id exists in cvData.educations
+                        checked={
+                          includedIds.has(field.id) ||
+                          cvData.experiences.some(
+                            (e: any) =>
+                              e.id ===
+                              (form.getValues(`experiences.${index}.id`) ||
+                                field.id)
+                          )
+                        }
+                        onChange={() => handleToggleInclude(index)}
+                        aria-label={`Include education ${index + 1} in CV`}
+                      />
+                      <p className="text-[#008888]">
+                        Select to include this data in your resume
+                      </p>
+                    </div>}
                                 <div key={field.rhfKey} className="border p-4 rounded bg-white">
                                     <div className="flex justify-between">
                                         <div className="font-medium">{"Company"}</div>
@@ -477,16 +578,13 @@ export const ExperienceDetails = ({ step, setStep, uid,docId}: IStepCard) => {
                                                 )}
                                             />
 
-                                            <Button
+                                            {loading?<LoadingButton />:<Button
                                                 type="button"
-                                                onClick={() => {
-                                                    // call your email send routine. don't call on render:
-                                                    // sendIssuerEmail(index, form.getValues(`educations.${index}.issuerEmail`))
-                                                }}
+                                                onClick={() => emailHandler(index)}
                                                 className="whitespace-nowrap"
                                             >
                                                 Send Email To Issuer
-                                            </Button>
+                                            </Button>}
                                         </div>
                                     </div>
                                 </div>
