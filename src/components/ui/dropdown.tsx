@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
+import { API_BASE_URL } from "@/main";
 // import { useFormContext } from "react-hook-form";
 
 type Option = { orgId: string; name: string };
@@ -17,7 +18,7 @@ export type DropDownProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
 
 const defaultFetcher = async (q: string): Promise<Option[]> => {
   try {
-    const res = await fetch(`http://localhost:8000/api/dl/getIssuer?q=${encodeURIComponent(q)}`);
+    const res = await fetch(`${API_BASE_URL}/api/dl/getIssuer?q=${encodeURIComponent(q)}`);
     const data = await res.json();
     console.log("data", data);
     return data.items ?? [];

@@ -578,7 +578,7 @@ export default function AdminUserProfilesPage() {
                       <div className="bg-gray-50 rounded-xl p-3">
                         <div className="text-xs text-gray-500">Certificate link</div>
                         <div className="mt-1 flex items-center justify-between gap-2">
-                          <a href={`http://localhost:8000/api/dl/view-doc?uri=${activeCert?.docUri}`} target="_blank" rel="noreferrer" className="truncate text-sm font-medium hover:underline" style={{ color: COLOR_PRIMARY }}>
+                          <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${activeCert?.docUri}`} target="_blank" rel="noreferrer" className="truncate text-sm font-medium hover:underline" style={{ color: COLOR_PRIMARY }}>
                             {activeCert?.docUri}
                           </a>
                           <button className="p-2 rounded-lg hover:bg-white" title="Copy link" onClick={() => navigator.clipboard?.writeText(activeCert?.docUri || "")}><Copy className="h-4 w-4 text-gray-500" /></button>

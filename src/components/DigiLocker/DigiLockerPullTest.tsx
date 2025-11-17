@@ -1,4 +1,5 @@
 // DigiLockerTest.tsx
+import { API_BASE_URL } from "@/main";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
@@ -22,11 +23,7 @@ type Profile = {
   eaadhaar?: "Y" | "N";
 };
 
-const BACKEND = "http://localhost:8000";
-const DIGILOCKER_CLIENT_ID = "WI7E8AA6B6"; // sandbox client id
-const DIGILOCKER_REDIRECT_URI = "http://localhost:8000/api/dl/callback";
-const DIGILOCKER_AUTH_URL =
-  "https://digilocker.meripehchaan.gov.in/public/oauth2/1/authorize";
+
 
 // const checkClasses = "bg-emerald-50 text-emerald-600"
 
@@ -351,6 +348,10 @@ export default function DigiLockerTest({
   openDigiLocker: boolean;
   index: number;
 }) {
+
+const DIGILOCKER_CLIENT_ID = "WI7E8AA6B6"; // sandbox client id
+const DIGILOCKER_REDIRECT_URI = `${API_BASE_URL}/api/dl/callback`;
+const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2/1/authorize";
   const [profile, setProfile] = useState<Profile | null>(null);
   const [docs, setDocs] = useState<IssuedItem[]>([]);
   const form = useFormContext();
@@ -388,7 +389,7 @@ export default function DigiLockerTest({
 
   const fetchProfile = async () => {
     try {
-      const r = await fetch(`${BACKEND}/api/dl/me`, {
+      const r = await fetch(`${API_BASE_URL}/api/dl/me`, {
         credentials: "include",
       });
       if (r.ok) {
@@ -405,7 +406,7 @@ export default function DigiLockerTest({
     //setStatus("Loading issued documents…");
     try {
       const r: any = await fetch(
-        `${BACKEND}/api/dl/XCert?typeClass=${field}?orgId=${orgId}`,
+        `${API_BASE_URL}/api/dl/XCert?typeClass=${field}?orgId=${orgId}`,
         {
           credentials: "include",
         }
@@ -472,7 +473,7 @@ export default function DigiLockerTest({
     );
 
     // 2. Save verifier to backend session
-    await fetch(`${BACKEND}/api/dl/save-verifier`, {
+    await fetch(`${API_BASE_URL}/api/dl/save-verifier`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ verifier }),
@@ -505,14 +506,14 @@ export default function DigiLockerTest({
 
   const downloadPdf = (uri: string) => {
     window.open(
-      `${BACKEND}/api/dl/file?uri=${encodeURIComponent(uri)}`,
+      `${API_BASE_URL}/api/dl/file?uri=${encodeURIComponent(uri)}`,
       "_blank"
     );
   };
 
   const viewXml = (uri: string) => {
     window.open(
-      `${BACKEND}/api/dl/xml?uri=${encodeURIComponent(uri)}`,
+      `${API_BASE_URL}/api/dl/xml?uri=${encodeURIComponent(uri)}`,
       "_blank"
     );
   };
@@ -608,7 +609,7 @@ export default function DigiLockerTest({
           <p className="m-4 font-semibold">
             Document found:{" "}
             <a
-              href={`http://localhost:8000/api/dl/view-doc?uri=${uri}`}
+              href={`${API_BASE_URL}/api/dl/view-doc?uri=${uri}`}
               target="_blank"
               className="mt-2 underline text-[#006666]"
             >

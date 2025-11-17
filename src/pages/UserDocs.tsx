@@ -2,6 +2,7 @@ import React, { useMemo} from "react";
 import { CheckCircle, Clock, ExternalLink, ShieldCheck, FileText, BadgeCheck,UserCircle} from "lucide-react";
 
 import { useUserData } from "@/context/AuthContext";
+import { API_BASE_URL } from "@/main";
 
 // Colors
 const COLOR_PRIMARY = "#03257e"; // deep blue
@@ -162,7 +163,7 @@ export default function UserDocs({educationDocs,experienceDocs}: {educationDocs:
                         <MethodChip method={cert?.verifiedThrough||"email"}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
-                      <a href={`http://localhost:8000/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                      <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
                         View details <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                       </a>
                     </button>
@@ -184,7 +185,7 @@ export default function UserDocs({educationDocs,experienceDocs}: {educationDocs:
                         <MethodChip method={cert?.verifiedThrough||"email"}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
-                      <a href={`http://localhost:8000/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                      <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
                         View details <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                       </a>
                     </button>
