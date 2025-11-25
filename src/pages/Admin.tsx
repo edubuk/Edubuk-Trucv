@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CheckCircle, Clock, ShieldCheck, X, FileText, BadgeCheck, Loader2, Copy, Hash, ChevronDown, RefreshCwIcon, Crown, Edit, ExternalLink, User, XCircle, Verified } from "lucide-react";
+import { CheckCircle, Clock, ShieldCheck, X, FileText, BadgeCheck, Loader2, Copy, Hash, ChevronDown, RefreshCwIcon, Crown, Edit, ExternalLink, User, XCircle,CircleCheckBig, FolderCheck } from "lucide-react";
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
@@ -13,7 +13,7 @@ const COLOR_ACCENT = "#f14419"; // orange-red
 
 // Types
 export type VerificationStatus = "verified" | "pending";
-export type VerificationMethod = "DigiLocker" | "email" | "third_party" | null;
+export type VerificationMethod = "DigiLocker" | "Email" | "Third Party" | null;
 
 type Certificate = {
   _id: string;
@@ -96,7 +96,7 @@ const StatusBadge: React.FC<{ status: VerificationStatus }> = ({ status }) => {
 };
 
 const MethodChip: React.FC<{ method: VerificationMethod }> = ({ method }) => {
-  const label = method === "DigiLocker" ? "DigiLocker" : method === "email" ? "Email" : method === "third_party" ? "Third Party" : "Not set";
+  const label = method === "DigiLocker" ? "DigiLocker" : method === "Email" ? "Email" : method === "Third Party" ? "Third Party" : "Not set";
   const color = method ? COLOR_PRIMARY : "#666";
   return (
     <span
@@ -270,6 +270,7 @@ export default function AdminUserProfilesPage() {
         },
       });
       const data = await response.json();
+      console.log("docs data",data.data);
       if (!data.success) {
         return toast.error("No CV found");
       }
@@ -549,12 +550,12 @@ export default function AdminUserProfilesPage() {
             <div className="fixed inset-0 z-50">
               <div className="absolute inset-0 bg-black/30" onClick={() => { setActiveCert(null); setActiveUser(null); setMintResult(null); }} />
               <div className="absolute inset-0 flex items-end sm:items-center justify-center p-2 sm:p-4">
-                <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-y">
                   {/* Modal Header */}
                   <div className="flex items-center justify-between px-4 sm:px-6 py-3" style={{ backgroundColor: COLOR_PRIMARY, color: "white" }}>
                     <div className="flex items-center gap-2">
                       <FileText className="h-5 w-5" />
-                      <div className="font-semibold">{activeCert?.level??activeCert?.jobRole} • {activeUser?.name}</div>
+                      <div className="font-semibold flex items-center gap-2">{activeCert?.level??activeCert?.jobRole} • {activeUser?.name} {activeCert?.status === "verified" && <CircleCheckBig size={20} className="text-green-600 font-semibold" />}</div>
                     </div>
                     <button className="p-1 rounded-lg hover:bg-white/10" onClick={() => { setActiveCert(null); setActiveUser(null); setMintResult(null); }} aria-label="Close">
                       <X className="h-5 w-5" />
@@ -568,11 +569,12 @@ export default function AdminUserProfilesPage() {
                         <div className="flex items-center justify-between"><span className="text-gray-500">Issued By</span><span className="font-medium">{activeCert?.companyName??activeCert?.institutionName}</span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Issued To</span><span className="font-medium">{activeUser?.name}</span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Issued On</span><span className="font-medium">{formatDate(activeCert?.createdAt)}</span></div>
+                        {(activeCert?.issuerEmailId &&activeCert.status==="verified") && <div className="flex items-center justify-between"><span className="text-gray-500">Approved By</span><span className="font-medium">{activeCert?.issuerEmailId}</span></div>}
                         <div className="flex items-center justify-between"><span className="text-gray-500">Last Updated</span><span className="font-medium">{formatDate(activeCert?.updatedAt)}</span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Status</span><span><StatusBadge status={activeCert?.status || "pending"} /></span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Verification Method</span><span><MethodChip method={activeCert?.verifiedThrough ||null} /></span></div>
-                        {!activeCert?.isEmailSend && activeCert.status!=="verified" && <div className="flex items-start justify-start gap-1"><span className="text-[#f14419]">Remark: </span><span>Email has been sent to issuer email id  <span className="font-medium text-[#008888]">{activeCert?.issuerEmailId}</span>. Once issuer accept or reject the status will update automatically here</span></div>}  
-                        {activeCert.status==="verified" && <div className="flex items-center justify-center text-green-600 text-lg font-semibold"><Verified className="h-6 w-6" />Verified</div>}  
+                        {(activeCert?.isEmailSend && activeCert.status!=="verified") && <div className="flex items-start justify-start gap-1"><span className="text-[#f14419]">Remark: </span><span>Email has been sent to issuer email id  <span className="font-medium text-[#008888]">{activeCert?.issuerEmailId}</span>. Once issuer approve or reject, the updated status will reflect here</span></div>}  
+                        {activeCert.status==="verified" && <div className="flex items-center justify-center text-green-600 text-lg font-semibold gap-1"><FolderCheck className="h-6 w-6" /> Verified</div>}  
 
                       </div>
                       <div className="bg-gray-50 rounded-xl p-3">
@@ -583,7 +585,7 @@ export default function AdminUserProfilesPage() {
                           </a>
                           <button className="p-2 rounded-lg hover:bg-white" title="Copy link" onClick={() => navigator.clipboard?.writeText(activeCert?.docUri || "")}><Copy className="h-4 w-4 text-gray-500" /></button>
                         </div>
-                        <div className="mt-3 text-xs text-gray-500">Metadata (sample)</div>
+                        <div className="mt-3 text-xs text-gray-500">Metadata</div>
                         <pre className="mt-1 text-[11px] leading-relaxed bg-white border border-gray-200 rounded-lg p-2 overflow-auto max-h-40">
                           {JSON.stringify({
                             holder: activeUser.name,
@@ -604,7 +606,7 @@ export default function AdminUserProfilesPage() {
 
                     {/* Actions (restored) */}
                     <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {/* <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <button
                           className="px-3 py-2 rounded-xl text-white text-sm font-medium shadow"
                           style={{ backgroundColor: COLOR_TEAL }}
@@ -626,7 +628,7 @@ export default function AdminUserProfilesPage() {
                         >
                           Verify via Third Party
                         </button>
-                      </div>
+                      </div> */}
 
                       <div className="flex items-center gap-2 sm:ml-auto">
                         <button
@@ -672,26 +674,26 @@ export default function AdminUserProfilesPage() {
 
                         <pre className="bg-white p-2 rounded border overflow-auto">
                           {`// Example (pseudo):
-import algosdk from 'algosdk';
-const client = new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', '');
-const acct = algosdk.mnemonicToSecretKey(process.env.NEXT_PUBLIC_ALGO_MNEMONIC!);
-const params = await client.getTransactionParams().do();
-const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
-  from: acct.addr,
-  total: 1,
-  decimals: 0,
-  assetName: '${'${activeUser?.fullName ?? ""} – ${activeCert?.name ?? ""}'}',
-  unitName: 'CERT',
-  defaultFrozen: false,
-  assetURL: 'https://your-domain.com/metadata/123.json',
-  metadataHash: new Uint8Array([/* sha256 of JSON */]),
-  suggestedParams: params,
-});
-const signed = txn.signTxn(acct.sk);
-const { txId } = await client.sendRawTransaction(signed).do();
-const result = await algosdk.waitForConfirmation(client, txId, 4);
-const assetId = result['asset-index'];
-`}
+                            import algosdk from 'algosdk';
+                            const client = new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', '');
+                            const acct = algosdk.mnemonicToSecretKey(process.env.NEXT_PUBLIC_ALGO_MNEMONIC!);
+                            const params = await client.getTransactionParams().do();
+                            const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
+                              from: acct.addr,
+                              total: 1,
+                              decimals: 0,
+                              assetName: '${'${activeUser?.fullName ?? ""} – ${activeCert?.name ?? ""}'}',
+                              unitName: 'CERT',
+                              defaultFrozen: false,
+                              assetURL: 'https://your-domain.com/metadata/123.json',
+                              metadataHash: new Uint8Array([/* sha256 of JSON */]),
+                              suggestedParams: params,
+                            });
+                            const signed = txn.signTxn(acct.sk);
+                            const { txId } = await client.sendRawTransaction(signed).do();
+                            const result = await algosdk.waitForConfirmation(client, txId, 4);
+                            const assetId = result['asset-index'];
+                            `}
                         </pre>
                       </div>
                     </details>

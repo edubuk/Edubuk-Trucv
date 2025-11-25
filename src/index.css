@@ -22,3 +22,19 @@
 .aos-init[data-aos][data-aos].aos-animate {
   transform: unset;
 }
+
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  * {
+    page-break-inside: avoid;
+  }
+
+  .print-area {
+    page-break-inside: auto;
+  }
+}
+

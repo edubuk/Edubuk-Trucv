@@ -267,15 +267,15 @@ function DigiLockerPullCard({
                   />
                   <span className="text-slate-600">
                     I provide my consent to share my basic information and
-                    educational documents with the{" "}
+                    educational documents with the Edubuk{" "}
                     <span className="font-semibold text-slate-800">
                       {issuerName}
                     </span>{" "}
-                    for the purpose of fetching{" "}
+                    for the purpose of Educational Documents Verification{" "}
                     <span className="font-semibold text-slate-800">
                       {description}
                     </span>{" "}
-                    into DigiLocker.
+                    through DigiLocker to create a verified CV.
                   </span>
                 </label>
 

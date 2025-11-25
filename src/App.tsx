@@ -16,6 +16,7 @@ const ContactUs = lazy(() => import("./pages/ContactUs"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const Digilocker = lazy(()=>import("./pages/Digilocker"));
+const SkillVerify = lazy(()=>import("./components/SkillVerification/VerifySkill"))
 import AOS from "aos";
 import "aos/dist/aos.css";
 import AppPrivacyPolicy from "./pages/AppPrivacy";
@@ -62,6 +63,7 @@ useEffect(() => {
               <Route path="/pprivacy-policy" element={<AppPrivacyPolicy />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/login" element={<GoogleLoginModal />} />
+              <Route path="/verify-skill/:token" element={<SkillVerify />} />
               <Route path="cv-builder" element={<Layout><CVBuilder /></Layout>}> </Route>
               <Route path="/password-reset" element={<PasswordResetUI />} />
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />

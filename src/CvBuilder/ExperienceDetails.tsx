@@ -22,12 +22,12 @@ import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
-import { useUserData } from "@/context/AuthContext";
+//import { useUserData } from "@/context/AuthContext";
 
 export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: IStepCard) => {
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [refresh,setRefresh] = useState<boolean>(false);
-    const {user} = useUserData();
+    // const {user} = useUserData();
     const form = useForm<ExperienceFormValues>({
         resolver: zodResolver(ExperienceSchema),
         defaultValues: {
@@ -51,11 +51,12 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
 
         },
     });
-    const { control, setValue, handleSubmit,getValues} = form;
+    const { control, setValue,getValues} = form;
     const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [isCurrentlyWorking, setIsCurrentlyWorking] = useState<boolean>(false);
     const [loading,setLoading] = useState<boolean>(false);
+    const [idx,setIdx]= useState<number>();
 
     const { fields, append, remove } = useFieldArray({
         control,
@@ -94,34 +95,38 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
         setValue(`experiences.${index}.selfAttested`, true, { shouldValidate: true, shouldDirty: true });
     };
 
-   const submitFormHandler = async (data: ExperienceFormValues) => {
-            console.log("form submit", data.experiences);
-            try {
-                setLoading(true);
-                const payload = { data: data.experiences };
-                const result = await fetch(`${API_BASE_URL}/doc/save-expDoc`, {
-                    method: "POST",
-                    credentials: "include",
-                    body: JSON.stringify(payload),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                const res = await result.json();
-                if (!res.success) {
-                    toast.error(res.message);
-                    setLoading(false);
-                    return;
-                }
-                toast.success(res.message);
-                setLoading(false);
-                setRefresh((prev)=>!prev)
-            } catch (error: any) {
-                toast.error(error.message ?? error ?? "Something went wrong");
-            } finally {
-                setLoading(false);
-            }
-        };
+   const submitFormHandler = async (index:number) => {
+    const isValid = await form.trigger(`experiences.${index}`);
+    if (!isValid) return;
+    //console.log("error", errors);
+    console.log("form submit", getValues(`experiences.${index}`));
+    const payload = getValues(`experiences.${index}`);
+    try {
+        setIdx(index);
+      setLoading(true);
+      const result = await fetch(`${API_BASE_URL}/doc/save-expDoc`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({data:payload}),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res = await result.json();
+      if (!res.success) {
+        toast.error(res.message);
+        setLoading(false);
+        return;
+      }
+      toast.success(res.message);
+      setLoading(false);
+      setRefresh((prev) => !prev);
+    } catch (error: any) {
+      toast.error(error.message ?? error ?? "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
     const fetchExpDocs = async () => {
             try {
@@ -145,6 +150,8 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                             description: doc.description ?? "",
                             selfAttested: doc.selfAttested ?? false,
                             isEmailSend: doc.isEmailSend ?? false,
+                            docUri:doc.docUri??"",
+                            issuerEmailId:doc.issuerEmailId??"",
                             verified: doc.verified ?? false,
                             status: doc.status ?? "pending",
                         }));
@@ -185,49 +192,71 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
             }
         }
 
-    const emailHandler = async (index: number) => {
-            try {
-                const emailId = getValues(`experiences.${index}.issuerEmail`);
-                const applicantName = user?.name;
-                const documentName = getValues(`experiences.${index}.jobRole`);
-                const documentType = getValues(`experiences.${index}.companyName`);
-                const documentViewUrl = getValues(`experiences.${index}.docUri`);
-                const skills = getValues(`experiences.${index}.skills`);
+
+        const uploadDocHandler = async(file:File,index:number)=>{
+            if (!file) return;
+            setSelectedFileName(file.name);
+            const uploadRes = await handleProofUploaded({
+              file,
+              setIsUploading,
+              setUploadError,
+              setSelectedFileName,
+            });
+            if(!uploadRes) return;
+            const {url,docHash} = uploadRes;
+            setValue(`experiences.${index}.docUri`, url, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            setValue(`experiences.${index}.docHash`, docHash, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+          }
+
+    // const emailHandler = async (index: number) => {
+    //         try {
+    //             const emailId = getValues(`experiences.${index}.issuerEmail`);
+    //             const applicantName = user?.name;
+    //             const documentName = getValues(`experiences.${index}.jobRole`);
+    //             const documentType = getValues(`experiences.${index}.companyName`);
+    //             const documentViewUrl = getValues(`experiences.${index}.docUri`);
+    //             const skills = getValues(`experiences.${index}.skills`);
     
-                if (!emailId || !documentViewUrl || !documentName || !documentType || !skills)
-                    return toast.error("Please fill first above all the input fields");
-                setLoading(true);
-                const result = await fetch(`${API_BASE_URL}/doc/email-issuer?skills=${skills}`, {
-                    method: "POST",
-                    credentials: "include",
-                    body: JSON.stringify({
-                        emailId: emailId,
-                        documentViewUrl: documentViewUrl,
-                        documentName: documentName,
-                        documentType: documentType,
-                        applicantName: applicantName
-                    }),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                const data = await result.json();
-                if (!data.success) {
-                    toast.error(data.message);
-                    setLoading(false);
-                }
+    //             if (!emailId || !documentViewUrl || !documentName || !documentType || !skills)
+    //                 return toast.error("Please fill first above all the input fields");
+    //             setLoading(true);
+    //             const result = await fetch(`${API_BASE_URL}/doc/email-issuer?skills=${skills}`, {
+    //                 method: "POST",
+    //                 credentials: "include",
+    //                 body: JSON.stringify({
+    //                     emailId: emailId,
+    //                     documentViewUrl: documentViewUrl,
+    //                     documentName: documentName,
+    //                     documentType: documentType,
+    //                     applicantName: applicantName
+    //                 }),
+    //                 headers: {
+    //                     "Content-Type": "application/json"
+    //                 }
+    //             })
+    //             const data = await result.json();
+    //             if (!data.success) {
+    //                 toast.error(data.message);
+    //                 setLoading(false);
+    //             }
     
-                if (data.status === "Succeeded") {
-                    toast.success(`${data.message} to entered email id`)
-                    setLoading(false);
+    //             if (data.status === "Succeeded") {
+    //                 toast.success(`${data.message} to entered email id`)
+    //                 setLoading(false);
     
-                }
-            } catch (error: any) {
-                toast.error(error.message ?? error ?? "something went wrong")
-            } finally {
-                setLoading(false);
-            }
-        }
+    //             }
+    //         } catch (error: any) {
+    //             toast.error(error.message ?? error ?? "something went wrong")
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     }
 
 
           const includedIds = useMemo(
@@ -262,9 +291,11 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
           }
 
 
+
+
     return (
         <Form {...form}>
-            <form onSubmit={handleSubmit(submitFormHandler)}>
+            <form >
                 <StepCard index={3} title="Experience Details" icon={Briefcase} open={step === 3} onToggle={() => setStep(step === 3 ? 0 : 3)}>
                     <p className="text-sm text-slate-500">Add professional experiences. Each entry supports proof upload and self-attestation.</p>
                     <div className="mt-4 space-y-4">
@@ -292,9 +323,11 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                       </p>
                     </div>}
                                 <div key={field.rhfKey} className="border p-4 rounded bg-white">
-                                    <div className="flex justify-between">
-                                        <div className="font-medium">{"Company"}</div>
-                                        <div className="flex flex-wrap items-center gap-2">
+                                    <div className="flex justify-between flex-wrap items-center mb-2">
+                                       <div className="text-sm font-medium text-[#03257e]">
+                                        Company {field.id}
+                                        </div>
+                                        <div className="flex items-center justify-end gap-2">
                                             <FormField
                                                 control={control}
                                                 name={`experiences.${index}.selfAttested`}
@@ -310,13 +343,14 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                     </FormItem>
                                                 )}
                                             />
-                                            {isMongoId(field.id)? <button
+                                            {isMongoId(field.id)? <Button
                                                     type="button"
+                                                    disabled={field.verified}
                                                     onClick={()=>updateHandler(index)}
-                                                    className="mt-2 px-3 py-1 rounded border border-green-600 text-green-600 flex items-center shadow-lg gap-2 hover:bg-green-600/10 active:scale-[0.99] transition"
+                                                    className="mt-2 px-3 py-1 rounded border bg-[#F14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/90 active:scale-[0.99] transition"
                                                 >
-                                                    <Replace size={14} /> Update
-                                                </button>:
+                                                    <Replace size={18} /> Update
+                                                </Button>:
                                                 <button
                                                     type="button"
                                                     onClick={() => removeExperience(index)}
@@ -455,7 +489,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                             )}
                                         />
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center">
+                                    {!field.verified&&<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center">
                                         {/* Upload / proof column */}
                                         <FormField
                                             control={form.control}
@@ -480,16 +514,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                                 id={`proof-file-${index}`}
                                                                 type="file"
                                                                 accept=".jpg,.jpeg,.png,.pdf"
-                                                                onChange={async(event) => {
-                                                                            const file = event.target.files?.[0];
-                                                                            if (!file) return;
-                                                                            setSelectedFileName(file.name);
-                                                                            const url = await handleProofUploaded({file, setIsUploading, setUploadError, setSelectedFileName });
-                                                                            setValue(`experiences.${index}.docUri`, url, {
-                                                                                shouldValidate: true,
-                                                                                shouldDirty: true,
-                                                                            });
-                                                                        }}
+                                                                onChange={(e)=>uploadDocHandler(e.target.files?.[0]!,index) }
                                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                                                 aria-label={`Upload proof for experience ${index + 1}`}
                                                             />
@@ -555,7 +580,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
                                             <FormField
                                                 control={control}
-                                                name={`experiences.${index}.issuerEmail`}
+                                                name={`experiences.${index}.issuerEmailId`}
                                                 render={({ field: f }) => (
                                                     <>
                                                         <label
@@ -578,15 +603,18 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                 )}
                                             />
 
-                                            {loading?<LoadingButton />:<Button
+                                            {/* {loading?<LoadingButton />:<Button
                                                 type="button"
                                                 onClick={() => emailHandler(index)}
                                                 className="whitespace-nowrap"
                                             >
                                                 Send Email To Issuer
-                                            </Button>}
+                                            </Button>} */}
                                         </div>
-                                    </div>
+                                    </div>}
+                            {loading?(index===idx&&<LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]"/>):
+                            !isMongoId(field.id)&&<Button onClick={()=>submitFormHandler(index)} type="button" className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition">Save</Button>}
+
                                 </div>
                             </>
                         ))}
@@ -594,7 +622,6 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                         <div>
                             <button onClick={addExperience} className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"><PlusCircle size={16} /> Add Experience</button>
                         </div>
-                        {loading?<LoadingButton />:<Button type="submit" className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition">Save</Button>}
                     </div>
                 </StepCard>
             </form>

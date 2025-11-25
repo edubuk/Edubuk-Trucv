@@ -32,7 +32,7 @@ import SelfAttestButton from "@/components/Buttons/SelfAttest";
 import { handleProofUploaded } from "./uploadProof";
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
-import { useUserData } from "@/context/AuthContext";
+//import { useUserData } from "@/context/AuthContext";
 import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
 
@@ -45,10 +45,11 @@ export const AwardDetails = ({
 }: IStepCard) => {
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [idx,setIdx] = useState<number>();
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const { user } = useUserData();
+  // const { user } = useUserData();
   const form = useForm<AwardFormValues>({
     resolver: zodResolver(AwardSchema),
     defaultValues: {
@@ -69,7 +70,7 @@ export const AwardDetails = ({
       ],
     },
   });
-  const { control, setValue, handleSubmit, getValues } = form;
+  const { control, setValue,getValues } = form;
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "awards",
@@ -98,15 +99,19 @@ export const AwardDetails = ({
     setValue(`awards.${index}.selfAttested`, true);
   };
 
-  const submitFormHandler = async (data: AwardFormValues) => {
-    console.log("form submit", data.awards);
+  const submitFormHandler = async (index:number) => {
+    const isValid = await form.trigger(`awards.${index}`);
+    if (!isValid) return;
+    //console.log("error", errors);
+    console.log("form submit", getValues(`awards.${index}`));
+    const payload = getValues(`awards.${index}`);
     try {
+      setIdx(index);
       setLoading(true);
-      const payload = { data: data.awards };
       const result = await fetch(`${API_BASE_URL}/doc/save-awards`, {
         method: "POST",
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({data:payload}),
         headers: {
           "Content-Type": "application/json",
         },
@@ -148,6 +153,8 @@ export const AwardDetails = ({
           },
           description: doc.description ?? "",
           selfAttested: doc.selfAttested ?? false,
+          issuerEmailId: doc.issuerEmailId ?? "",
+          docUri:doc.docUri??"",
           isEmailSend: doc.isEmailSend ?? false,
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
@@ -192,46 +199,67 @@ export const AwardDetails = ({
     }
   };
 
-  const emailHandler = async (index: number) => {
-    try {
-      const emailId = getValues(`awards.${index}.issuerEmail`);
-      const applicantName = user?.name;
-      const documentName = getValues(`awards.${index}.name`);
-      const documentType = getValues(`awards.${index}.organisation`);
-      const documentViewUrl = getValues(`awards.${index}.docUri`);
-      if (!emailId || !documentViewUrl || !documentName || !documentType)
-        return toast.error("Please fill first above all the input fields");
-      setLoading(true);
-      const result = await fetch(`${API_BASE_URL}/doc/email-issuer`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({
-          emailId: emailId,
-          documentViewUrl: documentViewUrl,
-          documentName: documentName,
-          documentType: documentType,
-          applicantName: applicantName,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await result.json();
-      if (!data.success) {
-        toast.error(data.message);
-        setLoading(false);
-      }
+  const uploadDocHandler = async(file:File,index:number)=>{
+    if (!file) return;
+    setSelectedFileName(file.name);
+    const uploadRes = await handleProofUploaded({
+      file,
+      setIsUploading,
+      setUploadError,
+      setSelectedFileName,
+    });
+    if(!uploadRes) return;
+    const {url,docHash} = uploadRes;
+    setValue(`awards.${index}.docUri`, url, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    setValue(`awards.${index}.docHash`, docHash, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  }
 
-      if (data.status === "Succeeded") {
-        toast.success(`${data.message} to entered email id`);
-        setLoading(false);
-      }
-    } catch (error: any) {
-      toast.error(error.message ?? error ?? "something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const emailHandler = async (index: number) => {
+  //   try {
+  //     const emailId = getValues(`awards.${index}.issuerEmail`);
+  //     const applicantName = user?.name;
+  //     const documentName = getValues(`awards.${index}.name`);
+  //     const documentType = getValues(`awards.${index}.organisation`);
+  //     const documentViewUrl = getValues(`awards.${index}.docUri`);
+  //     if (!emailId || !documentViewUrl || !documentName || !documentType)
+  //       return toast.error("Please fill first above all the input fields");
+  //     setLoading(true);
+  //     const result = await fetch(`${API_BASE_URL}/doc/email-issuer`, {
+  //       method: "POST",
+  //       credentials: "include",
+  //       body: JSON.stringify({
+  //         emailId: emailId,
+  //         documentViewUrl: documentViewUrl,
+  //         documentName: documentName,
+  //         documentType: documentType,
+  //         applicantName: applicantName,
+  //       }),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     const data = await result.json();
+  //     if (!data.success) {
+  //       toast.error(data.message);
+  //       setLoading(false);
+  //     }
+
+  //     if (data.status === "Succeeded") {
+  //       toast.success(`${data.message} to entered email id`);
+  //       setLoading(false);
+  //     }
+  //   } catch (error: any) {
+  //     toast.error(error.message ?? error ?? "something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const includedIds = useMemo(
     () => new Set(cvData.educations.map((e: any) => e.id)),
@@ -266,7 +294,7 @@ export const AwardDetails = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(submitFormHandler)}>
+      <form >
         <StepCard
           index={6}
           title="Certificates/Courses/Awards"
@@ -329,13 +357,14 @@ export const AwardDetails = ({
                         )}
                       />
                       {isMongoId(a.id) ? (
-                        <button
+                        <Button
+                        disabled={a.verified}
                           type="button"
                           onClick={() => updateHandler(index)}
-                          className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                          className="mt-2 px-3 py-1 rounded bg-[#f14419] border border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/90 active:scale-[0.99] transition"
                         >
                           <Replace size={14} /> Update
-                        </button>
+                        </Button>
                       ) : (
                         <button
                           type="button"
@@ -476,7 +505,7 @@ export const AwardDetails = ({
                       )}
                     />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center mt-1">
+                  {!a.verified&&<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center mt-1">
                     {/* Upload / proof column */}
                     <FormField
                       control={control}
@@ -500,21 +529,7 @@ export const AwardDetails = ({
                                 id={`proof-file-${index}`}
                                 type="file"
                                 accept=".jpg,.jpeg,.png,.pdf"
-                                onChange={async (event) => {
-                                  const file = event.target.files?.[0];
-                                  if (!file) return;
-                                  setSelectedFileName(file.name);
-                                  const url = await handleProofUploaded({
-                                    file,
-                                    setIsUploading,
-                                    setUploadError,
-                                    setSelectedFileName,
-                                  });
-                                  setValue(`awards.${index}.docUri`, url, {
-                                    shouldValidate: true,
-                                    shouldDirty: true,
-                                  });
-                                }}
+                                onChange={(event)=>uploadDocHandler(event.target.files?.[0]!,index)}
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 aria-label={`Upload proof for experience ${
                                   index + 1
@@ -594,7 +609,7 @@ export const AwardDetails = ({
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
                       <FormField
                         control={control}
-                        name={`awards.${index}.issuerEmail`}
+                        name={`awards.${index}.issuerEmailId`}
                         render={({ field: f }) => (
                           <>
                             <label
@@ -616,18 +631,19 @@ export const AwardDetails = ({
                           </>
                         )}
                       />
-
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          emailHandler(index);
-                        }}
-                        className="whitespace-nowrap"
-                      >
-                        Send Email To Issuer
-                      </Button>
                     </div>
-                  </div>
+                  </div>}
+                  {loading ? (
+              (index===idx)&&<LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]"/>
+            ) : (
+              !isMongoId(a.id)&&<Button
+                type="button"
+                onClick={()=>submitFormHandler(index)}
+                className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+              >
+                Save
+              </Button>
+            )}
                 </div>
               </>
             ))}
@@ -640,16 +656,6 @@ export const AwardDetails = ({
                 <PlusCircle size={16} /> Add Award/Certificate
               </button>
             </div>
-            {loading ? (
-              <LoadingButton />
-            ) : (
-              <Button
-                type="submit"
-                className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
-              >
-                Save
-              </Button>
-            )}
           </div>
         </StepCard>
       </form>

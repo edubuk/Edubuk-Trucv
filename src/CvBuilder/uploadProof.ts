@@ -1,5 +1,6 @@
 import { uploadFile } from "@/uploadFile";
 import React from "react";
+
 interface IProofUpload{
 file:File,
 setIsUploading:React.Dispatch<React.SetStateAction<boolean>>,
@@ -52,6 +53,7 @@ setSelectedFileName:React.Dispatch<React.SetStateAction<string | null>>,
 export const handleProofUploaded = async ({file,setIsUploading,setUploadError,setSelectedFileName}:IProofUpload) => {
         if (!file) return;
         setIsUploading(true);
+        //let docHash = null;
         const validation = validateProofFile(file);
             if (!validation.isValid) {
                 alert(validation.error);
@@ -59,13 +61,19 @@ export const handleProofUploaded = async ({file,setIsUploading,setUploadError,se
                 return;
             }
         try {
+            const arrayBuffer = await file.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const docHash = hashArray
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("");
             const formData = new FormData();
             formData.append("file", file);
             const response: any = await uploadFile(formData);
             if (response?.data?.success) {
                 const url = response.data.url;
                 setIsUploading(false);
-                return url;
+                return {url,docHash};
             } else {
                 // try to pick error message from response
                 const err = response?.response?.data?.error || response?.data?.error || "Upload failed";

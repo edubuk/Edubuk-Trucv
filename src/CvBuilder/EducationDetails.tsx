@@ -34,7 +34,7 @@ import DigiLockerTest from "@/components/DigiLocker/DigiLockerPullTest";
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
-import { useUserData } from "@/context/AuthContext";
+//import { useUserData } from "@/context/AuthContext";
 import { isMongoId } from "@/lib/utils";
 import { ICvData } from "./CvBuilder";
 
@@ -55,7 +55,8 @@ export const EducationDetails = ({
 }) => {
   const [refresh, setRefresh] = useState<boolean>(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
-  const { user } = useUserData();
+  //const { user } = useUserData();
+  const [idx,setIdx]= useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
   const [openDigiLocker, setOpenDigiLocker] = useState<boolean>(false);
   const form = useForm<EducationFormValues>({
@@ -79,7 +80,7 @@ export const EducationDetails = ({
     },
   });
 
-  const { control, handleSubmit, setValue, formState, getValues} = form;
+  const { control,setValue, formState, getValues} = form;
   const { errors } = formState;
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -91,34 +92,37 @@ export const EducationDetails = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const submitFormHandler = async (data: EducationFormValues) => {
+  const submitFormHandler = async (index:number) => {
+    const isValid = await form.trigger(`educations.${index}`);
+    if (!isValid) return;
     console.log("error", errors);
-    console.log("form submit", data.educations);
-    // try {
-    //   setLoading(true);
-    //   const payload = { data: data.educations };
-    //   const result = await fetch(`${API_BASE_URL}/doc/save-doc`, {
-    //     method: "POST",
-    //     credentials: "include",
-    //     body: JSON.stringify(payload),
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   });
-    //   const res = await result.json();
-    //   if (!res.success) {
-    //     toast.error(res.message);
-    //     setLoading(false);
-    //     return;
-    //   }
-    //   toast.success(res.message);
-    //   setLoading(false);
-    //   setRefresh((prev) => !prev);
-    // } catch (error: any) {
-    //   toast.error(error.message ?? error ?? "Something went wrong");
-    // } finally {
-    //   setLoading(false);
-    // }
+    console.log("form submit", getValues(`educations.${index}`));
+    const payload = getValues(`educations.${index}`);
+    try {
+      setIdx(index);
+      setLoading(true);
+      const result = await fetch(`${API_BASE_URL}/doc/save-doc`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({data:payload}),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res = await result.json();
+      if (!res.success) {
+        toast.error(res.message);
+        setLoading(false);
+        return;
+      }
+      toast.success(res.message);
+      setLoading(false);
+      setRefresh((prev) => !prev);
+    } catch (error: any) {
+      toast.error(error.message ?? error ?? "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addEducation = (
@@ -154,47 +158,47 @@ export const EducationDetails = ({
     });
   };
 
-  const emailHandler = async (index: number) => {
-    try {
-      const emailId = getValues(`educations.${index}.issuerEmailId`);
-      const applicantName = user?.name;
-      const documentName = getValues(`educations.${index}.level`);
-      const documentType = getValues(`educations.${index}.boardNameOrDegree`);
-      const documentViewUrl = getValues(`educations.${index}.docUri`);
+  // const emailHandler = async (index: number) => {
+  //   try {
+  //     const emailId = getValues(`educations.${index}.issuerEmailId`);
+  //     const applicantName = user?.name;
+  //     const documentName = getValues(`educations.${index}.level`);
+  //     const documentType = getValues(`educations.${index}.boardNameOrDegree`);
+  //     const documentViewUrl = getValues(`educations.${index}.docUri`);
 
-      if (!emailId || !documentViewUrl || !documentName || !documentType)
-        return toast.error("Please fill first above all the input fields");
-      setLoading(true);
-      const result = await fetch(`${API_BASE_URL}/doc/email-issuer`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({
-          emailId: emailId,
-          documentViewUrl: documentViewUrl,
-          documentName: documentName,
-          documentType: documentType,
-          applicantName: applicantName,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await result.json();
-      if (!data.success) {
-        toast.error(data.message);
-        setLoading(false);
-      }
+  //     if (!emailId || !documentViewUrl || !documentName || !documentType)
+  //       return toast.error("Please fill first above all the input fields");
+  //     setLoading(true);
+  //     const result = await fetch(`${API_BASE_URL}/doc/email-issuer`, {
+  //       method: "POST",
+  //       credentials: "include",
+  //       body: JSON.stringify({
+  //         emailId: emailId,
+  //         documentViewUrl: documentViewUrl,
+  //         documentName: documentName,
+  //         documentType: documentType,
+  //         applicantName: applicantName,
+  //       }),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     const data = await result.json();
+  //     if (!data.success) {
+  //       toast.error(data.message);
+  //       setLoading(false);
+  //     }
 
-      if (data.status === "Succeeded") {
-        toast.success(`${data.message} to entered email id`);
-        setLoading(false);
-      }
-    } catch (error: any) {
-      toast.error(error.message ?? error ?? "something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (data.status === "Succeeded") {
+  //       toast.success(`${data.message} to entered email id`);
+  //       setLoading(false);
+  //     }
+  //   } catch (error: any) {
+  //     toast.error(error.message ?? error ?? "something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchEducationsDocs = async () => {
     try {
@@ -217,6 +221,8 @@ export const EducationDetails = ({
             to: doc.duration?.to ?? "",
           },
           selfAttested: doc.selfAttested ?? false,
+          docUri:doc.docUri??"",
+          issuerEmailId:doc.issuerEmailId??"",
           isEmailSend: doc.isEmailSend ?? false,
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
@@ -239,7 +245,7 @@ export const EducationDetails = ({
       const payload = getValues(`educations.${index}`);
       console.log("payload", payload);
       const data = await fetch(`${API_BASE_URL}/doc/update-doc/${payload.id}`, {
-        method: "PUT",
+        method: "PATCH",
         credentials: "include",
         body: JSON.stringify({ data: payload }),
         headers: {
@@ -257,6 +263,27 @@ export const EducationDetails = ({
       toast.error("something went wrong");
     }
   };
+
+  const uploadDocHandler = async(file:File,index:number)=>{
+            if (!file) return;
+            setSelectedFileName(file.name);
+            const uploadRes = await handleProofUploaded({
+              file,
+              setIsUploading,
+              setUploadError,
+              setSelectedFileName,
+            });
+            if(!uploadRes) return;
+            const {url,docHash} = uploadRes;
+            setValue(`educations.${index}.docUri`, url, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            setValue(`educations.${index}.docHash`, docHash, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+          }
 
   const includedIds = useMemo(
     () => new Set(cvData.educations.map((e: any) => e.id)),
@@ -293,7 +320,7 @@ export const EducationDetails = ({
     <>
       <Form {...form}>
         {/* noValidate disables native browser popup validation */}
-        <form noValidate onSubmit={handleSubmit(submitFormHandler)}>
+        <form noValidate>
           <StepCard
             index={2}
             title="Educational Details"
@@ -310,7 +337,6 @@ export const EducationDetails = ({
               {fields.map((field, index) => {
                 // Use field values if you need quick read-only access:
                 //const levelPath = `educations.${index}.level` as const;
-
                 return (
                   <div
                     key={field.rhfKey}
@@ -373,13 +399,14 @@ export const EducationDetails = ({
                           )}
                         />
                         {isMongoId(field.id) ? (
-                          <button
+                          <Button
+                          disabled={field.verified}
                             type="button"
                             onClick={() => updateHandler(index)}
-                            className="mt-2 px-3 py-1 rounded border border-green-600 text-green-600 flex items-center shadow-lg gap-2 hover:bg-green-600/10 active:scale-[0.99] transition"
+                            className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
                           >
                             <Replace size={14} /> Update
-                          </button>
+                          </Button>
                         ) : (
                           <button
                             type="button"
@@ -592,7 +619,8 @@ export const EducationDetails = ({
                       </div>
 
                       {/* Proof Upload & DigiLocker area (single row UI) */}
-                      <div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
+                      {(!field.verified)
+                      &&<div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                             <label className="text-sm font-medium text-gray-700">
@@ -632,8 +660,8 @@ export const EducationDetails = ({
                                   <div className="flex items-start md:items-center gap-2">
                                     <Paperclip className="h-5 w-5 text-gray-700" />
                                     <div className="text-sm text-gray-700">
-                                      Upload your document and send an email to
-                                      the issuer for verification.
+                                      Upload your document and enter issuer email id to send a email to the issuer for verification.<br></br>
+                                      {/* <span className="text-[#03257e]">Note: Please ensure before enter the email id is correct and belong to the issuer </span> */}
                                     </div>
                                   </div>
                                 </FormLabel>
@@ -645,25 +673,7 @@ export const EducationDetails = ({
                                       id={`proof-file-${index}`}
                                       type="file"
                                       accept=".jpg,.jpeg,.png,.pdf"
-                                      onChange={async (event) => {
-                                        const file = event.target.files?.[0];
-                                        if (!file) return;
-                                        setSelectedFileName(file.name);
-                                        const url = await handleProofUploaded({
-                                          file,
-                                          setIsUploading,
-                                          setUploadError,
-                                          setSelectedFileName,
-                                        });
-                                        setValue(
-                                          `educations.${index}.docUri`,
-                                          url,
-                                          {
-                                            shouldValidate: true,
-                                            shouldDirty: true,
-                                          }
-                                        );
-                                      }}
+                                      onChange={(e)=>uploadDocHandler(e.target.files?.[0]!,index) }
                                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                       aria-label={`Upload proof for education ${
                                         index + 1
@@ -778,7 +788,7 @@ export const EducationDetails = ({
                               )}
                             />
 
-                            <Button
+                            {/* <Button
                               type="button"
                               onClick={() => emailHandler(index)}
                               className="whitespace-nowrap"
@@ -788,10 +798,10 @@ export const EducationDetails = ({
                               ) : (
                                 "Send Email To Issuer"
                               )}
-                            </Button>
+                            </Button> */}
                           </div>
                         </div>
-                      </div>
+                      </div>}
                       {openDigiLocker && (
                         <DigiLockerTest
                           setOpenDigiLocker={setOpenDigiLocker}
@@ -801,6 +811,18 @@ export const EducationDetails = ({
                         />
                       )}
                     </div>
+                    {loading ? (
+                index===idx&&<LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]" />
+              ) : (
+                !isMongoId(field.id)&&<Button
+                  type="button"
+                  onClick={() => submitFormHandler(index)}
+                  className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+                >
+                  Save
+                </Button>
+
+              )}
                   </div>
                 );
               })}
@@ -821,17 +843,6 @@ export const EducationDetails = ({
                   <PlusCircle size={16} /> Add College
                 </button>
               </div>
-
-              {loading ? (
-                <LoadingButton />
-              ) : (
-                <Button
-                  type="submit"
-                  className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
-                >
-                  Save
-                </Button>
-              )}
             </div>
           </StepCard>
         </form>

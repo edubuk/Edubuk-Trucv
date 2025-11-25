@@ -1,5 +1,5 @@
-import React, { useMemo} from "react";
-import { CheckCircle, Clock, ExternalLink, ShieldCheck, FileText, BadgeCheck,UserCircle} from "lucide-react";
+import React from "react";
+import { CheckCircle, Clock, ExternalLink, ShieldCheck, FileText,UserCircle} from "lucide-react";
 
 import { useUserData } from "@/context/AuthContext";
 import { API_BASE_URL } from "@/main";
@@ -62,7 +62,7 @@ export interface IExperienceDoc{
 
 // Types
 export type VerificationStatus = "verified" | "pending" | "rejected" | "inProgress";
-export type VerificationMethod = "DigiLocker" | "email" | "third_party" | null;
+export type VerificationMethod = "DigiLocker" | "Email" | "Third Party" | null;
 
 
 // UI bits
@@ -88,7 +88,7 @@ const StatusBadge: React.FC<{ status: VerificationStatus }> = ({ status }) => {
 };
 
 const MethodChip: React.FC<{ method: VerificationMethod }> = ({ method }) => {
-  const label = method === "DigiLocker" ? "DigiLocker" : method === "email" ? "Email" : method === "third_party" ? "Third Party" : "Not set";
+  const label = method === "DigiLocker" ? "DigiLocker" : method === "Email" ? "Email" : method === "Third Party" ? "Third Party" : "Not set";
   const color = method ? COLOR_PRIMARY : "#666";
   return (
     <span
@@ -104,8 +104,8 @@ export default function UserDocs({educationDocs,experienceDocs}: {educationDocs:
     const {user} = useUserData();
     console.log("edu data",educationDocs)
 
-  const verifiedCount = useMemo(() => educationDocs?.reduce((sum, u) => (sum + (u.status==="verified"?1:0)), 0), [educationDocs]);
-  const totalCerts = useMemo(() => educationDocs?.reduce((sum) => sum + 1, 0), [educationDocs]);
+  // const verifiedCount = useMemo(() => educationDocs?.reduce((sum, u) => (sum + (u.status==="verified"?1:0)), 0), [educationDocs]);
+  // const totalCerts = useMemo(() => educationDocs?.reduce((sum) => sum + 1, 0), [educationDocs]);
 
   function formatDate(iso?: string) {
     if (!iso) return "—";
@@ -134,8 +134,8 @@ export default function UserDocs({educationDocs,experienceDocs}: {educationDocs:
                 </div>
               </div>
               <div className="flex items-center gap-2 text-[#03257e] text-xs sm:text-sm">
-            <BadgeCheck className="h-4 w-4 text-green-500" />
-            <span>{verifiedCount}/{totalCerts} verified</span>
+            {/* <BadgeCheck className="h-4 w-4 text-green-500" /> */}
+            {/* <span>{verifiedCount}/{totalCerts} verified</span> */}
           </div>
             </div>
 
@@ -160,7 +160,7 @@ export default function UserDocs({educationDocs,experienceDocs}: {educationDocs:
                         <StatusBadge status={cert?.status||"pending"} />
                       </div>
                       <div className="mt-3 flex items-center justify-between">
-                        <MethodChip method={cert?.verifiedThrough||"email"}/>
+                        <MethodChip method={cert?.verifiedThrough!}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
                       <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
@@ -182,7 +182,7 @@ export default function UserDocs({educationDocs,experienceDocs}: {educationDocs:
                         <StatusBadge status={cert?.status||"pending"} />
                       </div>
                       <div className="mt-3 flex items-center justify-between">
-                        <MethodChip method={cert?.verifiedThrough||"email"}/>
+                        <MethodChip method={cert?.verifiedThrough!}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
                       <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>

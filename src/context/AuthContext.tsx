@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/main";
-import React, { createContext, useContext,useLayoutEffect, useState } from "react";
+import React, { createContext, useContext,useEffect, useState } from "react";
 
 
 // interface ISubscriptionData {
@@ -30,7 +30,6 @@ interface IUSER {
 interface UserContextType {
   user: IUSER | null;
   loading:boolean;
-  subscriptionDataLoading:boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -38,39 +37,27 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUSER | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [subscriptionDataLoading,setSubscriptionDataLoading]= useState<boolean>(false);
-  //const [userData, setUserData] = useState<ISubscriptionData | null>(null);
 
-  const getUser = async()=>{
+  const fetchDetails = async()=>{
     try {
       setLoading(true);
-      const user = await fetch(`${API_BASE_URL}/user/profile`,{
-        method:"GET",
-        credentials: "include"
-      })
-      const userData = await user.json();
+      const [data1,data2] = await Promise.all([
+        fetch(`${API_BASE_URL}/user/profile`,{
+          method:"GET",
+          credentials: "include"
+        }),
+        fetch(`${API_BASE_URL}/user/subscription`, {
+          method: "GET",
+          credentials: "include",
+        })
+      ]);
+      const userData = await data1.json();
+      const subscription = await data2.json();
       if(userData && userData.success)
       {
         // setUser({name:userData?.user?.name,email:userData?.user?.email,phoneNumber:userData?.user?.phoneNumber,address:userData.user.address,roles:userData?.user?.roles,uuid:userData?.user?.uuid,_id:userData?.user?._id})
         setUser(userData.user);
       }
-      console.log("userData", userData);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-    }finally{
-      setLoading(false);
-    }
-  }
-
-  const userSubscription = async () => {
-    try {
-      setSubscriptionDataLoading(true)
-      const res = await fetch(`${API_BASE_URL}/user/subscription`, {
-        method: "GET",
-        credentials: "include",
-      });
-      const subscription = await res.json();
-
       if (subscription && subscription.success) {
         // update user state safely (functional update to avoid stale closure)
         setUser((prev) =>
@@ -82,18 +69,16 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
     } catch (error) {
       console.error("Error fetching user subscription:", error);
     }
-    finally{setSubscriptionDataLoading(false)};
+    finally{setLoading(false)};
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     // load both — order doesn't strictly matter because subscription update uses functional setUser
-    getUser();
-    userSubscription();
-    console.log("user",user)
+    fetchDetails();
   }, []);
 
   return (
-    <UserContext.Provider value={{user,loading,subscriptionDataLoading}}>
+    <UserContext.Provider value={{user,loading}}>
       {children}
     </UserContext.Provider>
   );

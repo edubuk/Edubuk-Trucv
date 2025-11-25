@@ -240,6 +240,10 @@ export const ProjectDetails = ({
                   </div>
                 )}
                 <div key={p.id} className="border p-4 rounded bg-white">
+                  <div className="flex justify-between flex-wrap items-center mb-2">
+                  <div className="text-sm font-medium text-[#03257e]">
+                    Project {p.id}
+                  </div>
                   <div className="flex justify-end items-center gap-2">
                     <FormField
                       control={control}
@@ -264,7 +268,7 @@ export const ProjectDetails = ({
                       <button
                         type="button"
                         onClick={() => updateHandler(index)}
-                        className="mt-2 px-3 py-1 rounded border border-green-600 text-green-600 flex items-center shadow-lg gap-2 hover:bg-green-50 active:scale-[0.99] transition"
+                        className="mt-2 px-3 py-1 rounded bg-[#f14419] border border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/90 active:scale-[0.99] transition"
                       >
                         <Replace size={14} /> Update
                       </button>
@@ -278,7 +282,7 @@ export const ProjectDetails = ({
                       </button>
                     )}
                   </div>
-
+                </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                     <FormField
                       control={control}

@@ -74,11 +74,11 @@ const DashBoard = () => {
       setSelected("cv");      // <- new: mark CV view as active
       fetchIds();
      }
-     const nftFetchHandler = ()=>{
-      //setActiveButton(false)
-      //setNFT(true);
-      setSelected("nft");     // <- new: mark NFT view as active
-     }
+    //  const nftFetchHandler = ()=>{
+    //   //setActiveButton(false)
+    //   //setNFT(true);
+    //   setSelected("nft");     // <- new: mark NFT view as active
+    //  }
 
        const getDocs = async()=>{
          // switch to docs view when fetching
@@ -132,12 +132,12 @@ const DashBoard = () => {
         </Button>
         </div>
         <div className="relative rounded-lg p-[1px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
-        <Button
+        {/* <Button
           className={`text-center border border-slate-300 text-[#006666] hover:bg-slate-100 bg-white ${selected === "nft" ? "text-[#03257e] font-semibold" : "text-[#006666] border"}`}
           onClick={nftFetchHandler}
         >
           Fetch your NFTs
-        </Button>
+        </Button> */}
         </div>
         </div>
 

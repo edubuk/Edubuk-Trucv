@@ -42,10 +42,33 @@ export const EducationItemSchema = z.object({
    isEmailSend:z.boolean().optional(),
   issuerEmailId:z.string().email({message:"Invalid email"}).optional(),
   verified:z.boolean().optional(),
+  docHash:z.string().optional(),
   status:z.enum(["pending","verified","rejected","inProgress"]),
   verifiedThrough:z.string().optional(),
   docUri: z.string().optional(),
   orgId:z.string().optional(),
+}).superRefine((data,ctx)=>{
+    if(data.docUri)
+  {
+    if(!data.issuerEmailId)
+    {
+      ctx.addIssue({message:"Issuer Email Id required",path:["issuerEmailId"],code: z.ZodIssueCode.custom})
+    }
+  }
+  if(data.issuerEmailId)
+  {
+    if(!data.docUri)
+    {
+      ctx.addIssue({message:"Document Uri required",path:["docUri"],code: z.ZodIssueCode.custom})
+    }
+  }
+  if(data.duration.from && data.duration.to)
+  {
+    if(data.duration.from > data.duration.to)
+    {
+      ctx.addIssue({message:"Start date should be less than end date",path:["duration","from"],code: z.ZodIssueCode.custom})
+    }
+  }
 })
 
 
@@ -72,11 +95,34 @@ export const ExperienceItemSchema = z.object({
   description: z.string().min(1, "Description is required"),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
   isEmailSend:z.boolean(),
-  issuerEmail:z.string().email().optional(),
+  issuerEmailId:z.string().email().optional(),
   verified:z.boolean().optional(),
+  docHash:z.string().optional(),
   status:z.enum(["pending","verified","rejected","inProgress"]),
   verifiedThrough:z.string().optional(),
   docUri: z.string().optional()
+}).superRefine((data,ctx)=>{
+    if(data.docUri)
+  {
+    if(!data.issuerEmailId)
+    {
+      ctx.addIssue({message:"Issuer Email Id required",path:["issuerEmailId"],code: z.ZodIssueCode.custom})
+    }
+  }
+  if(data.issuerEmailId)
+  {
+    if(!data.docUri)
+    {
+      ctx.addIssue({message:"Document Uri required",path:["docUri"],code: z.ZodIssueCode.custom})
+    }
+  }
+  if(data.duration.from && data.duration.to)
+  {
+    if(data.duration.from > data.duration.to)
+    {
+      ctx.addIssue({message:"Start date should be less than end date",path:["duration","from"],code: z.ZodIssueCode.custom})
+    }
+  }
 });
 
 export const ExperienceSchema = z.object({
@@ -119,9 +165,10 @@ export const AwardItemSchema = z.object({
   description: z.string().min(1,"description is required"),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
   isEmailSend:z.boolean(),
-  issuerEmail:z.string().email().optional(),
+  issuerEmailId:z.string().email().optional(),
   docUri: z.string().optional(),
   verified:z.boolean().optional(),
+  docHash:z.string().optional(),
   status:z.enum(["pending","verified","rejected","inProgress"]),
   verifiedThrough:z.string().optional(),
 }).superRefine((data,ctx)=>{
@@ -140,6 +187,27 @@ export const AwardItemSchema = z.object({
       ctx.addIssue({path:["duration","to"],message:"Date is required",code: z.ZodIssueCode.custom,})
     }
   }
+  if(data.docUri)
+  {
+    if(!data.issuerEmailId)
+    {
+      ctx.addIssue({message:"Issuer Email Id required",path:["issuerEmailId"],code: z.ZodIssueCode.custom})
+    }
+  }
+  if(data.issuerEmailId)
+  {
+    if(!data.docUri)
+    {
+      ctx.addIssue({message:"Document Uri required",path:["docUri"],code: z.ZodIssueCode.custom})
+    }
+  }
+  if(data.duration.from && data.duration.to)
+  {
+    if(data.duration.from > data.duration.to)
+    {
+      ctx.addIssue({message:"Start date should be less than end date",path:["duration","from"],code: z.ZodIssueCode.custom})
+    }
+  }
 });
 
 export const AwardSchema = z.object({
@@ -156,3 +224,20 @@ export const ProfileSummarySchema = z.object({
 
 })
 export type ProfileSummaryItem = z.infer<typeof ProfileSummarySchema>
+
+
+export const SKillItemSchema = z.object({
+  id: z.string().uuid().or(z.string().min(1, "ID is required")),
+  skillName:z.string().min(1,"Skill name is required"),
+  level:z.enum(["beginner","intermediate","advanced","expert"],{required_error:"Level is required"}),
+  selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
+  endoresBy:z.string().optional(),
+  endoresThrough:z.string().optional(),
+})
+
+export const SkillSchema = z.object({
+  skills:z.array(SKillItemSchema)
+})
+
+export type SkillFormValues = z.infer<typeof SkillSchema>
+export type TypeSkill = z.infer<typeof SKillItemSchema>

@@ -20,7 +20,7 @@ import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 // import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
 
 import { ICvData } from "./CvBuilder";
-import { TypeAward, TypeEducation, TypeExperience, TypeProject } from "./cvSchema";
+import { TypeAward, TypeEducation, TypeExperience, TypeProject, TypeSkill } from "./cvSchema";
 //import PdfDownloader from "@/components/PDFDownloader/PdfDownloader";
 
 const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch<React.SetStateAction<boolean>>}) => {
@@ -129,7 +129,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
         {/* modal content — make scrollable and nicely padded */}
         <div
           ref={pdfRef}
-          className="bg-white rounded-lg shadow-xl overflow-auto max-h-[90vh] no-scrollbar"
+          className="bg-white rounded-lg overflow-auto max-h-[90vh] no-scrollbar print-area"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <div id="cv-preview-wrapper" className="px-6 py-5 font-family">
@@ -226,7 +226,13 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
               <h2 className="text-xl font-semibold text-[#000000] border-b border-black pb-2">
                 Skills
               </h2>
-              {/* render skills if you want */}
+              <div className="flex justify-start items-center gap-1 mt-2">
+              {
+                cvData?.skills?.map((skill:TypeSkill,i)=>(
+                    <p key={i} className="border px-2 py-1 font-bold rounded-full ">{skill?.skillName}</p>
+                ))
+              }
+               </div>
             </section>}
 
             {/* Experience */}
