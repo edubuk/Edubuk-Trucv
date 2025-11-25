@@ -349,7 +349,7 @@ export default function DigiLockerTest({
   index: number;
 }) {
 
-const DIGILOCKER_CLIENT_ID = "WI7E8AA6B6"; // sandbox client id
+const DIGILOCKER_CLIENT_ID = "YZDD56F8C8"; // sandbox client id
 const DIGILOCKER_REDIRECT_URI = `${API_BASE_URL}/api/dl/callback`;
 const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2/1/authorize";
   const [profile, setProfile] = useState<Profile | null>(null);
