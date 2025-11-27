@@ -24,7 +24,6 @@ import SubscriptionPlans from "./components/Subscription/Subscription";
 import GoogleLoginModal from "./pages/Login";
 import ProtectedRoute from "./protectRoute";
 import AdminUsersPage from "./pages/Admin";
-import InvalidTokenModal from "./pages/InvalidTokenModel";
 import Layout from "./Layout/Layout";
 import Register from "./pages/Register";
 import PasswordResetUI from "./pages/ForgotPassword";
@@ -51,7 +50,6 @@ useEffect(() => {
                 path="/"
                 element={<Layout> <Home /></Layout>}
               />
-              <Route path="/invalid-token" element={<InvalidTokenModal open={true} redirectUrl="/login"/>}></Route>
               <Route path="*" element={<NotFoundPage />} />
               <Route path="/digilocker" element={<Digilocker/>}/>
               <Route path="/new-cv/:id" element={<Resume />} />

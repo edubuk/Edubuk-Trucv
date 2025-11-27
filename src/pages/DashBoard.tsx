@@ -4,15 +4,15 @@ import { useState } from "react"
 import CvById from "./CvById";
 //import { connectWallet } from "@/api/contract.api";
 import toast from "react-hot-toast";
-import { API_BASE_URL } from "@/main";
 //import { contractNFTAddress,abiNFT } from "@/contract/nft.contractData";
 //import NFTGallery from "./NFTData";
 import UserDocs from "./UserDocs";
+import api from "@/lib/api";
 
 
 const DashBoard = () => {
     //const [isActiveButton , setActiveButton] = useState<boolean>(true);
-    const [cvData, setCvData] = useState([]);
+    const [cvData, setCvData] = useState([{}]);
     const [educationDocs,setEducationDocs] = useState({
       educations:[]
     });
@@ -40,39 +40,40 @@ const DashBoard = () => {
     //   }
     //  }
 
-     const fetchIds = async()=>{
-      const id=toast.loading("document fetching...")
-      try{
-        const response = await fetch(`${API_BASE_URL}/api/cv-ids`, {
-          method: "GET",
-          credentials:"include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        if(!data.success)
-        {
-          toast.dismiss(id);
-          return toast.error("No CV found");
-        }
-        setCvData(data.data);
-        console.log("data",data.data)
-        toast.dismiss(id);
-      }
-      catch(err){
-        toast.dismiss(id);
-        toast.error("something went wrong")
-        console.log("error while fetching all doc ids",err)
-      }
-     }
+    //  const fetchIds = async()=>{
+    //   const id=toast.loading("document fetching...")
+    //   try{
+    //     const response = await fetch(`${API_BASE_URL}/api/cv-ids`, {
+    //       method: "GET",
+    //       credentials:"include",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
+    //     const data = await response.json();
+    //     if(!data.success)
+    //     {
+    //       toast.dismiss(id);
+    //       return toast.error("No CV found");
+    //     }
+    //     setCvData(data.data);
+    //     console.log("data",data.data)
+    //     toast.dismiss(id);
+    //   }
+    //   catch(err){
+    //     toast.dismiss(id);
+    //     toast.error("something went wrong")
+    //     console.log("error while fetching all doc ids",err)
+    //   }
+    //  }
 
      const idFetchHandler = ()=>{
       // keep existing behavior
       //setActiveButton(true)
       //setNFT(false);
       setSelected("cv");      // <- new: mark CV view as active
-      fetchIds();
+      //fetchIds();
+      userCvs();
      }
     //  const nftFetchHandler = ()=>{
     //   //setActiveButton(false)
@@ -87,14 +88,15 @@ const DashBoard = () => {
          setSelected("docs");   // <- new: mark docs view as active
 
          try {
-             const userDocs = await fetch(`${API_BASE_URL}/doc/user-docs`,{
-                 method:"GET",
-                 credentials:"include",
-                 headers:{
-                     "Content-Type":"application/json",
-                 }
-             })
-             const data = await userDocs.json();
+            //  const userDocs = await fetch(`${API_BASE_URL}/doc/user-docs`,{
+            //      method:"GET",
+            //      credentials:"include",
+            //      headers:{
+            //          "Content-Type":"application/json",
+            //      }
+            //  })
+             const userDocs = await api.get("/doc/user-docs");
+             const data = await userDocs.data;
              console.log("data",data);
              if(!data.success)
              {
@@ -110,6 +112,21 @@ const DashBoard = () => {
              console.log("error while fetching docs",error)
          }
 
+       }
+
+
+       const userCvs = async()=>{
+        try {
+          const data:any = await api.get("/cv/user-cvs");
+          if(data.success)
+          {
+            setCvData(data.data);
+          }
+          console.log("data",data.data)
+        } catch (error) {
+          toast.error("something went wrong");
+             console.log("error while fetching docs",error)
+        }
        }
 
   return (

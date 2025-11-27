@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/main";
+import api from "@/lib/api";
 import React, { createContext, useContext,useEffect, useState } from "react";
 
 
@@ -42,19 +42,15 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
     try {
       setLoading(true);
       const [data1,data2] = await Promise.all([
-        fetch(`${API_BASE_URL}/user/profile`,{
-          method:"GET",
-          credentials: "include"
-        }),
-        fetch(`${API_BASE_URL}/user/subscription`, {
-          method: "GET",
-          credentials: "include",
-        })
+        api.get("/user/profile"),
+        api.get("/user/subscription")
       ]);
-      const userData = await data1.json();
-      const subscription = await data2.json();
+      const userData = data1.data;
+      const subscription = data2.data;
+      console.log("userData",userData);
       if(userData && userData.success)
       {
+        console.log("userData",userData);
         // setUser({name:userData?.user?.name,email:userData?.user?.email,phoneNumber:userData?.user?.phoneNumber,address:userData.user.address,roles:userData?.user?.roles,uuid:userData?.user?.uuid,_id:userData?.user?._id})
         setUser(userData.user);
       }

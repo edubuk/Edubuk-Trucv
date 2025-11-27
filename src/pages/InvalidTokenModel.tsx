@@ -1,39 +1,20 @@
 import { useEffect, useState } from "react";
-
-/**
- * InvalidTokenModal.tsx
- *
- * Modern modal to show when the backend responds with "invalid token".
- * - Uses exact hex colors: #03257e (deep blue), #006666 (teal), #f14419 (accent)
- * - Tailwind utility classes for layout + inline styles for exact color values
- *
- * Usage:
- *  <InvalidTokenModal
- *    open={true}
- *    redirectUrl="/login"
- *    onClose={() => setShowModal(false)}
- *  />
- */
+import { useAuthStore } from "@/lib/authStore";
 
 type Props = {
-  open: boolean;
-  onClose?: () => void;
-  redirectUrl?: string;
   autoRedirect?: boolean; // auto redirect after countdown
   countdownStart?: number; // seconds
 };
 
 export default function InvalidTokenModal({
-  open,
-  onClose,
-  redirectUrl = "/login",
   autoRedirect = true,
   countdownStart = 6,
 }: Props) {
   const [count, setCount] = useState(countdownStart);
+  const { showInvalidTokenModal, setShowInvalidTokenModal } = useAuthStore();
 
   useEffect(() => {
-    if (!open) return;
+    if (!showInvalidTokenModal) return;
 
     setCount(countdownStart);
     if (!autoRedirect) return;
@@ -43,16 +24,17 @@ export default function InvalidTokenModal({
     }, 1000);
 
     return () => clearInterval(t);
-  }, [open, autoRedirect, countdownStart]);
+  }, [autoRedirect, countdownStart]);
 
   useEffect(() => {
     if (!autoRedirect) return;
-    if (count <= 0 && open) {
-      window.location.href = redirectUrl;
+    if (count <= 0 && showInvalidTokenModal) {
+      setShowInvalidTokenModal(false);
+      window.location.href ="/login";
     }
-  }, [count, autoRedirect, open, redirectUrl]);
+  }, [count,setShowInvalidTokenModal]);
 
-  if (!open) return null;
+  if (!showInvalidTokenModal) return null;
 
   return (
     <div
@@ -61,7 +43,7 @@ export default function InvalidTokenModal({
       role="dialog"
     >
       {/* overlay */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowInvalidTokenModal(false)} />
 
       {/* modal card */}
       <div
@@ -113,7 +95,7 @@ export default function InvalidTokenModal({
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => (window.location.href = redirectUrl)}
+              onClick={() => (window.location.href = "/login")}
               className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-white font-medium shadow-sm"
               style={{ backgroundColor: "#03257e" }}
             >

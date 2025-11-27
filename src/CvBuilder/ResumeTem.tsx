@@ -21,6 +21,8 @@ import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 
 import { ICvData } from "./CvBuilder";
 import { TypeAward, TypeEducation, TypeExperience, TypeProject, TypeSkill } from "./cvSchema";
+import api from "@/lib/api";
+import toast from "react-hot-toast";
 //import PdfDownloader from "@/components/PDFDownloader/PdfDownloader";
 
 const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch<React.SetStateAction<boolean>>}) => {
@@ -63,6 +65,17 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
         <h1 className="text-4xl font-bold text-[#006666]">No CV Found</h1>
       </div>
     );
+  }
+
+    const createCv = async()=>{
+    try {
+      const res = await api.post("/cv/create-cv",{data:cvData})
+      if(res.status === 200){
+        toast.success("CV Created Successfully")
+      }
+    } catch (error) {
+      toast.error("Something went wrong")
+    }
   }
 
   // const downloadPdfHandler = async()=>{
@@ -126,6 +139,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
           ✕
         </button>
        <button onClick={handlePrint} className="bg-green-600 px-3 py-2 mb-2 text-white text-center rounded">Print</button>
+       <button onClick={createCv} className="bg-green-600 px-3 py-2 mb-2 text-white text-center rounded">Create CV</button>
         {/* modal content — make scrollable and nicely padded */}
         <div
           ref={pdfRef}
