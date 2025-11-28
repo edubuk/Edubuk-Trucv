@@ -1,19 +1,10 @@
 // DigiLockerTest.tsx
+import api from "@/lib/api";
 import { API_BASE_URL } from "@/main";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import toast from "react-hot-toast";
 
-type IssuedItem = {
-  name: string;
-  type: string;
-  mime: string | string[];
-  uri: string;
-  description?: string;
-  issuer?: string;
-  issuerid?: string;
-  doctype?: string;
-  date?: string;
-};
 
 type Profile = {
   digilockerid?: string;
@@ -349,11 +340,10 @@ export default function DigiLockerTest({
   index: number;
 }) {
 
-const DIGILOCKER_CLIENT_ID = "YZDD56F8C8"; // sandbox client id
-const DIGILOCKER_REDIRECT_URI = `${API_BASE_URL}/api/dl/callback`;
-const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2/1/authorize";
+  const DIGILOCKER_CLIENT_ID = "WI7E8AA6B6"; // sandbox client id
+  const DIGILOCKER_REDIRECT_URI = `${API_BASE_URL}/api/dl/callback`;
+  const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2/1/authorize";
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [docs, setDocs] = useState<IssuedItem[]>([]);
   const form = useFormContext();
   const { getValues, setValue } = form;
   //const [status, setStatus] = useState<string>("");
@@ -361,41 +351,45 @@ const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2
   const [uri, setUri] = useState<string>();
 
   const [consent, setConsent] = useState(false);
-  let issuerName = "";
-  let description = "";
-  let orgId = "";
+  const [year, setYear] = useState<string>();
+  const [rollno,setRollno] = useState<string>();
+  let issuerName =null;
+  let description =null;
+  let orgId =null;
+  let doctype = null;
   switch (field) {
     case "Secondary School":
       issuerName = getValues(`educations.${index}.boardNameOrDegree`);
       description = "Class X Marksheet";
+      doctype = "SSCER";
       orgId = getValues(`educations.${index}.orgId`);
       break;
     case "Higher Secondary School":
       issuerName = getValues(`educations.${index}.boardNameOrDegree`);
       description = "Class XII Marksheet";
+      doctype = "HSCER";
       orgId = getValues(`educations.${index}.orgId`);
       break;
     case "Graduation":
       issuerName = getValues(`educations.${index}.institutionName`);
-      description = "Degree/Provisional Certificate";
+      description = "Degree Certificate";
+      doctype = "DGCER"
       orgId = getValues(`educations.${index}.orgId`);
       break;
     case "PostGraduation":
       issuerName = getValues(`educations.${index}.institutionName`);
-      description = "Degree/Provisional Certificate";
+      description = "PostGraduation Certificate";
+      doctype = "PGCER"
       orgId = getValues(`educations.${index}.orgId`);
       break;
   }
 
   const fetchProfile = async () => {
     try {
-      const r = await fetch(`${API_BASE_URL}/api/dl/me`, {
-        credentials: "include",
-      });
+      const r:any = await api.get("/api/dl/me")
       if (r.ok) {
-        const data = await r.json();
-        console.log("Profile:", data);
-        setProfile(data);
+        console.log("Profile:", r.data);
+        setProfile(r.data);
       }
     } catch (err) {
       console.error("Failed to fetch profile", err);
@@ -404,18 +398,17 @@ const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2
 
   const fetchIssued = async () => {
     //setStatus("Loading issued documents…");
+    if(!rollno || !year){
+      return toast.error("year and rollno required");
+    }
     try {
-      const r: any = await fetch(
-        `${API_BASE_URL}/api/dl/XCert?typeClass=${field}?orgId=${orgId}`,
-        {
-          credentials: "include",
-        }
-      );
-      const data = await r.json();
-      console.log("Issued docs:", data);
-      if (data.uri) {
-        setUri(data.uri);
-        setValue(`educations.${index}.proof`, data.uri, {
+      const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgId}&doctype=${doctype}`,{
+        body:{rollno:rollno,year:year}
+      })
+      console.log("Issued docs:", r);
+      if (r.data.uri) {
+        setUri(r.data.uri);
+        setValue(`educations.${index}.proof`, r.data.uri, {
           shouldValidate: true,
           shouldDirty: true,
         });
@@ -427,28 +420,10 @@ const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2
         setErrorMsg("No document found");
       }
       if (!r.ok) {
-        setErrorMsg(data?.error?.error_description);
+        setErrorMsg(r?.error?.error_description);
       }
-
-      const items: IssuedItem[] = Array.isArray(data?.items) ? data.items : [];
-
-      // filter for Class X / XII mark sheets
-      const filtered = items.filter((it) => {
-        const text = `${it.name} ${it.description || ""}`.toLowerCase();
-        return (
-          text.includes("class x") ||
-          text.includes("class xii") ||
-          it.doctype === "HSCER"
-        );
-      });
-
-      setDocs(filtered);
-      // setStatus(
-      //   filtered.length ? "" : "No Class X/XII marksheets found in issued documents."
-      // );
     } catch (e: any) {
       console.error(e);
-      //setStatus(e?.message || "Failed to load");
     }
   };
 
@@ -504,19 +479,19 @@ const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2
     fetchProfile();
   }, []);
 
-  const downloadPdf = (uri: string) => {
-    window.open(
-      `${API_BASE_URL}/api/dl/file?uri=${encodeURIComponent(uri)}`,
-      "_blank"
-    );
-  };
+  // const downloadPdf = (uri: string) => {
+  //   window.open(
+  //     `${API_BASE_URL}/api/dl/file?uri=${encodeURIComponent(uri)}`,
+  //     "_blank"
+  //   );
+  // };
 
-  const viewXml = (uri: string) => {
-    window.open(
-      `${API_BASE_URL}/api/dl/xml?uri=${encodeURIComponent(uri)}`,
-      "_blank"
-    );
-  };
+  // const viewXml = (uri: string) => {
+  //   window.open(
+  //     `${API_BASE_URL}/api/dl/xml?uri=${encodeURIComponent(uri)}`,
+  //     "_blank"
+  //   );
+  // };
 
   // If there's no connected profile, show the Digilocker pull card (static JSX)
   if (!profile?.digilockerid) {
@@ -581,6 +556,14 @@ const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2
             </span>
           </div>
         </div>
+        <div className="flex justify-start items-center gap-2">
+          <input type="text" placeholder="Enter Roll Number" value={rollno} onChange={(e) => setRollno(e.target.value)}
+          className="rounded w-full"
+          ></input>
+          <input type="text" placeholder="Enter Passing Year" value={year} onChange={(e) => setYear(e.target.value)}
+          className="rounded w-full"
+          ></input>
+        </div>
 
         <div>
           <label
@@ -609,7 +592,7 @@ const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2
           <p className="m-4 font-semibold">
             Document found:{" "}
             <a
-              href={`${API_BASE_URL}/api/dl/view-doc?uri=${uri}`}
+              href={`${API_BASE_URL}/api/dl/view-doc?docUri=${uri}`}
               target="_blank"
               className="mt-2 underline text-[#006666]"
             >
@@ -650,66 +633,6 @@ const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2
           >
             {errorMsg}
           </div>
-        )}
-        {docs.length > 0 && (
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              border: "1px solid #eee",
-              borderRadius: 12,
-              overflow: "hidden",
-            }}
-          >
-            <thead style={{ background: "#f5f7ff" }}>
-              <tr>
-                <th style={{ textAlign: "left", padding: 12 }}>Name</th>
-                <th style={{ textAlign: "left", padding: 12 }}>Issuer</th>
-                <th style={{ textAlign: "left", padding: 12 }}>Doctype</th>
-                <th style={{ textAlign: "left", padding: 12 }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {docs.map((d) => (
-                <tr key={d.uri}>
-                  <td style={{ padding: 12, borderTop: "1px solid #eee" }}>
-                    {d.name || d.description}
-                  </td>
-                  <td style={{ padding: 12, borderTop: "1px solid #eee" }}>
-                    {d.issuer || d.issuerid}
-                  </td>
-                  <td style={{ padding: 12, borderTop: "1px solid #eee" }}>
-                    {d.doctype || "-"}
-                  </td>
-                  <td style={{ padding: 12, borderTop: "1px solid #eee" }}>
-                    <button
-                      type="button"
-                      onClick={() => downloadPdf(d.uri)}
-                      style={{
-                        marginRight: 8,
-                        padding: "6px 10px",
-                        borderRadius: 8,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Download PDF
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => viewXml(d.uri)}
-                      style={{
-                        padding: "6px 10px",
-                        borderRadius: 8,
-                        cursor: "pointer",
-                      }}
-                    >
-                      View XML
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         )}
       </div>
     </>
