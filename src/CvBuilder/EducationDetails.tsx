@@ -91,7 +91,6 @@ export const EducationDetails = ({
   // local UI state for proof dialog/upload (example)
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-
   const submitFormHandler = async (index:number) => {
     const isValid = await form.trigger(`educations.${index}`);
     if (!isValid) return;
@@ -632,7 +631,7 @@ export const EducationDetails = ({
                             </label>
                             <button
                               type="button"
-                              onClick={() => setOpenDigiLocker(true)}
+                              onClick={() => {setOpenDigiLocker(true);setIdx(index)}}
                               className="border border-[#6334FA] rounded-lg p-1.5 hover:bg-[#6334FA]/10 transition flex items-center justify-center"
                             >
                               <img
@@ -802,7 +801,7 @@ export const EducationDetails = ({
                           </div>
                         </div>
                       </div>}
-                      {openDigiLocker && (
+                      {openDigiLocker && index===idx&& (
                         <DigiLockerTest
                           setOpenDigiLocker={setOpenDigiLocker}
                           openDigiLocker={openDigiLocker}

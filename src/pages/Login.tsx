@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom"
 import loginImg from "../assets/login.avif"
-import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import { ArrowLeftSquare } from "lucide-react";
+import api from "@/lib/api";
 
 type FormState = {
     email: string;
@@ -41,16 +41,10 @@ export default function LoginPage(): JSX.Element {
 
         setLoading(true);
         try {
-            console.log("url",API_BASE_URL)
-            const res = await fetch(`${API_BASE_URL}/user/login`, {
-                method: "POST",
-                credentials: "include",
-                body: JSON.stringify({ email: form.email, password: form.password }),
-                headers: {
-                    "Content-Type": "application/json",
-                }
+            const res = await api.post(`/user/login`, {
+                email: form.email, password: form.password
             })
-            const data = await res.json()
+            const data = await res.data
             if (data && data.success) {
                 toast.success(data.message)
                 window.location.href = "/create-cv"

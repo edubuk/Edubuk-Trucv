@@ -1,9 +1,10 @@
-// DigiLockerTest.tsx
+// DigiLockerTest.tsx (styled)
 import api from "@/lib/api";
 import { API_BASE_URL } from "@/main";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import toast from "react-hot-toast";
+import ThreeDotLoader from "../Loader/ThreeDotLoader";
 
 
 type Profile = {
@@ -14,9 +15,6 @@ type Profile = {
   eaadhaar?: "Y" | "N";
 };
 
-
-
-// const checkClasses = "bg-emerald-50 text-emerald-600"
 
 function DigiLockerPullCard({
   onConnect,
@@ -74,11 +72,11 @@ function DigiLockerPullCard({
       description = "Degree Certificate";
       break;
   }
-  console.log("issuerName", issuerName);
+
   return (
     <div
       ref={backdropRef}
-      className="fixed inset-0 z-50 flex items-start justify-center px-4 py-6"
+      className="fixed inset-0 z-50 flex items-start justify-center px-4 py-8 sm:py-12"
       aria-modal="true"
       role="dialog"
       onMouseDown={(e) => {
@@ -87,212 +85,100 @@ function DigiLockerPullCard({
       }}
     >
       {/* blurred dim background */}
-      <div
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity" aria-hidden="true" />
 
       {/* centered popup content container */}
       <div className="relative z-30 w-full max-w-3xl">
-        {/* keep your inner markup here — adjusted styles (removed fixed/top/left classes) */}
         <div className="flex w-full">
-          <div className="flex flex-col md:flex-row gap-6 z-30 w-full p-2">
-            {/* Info column */}
-            <div className="flex-1 flex flex-col justify-between p-5 bg-white rounded-2xl border border-slate-100">
-              <div className="flex items-start gap-4">
-                <div className="flex-none w-12 h-12 rounded-lg bg-indigo-50 grid place-items-center">
-                  {/* cloud-download icon */}
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                    className="text-indigo-600"
-                  >
-                    <path
-                      d="M12 3v10"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M8 9l4 4 4-4"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M19 16.5A3.5 3.5 0 0115.5 20H8.5A3.5 3.5 0 015 16.5 3.5 3.5 0 018.5 13H9"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-
-                <div className="min-w-0">
-                  <h2
-                    id="digilocker-heading"
-                    className="text-slate-900 text-lg font-semibold truncate"
-                  >
-                    Pull certificates from DigiLocker
-                  </h2>
-                  <p className="mt-1 text-sm text-slate-500">
-                    If your certificates are stored on DigiLocker, connect to
-                    import verified documents instantly — no manual upload
-                    required.
-                  </p>
-                </div>
+          <div className="flex-1 p-6 bg-white rounded-2xl shadow-lg border border-slate-100">
+            <div className="flex items-start gap-4">
+              <div className="flex-none w-12 h-12 rounded-lg bg-indigo-50 grid place-items-center">
+                {/* cloud-download icon */}
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-indigo-600">
+                  <path d="M12 3v10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M8 9l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M19 16.5A3.5 3.5 0 0115.5 20H8.5A3.5 3.5 0 015 16.5 3.5 3.5 0 018.5 13H9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </div>
 
-              <ul className="mt-6 space-y-3 text-sm text-slate-700">
-                <li className="flex items-start gap-3">
-                  <span
-                    className={`flex-none mt-1 w-6 h-6 rounded-full grid place-items-center`}
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      aria-hidden="true"
-                      className="block"
-                    >
-                      <path
-                        d="M20 6L9 17l-5-5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  <div className="leading-tight">
-                    <span className="font-medium text-slate-800">
-                      Auto-verified:
-                    </span>{" "}
-                    <span className="text-slate-600">
-                      Certificates pulled from DigiLocker are verified by the
-                      source.
-                    </span>
-                  </div>
-                </li>
+              <div className="min-w-0">
+                <h2 id="digilocker-heading" className="text-slate-900 text-lg font-semibold truncate">Pull certificates from DigiLocker</h2>
+                <p className="mt-1 text-sm text-slate-500">If your certificates are stored on DigiLocker, connect to import verified documents instantly — no manual upload required.</p>
+              </div>
+            </div>
 
-                <li className="flex items-start gap-3">
-                  <span className="flex-none mt-1 w-6 h-6 rounded-full bg-sky-50 grid place-items-center text-[#03257e]">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      aria-hidden="true"
-                      className="block"
-                    >
-                      <path
-                        d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  <div className="leading-tight">
-                    <span className="font-medium text-slate-800">
-                      Instant retrieval:
-                    </span>{" "}
-                    <span className="text-slate-600">
-                      Fetch documents in seconds to speed up verification
-                      workflows.
-                    </span>
-                  </div>
-                </li>
+            <ul className="mt-6 grid gap-3 text-sm text-slate-700">
+              <li className="flex items-start gap-3">
+                <span className={`flex-none mt-1 w-7 h-7 rounded-full grid place-items-center bg-slate-100 text-slate-700`}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="block">
+                    <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <div className="leading-tight">
+                  <span className="font-medium text-slate-800">Auto-verified:</span>{" "}
+                  <span className="text-slate-600">Certificates pulled from DigiLocker are verified by the source.</span>
+                </div>
+              </li>
 
-                <li className="flex items-start gap-3">
-                  <span className="flex-none mt-1 w-6 h-6 rounded-full bg-emerald-50 grid place-items-center text-emerald-600">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      aria-hidden="true"
-                      className="block"
-                    >
-                      <path
-                        d="M12 2a10 10 0 100 20 10 10 0 000-20zM9.5 13.5L7 11l1-1 1.5 1.5L16 6l1 1-7.5 6.5z"
-                        stroke="currentColor"
-                        strokeWidth="0.9"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  <div className="leading-tight">
-                    <span className="font-medium text-slate-800">
-                      Trusted source:
-                    </span>{" "}
-                    <span className="text-slate-600">
-                      DigiLocker is an official government-backed repository
-                      that ensures document authenticity.
-                    </span>
-                  </div>
-                </li>
-              </ul>
+              <li className="flex items-start gap-3">
+                <span className="flex-none mt-1 w-7 h-7 rounded-full bg-sky-50 grid place-items-center text-[#03257e]">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="block">
+                    <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <div className="leading-tight">
+                  <span className="font-medium text-slate-800">Instant retrieval:</span>{" "}
+                  <span className="text-slate-600">Fetch documents in seconds to speed up verification workflows.</span>
+                </div>
+              </li>
 
-              <div className="mt-6">
-                <label
-                  htmlFor="digilocker-checkbox"
-                  className="flex items-start gap-3 text-sm text-slate-600"
-                >
-                  <input
-                    id="digilocker-checkbox"
-                    type="checkbox"
-                    checked={consent}
-                    onChange={(e) => setConsent(e.target.checked)}
-                    // onChange and checked should be controlled from parent via props or context
-                    className="mt-1 h-4 w-4 rounded border-slate-300 text-[#006666]"
-                  />
-                  <span className="text-slate-600">
-                    I provide my consent to share my basic information and
-                    educational documents with the Edubuk{" "}
-                    <span className="font-semibold text-slate-800">
-                      {issuerName}
-                    </span>{" "}
-                    for the purpose of Educational Documents Verification{" "}
-                    <span className="font-semibold text-slate-800">
-                      {description}
-                    </span>{" "}
-                    through DigiLocker to create a verified CV.
-                  </span>
-                </label>
+              <li className="flex items-start gap-3">
+                <span className="flex-none mt-1 w-7 h-7 rounded-full bg-emerald-50 grid place-items-center text-emerald-600">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="block">
+                    <path d="M12 2a10 10 0 100 20 10 10 0 000-20zM9.5 13.5L7 11l1-1 1.5 1.5L16 6l1 1-7.5 6.5z" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <div className="leading-tight">
+                  <span className="font-medium text-slate-800">Trusted source:</span>{" "}
+                  <span className="text-slate-600">DigiLocker is an official government-backed repository that ensures document authenticity.</span>
+                </div>
+              </li>
+            </ul>
 
+            <div className="mt-6">
+              <label htmlFor="digilocker-checkbox" className="flex items-start gap-3 text-sm text-slate-600">
+                <input
+                  id="digilocker-checkbox"
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-[#006666]"
+                />
+                <span className="text-slate-600">
+                  I provide my consent to share my basic information and educational documents with the Edubuk <span className="font-semibold text-slate-800">{issuerName}</span> for the purpose of Educational Documents Verification <span className="font-semibold text-slate-800">{description}</span> through DigiLocker to create a verified CV.
+                </span>
+              </label>
+
+              <div className="mt-3 flex gap-3">
                 <button
                   type="button"
                   disabled={!consent}
                   onClick={onConnect}
-                  className="inline-flex items-center mt-3 gap-2 px-4 py-2 rounded-md shadow-sm text-white font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#006666] bg-[#006666] hover:brightness-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md shadow-sm text-white font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#006666] bg-[#006666] hover:brightness-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Connect to Digilocker"
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M12 5v14M5 12h14"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   Connect DigiLocker
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOpenDigiLocker(false)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-slate-200 text-sm bg-white shadow-sm"
+                >
+                  Cancel
                 </button>
               </div>
             </div>
@@ -300,26 +186,9 @@ function DigiLockerPullCard({
         </div>
 
         {/* optional: small close button in top-right of the popup */}
-        <button
-          type="button"
-          onClick={() => setOpenDigiLocker(false)}
-          aria-label="Close popup"
-          className="absolute -top-1 -right-1 bg-white rounded-full p-1 z-30"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M6 6L18 18M6 18L18 6"
-              stroke="currentColor"
-              strokeWidth="1.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+        <button type="button" onClick={() => setOpenDigiLocker(false)} aria-label="Close popup" className="absolute -top-2 -right-2 bg-white rounded-full p-1 z-30 shadow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       </div>
@@ -348,8 +217,8 @@ export default function DigiLockerTest({
   const { getValues, setValue } = form;
   //const [status, setStatus] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [loading,setLoading] = useState<boolean>(false);
   const [uri, setUri] = useState<string>();
-
   const [consent, setConsent] = useState(false);
   const [year, setYear] = useState<string>();
   const [rollno,setRollno] = useState<string>();
@@ -386,14 +255,16 @@ export default function DigiLockerTest({
 
   const fetchProfile = async () => {
     try {
+      setLoading(true)
       const r:any = await api.get("/api/dl/me")
-      if (r.ok) {
+      if (r.status===200) {
         console.log("Profile:", r.data);
         setProfile(r.data);
+        setOpenDigiLocker(true);
       }
     } catch (err) {
       console.error("Failed to fetch profile", err);
-    }
+    }finally{setLoading(false)}
   };
 
   const fetchIssued = async () => {
@@ -402,9 +273,9 @@ export default function DigiLockerTest({
       return toast.error("year and rollno required");
     }
     try {
-      const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgId}&doctype=${doctype}`,{
-        body:{rollno:rollno,year:year}
-      })
+      const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgId}&doctype=${doctype}`,
+      {rollno, year}
+      )
       console.log("Issued docs:", r);
       if (r.data.uri) {
         setUri(r.data.uri);
@@ -419,11 +290,11 @@ export default function DigiLockerTest({
       } else {
         setErrorMsg("No document found");
       }
-      if (!r.ok) {
-        setErrorMsg(r?.error?.error_description);
+      if (!r.response.data.ok) {
+        setErrorMsg(r?.response?.data?.error?.error_description);
       }
     } catch (e: any) {
-      console.error(e);
+      setErrorMsg(e?.response?.data?.error?.error_description);
     }
   };
 
@@ -476,27 +347,22 @@ export default function DigiLockerTest({
   }
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  // const downloadPdf = (uri: string) => {
-  //   window.open(
-  //     `${API_BASE_URL}/api/dl/file?uri=${encodeURIComponent(uri)}`,
-  //     "_blank"
-  //   );
-  // };
-
-  // const viewXml = (uri: string) => {
-  //   window.open(
-  //     `${API_BASE_URL}/api/dl/xml?uri=${encodeURIComponent(uri)}`,
-  //     "_blank"
-  //   );
-  // };
+      fetchProfile();
+  },[]);
 
   // If there's no connected profile, show the Digilocker pull card (static JSX)
   if (!profile?.digilockerid) {
     return (
-      <DigiLockerPullCard
+      loading?
+      <>
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" aria-hidden="true" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="relative bg-white p-6 rounded-2xl shadow-2xl max-w-3xl w-full">
+          <ThreeDotLoader w={18} h={18} yPos="center"/>
+        </div>
+      </div>
+      </>
+      :<DigiLockerPullCard
         onConnect={startLogin}
         field={field}
         setOpenDigiLocker={setOpenDigiLocker}
@@ -508,68 +374,71 @@ export default function DigiLockerTest({
   // Otherwise show connected UI + fetch/docs area
   return (
     <>
-      <div
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
-        aria-hidden="true"
-      />
-      <div
-        className="z-20 absolute top-0 left-0 right-0 m-auto bg-white p-6 rounded"
-        style={{
-          maxWidth: 860,
-          margin: "40px auto",
-          fontFamily: "Inter, system-ui, Arial",
-        }}
-      >
-        <h1 style={{ marginBottom: 12 }}>DigiLocker Demo</h1>
-        <p style={{ opacity: 0.8, marginBottom: 24 }}>
-          <span className="rounded-full bg-green-500 text-white px-2 py-1">
-            Connected
-          </span>
-        </p>
-
-        <div
-          style={{
-            border: "1px solid #eee",
-            borderRadius: 12,
-            padding: 10,
-            marginBottom: 4,
-            background: "#fafafa",
-          }}
-        >
+    {(profile && openDigiLocker)&&<div>
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" aria-hidden="true" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="relative bg-white p-6 rounded-2xl shadow-2xl max-w-3xl w-full">
+          <div className="flex flex-col items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-4 w-full">
           <div>
-            Name: <span className="font-semibold">{profile.name}</span>
+            <h1 className="text-lg font-semibold text-slate-900">DigiLocker</h1>
+            <p className="text-sm text-slate-500 mt-1">Connected</p>
           </div>
-          <div>
-            DigiLocker ID:{" "}
-            <span className="font-semibold">{profile.digilockerid}</span>
+          <div className="text-right text-sm">
+            <span className="inline-flex items-center rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-xs font-medium">Connected</span>
           </div>
-          <div>
-            DOB: <span className="font-semibold">{profile.dob}</span>
-          </div>
-          <div>
-            Gender: <span className="font-semibold">{profile.gender}</span>
-          </div>
-          <div>
-            eAadhaar available:{" "}
-            <span className="font-semibold">
-              {profile.eaadhaar === "Y" ? "Yes" : "No"}
-            </span>
-          </div>
-        </div>
-        <div className="flex justify-start items-center gap-2">
-          <input type="text" placeholder="Enter Roll Number" value={rollno} onChange={(e) => setRollno(e.target.value)}
-          className="rounded w-full"
-          ></input>
-          <input type="text" placeholder="Enter Passing Year" value={year} onChange={(e) => setYear(e.target.value)}
-          className="rounded w-full"
-          ></input>
-        </div>
-
-        <div>
-          <label
-            htmlFor="digilocker-checkbox"
-            className="flex items-start gap-3 text-sm text-slate-600"
+          <button
+            type="button"
+            onClick={() => setOpenDigiLocker(false)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-slate-200 text-sm bg-white shadow-sm"
           >
+            Cancel
+          </button>
+        </div>
+
+        <div className="mt-4 bg-slate-50 border border-slate-100 rounded-lg p-4 grid gap-2">
+          <div className="flex justify-between text-sm text-slate-600">
+            <div>Name:</div>
+            <div className="font-medium text-slate-800">{profile.name}</div>
+          </div>
+          <div className="flex justify-between text-sm text-slate-600">
+            <div>DigiLocker ID:</div>
+            <div className="font-medium text-slate-800">{profile.digilockerid}</div>
+          </div>
+          <div className="flex justify-between text-sm text-slate-600">
+            <div>DOB:</div>
+            <div className="font-medium text-slate-800">{profile.dob}</div>
+          </div>
+          <div className="flex justify-between text-sm text-slate-600">
+            <div>Gender:</div>
+            <div className="font-medium text-slate-800">{profile.gender}</div>
+          </div>
+          <div className="flex justify-between text-sm text-slate-600">
+            <div>eAadhaar available:</div>
+            <div className="font-medium text-slate-800">{profile.eaadhaar === "Y" ? "Yes" : "No"}</div>
+          </div>
+        </div>
+        <label>Enter {description} roll no and passing year</label>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input
+            type="text"
+            placeholder="Enter Roll Number"
+            value={rollno}
+            onChange={(e) => setRollno(e.target.value)}
+            className="rounded-lg w-full px-3 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#03257e]"
+          />
+
+          <input
+            type="text"
+            placeholder="Enter Passing Year"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className="rounded-lg w-full px-3 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#03257e]"
+          />
+        </div>
+
+        <div className="mt-4">
+          <label htmlFor="digilocker-checkbox" className="flex items-start gap-3 text-sm text-slate-600">
             <input
               id="digilocker-checkbox"
               type="checkbox"
@@ -577,64 +446,38 @@ export default function DigiLockerTest({
               checked={consent}
               className="mt-1 h-4 w-4 rounded border-slate-300 text-[#006666]"
             />
-            <span className="text-slate-600">
-              I provide my consent to share my educational documents with the{" "}
-              <span className="font-semibold text-slate-800">{issuerName}</span>{" "}
-              for the purpose of fetching{" "}
-              <span className="font-semibold text-slate-800">
-                {description}
-              </span>{" "}
-              into DigiLocker.
-            </span>
+            <span className="text-slate-600">I provide my consent to share my educational documents with the <span className="font-semibold text-slate-800">{issuerName}</span> for the purpose of fetching <span className="font-semibold text-slate-800">{description}</span> into DigiLocker.</span>
           </label>
         </div>
+
         {uri && (
-          <p className="m-4 font-semibold">
-            Document found:{" "}
-            <a
-              href={`${API_BASE_URL}/api/dl/view-doc?docUri=${uri}`}
-              target="_blank"
-              className="mt-2 underline text-[#006666]"
-            >
-              View Document
-            </a>
+          <p className="mt-4 text-sm font-semibold">
+            Document found: <a href={`${API_BASE_URL}/api/dl/view-doc?docUri=${uri}`} target="_blank" className="underline text-[#006666]">View Document</a>
           </p>
         )}
 
-        <button
-          type="button"
-          className="hover:bg-[#021e50] disabled:bg-[#021e50] disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={fetchIssued}
-          disabled={!consent}
-          style={{
-            backgroundColor: "#03257e",
-            color: "white",
-            padding: "10px 16px",
-            borderRadius: 10,
-            cursor: "pointer",
-            margin: 2,
-            transition: "background-color 0.2s ease-in-out",
-          }}
-        >
-          Fetch {description}
-        </button>
-        {uri && (
+        <div className="mt-4 flex items-center gap-3">
           <button
             type="button"
-            className="ml-2 bg-green-500 text-white rounded-lg py-[10px] px-[16px]"
+            onClick={fetchIssued}
+            disabled={!consent}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium bg-[#03257e] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105 transition"
           >
-            Save Document
+            Fetch {description}
           </button>
-        )}
+
+          {uri && (
+            <button type="button" className="ml-2 bg-green-500 text-white rounded-lg py-2 px-4">Save Document</button>
+          )}
+        </div>
+
         {errorMsg && (
-          <div
-            className="text-red-500"
-            style={{ marginBottom: 4, opacity: 0.8 }}
-          >
-            {errorMsg}
-          </div>
+          <div className="text-red-500 mt-3 text-sm">{errorMsg}</div>
         )}
       </div>
+      </div>
+      </div>
+      </div>}
     </>
   );
 }

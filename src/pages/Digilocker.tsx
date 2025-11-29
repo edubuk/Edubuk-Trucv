@@ -120,6 +120,7 @@ export default function DigiLockerTest() {
       const r = await fetch(`${BACKEND}/api/dl/me`, {
         credentials: "include",
       });
+      console.log("response", r);
       if (r.ok) {
         const data = await r.json();
         console.log("Profile:", data);

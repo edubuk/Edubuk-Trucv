@@ -35,11 +35,7 @@ const CvById: React.FC<CvByIdProps> = ({ cvData }) => {
             <div className="flex items-center justify-between gap-2">
               <span className="inline-flex items-center gap-2 rounded-full bg-[#03257e]/5 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-[#03257e]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#03257e]" />
-                CV #{i + 1}
-              </span>
-
-              <span className="text-[11px] text-slate-400 group-hover:text-slate-500">
-                {user?.email ? "Linked to profile" : "Standalone CV"}
+                {doc.title}
               </span>
             </div>
 
@@ -76,7 +72,7 @@ const CvById: React.FC<CvByIdProps> = ({ cvData }) => {
           <div className="px-4 pb-4 pt-2 border-t border-slate-100">
             <div className="flex items-center gap-2">
               <Link
-                to={`/cv/${doc?.nanoId}`}
+                to={`/new-cv/${doc?._id}`}
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[#006666] py-2 text-sm font-medium text-white shadow-sm hover:bg-[#03257e] transition-colors duration-150"
               >
                 View CV

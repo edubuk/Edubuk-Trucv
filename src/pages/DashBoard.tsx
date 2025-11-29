@@ -12,7 +12,7 @@ import api from "@/lib/api";
 
 const DashBoard = () => {
     //const [isActiveButton , setActiveButton] = useState<boolean>(true);
-    const [cvData, setCvData] = useState([{}]);
+    const [cvData, setCvData] = useState([]);
     const [educationDocs,setEducationDocs] = useState({
       educations:[]
     });
@@ -117,12 +117,12 @@ const DashBoard = () => {
 
        const userCvs = async()=>{
         try {
-          const data:any = await api.get("/cv/user-cvs");
-          if(data.success)
+          const res:any = await api.get("/cv/user-cvs");
+          if(res.data.success)
           {
-            setCvData(data.data);
+            setCvData(res.data.data);
           }
-          console.log("data",data.data)
+          console.log("data",res.data)
         } catch (error) {
           toast.error("something went wrong");
              console.log("error while fetching docs",error)

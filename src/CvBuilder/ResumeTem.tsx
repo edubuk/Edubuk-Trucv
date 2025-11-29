@@ -1,4 +1,4 @@
-import { useRef} from "react";
+import { useRef, useState} from "react";
 import {
   FaPhoneAlt,
   FaEnvelope,
@@ -6,7 +6,7 @@ import {
   FaGithub,
 } from "react-icons/fa";
 
-import { useReactToPrint } from "react-to-print";
+//import { useReactToPrint } from "react-to-print";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 
 // import { SiHyperskill } from "react-icons/si";
@@ -28,6 +28,7 @@ import toast from "react-hot-toast";
 const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch<React.SetStateAction<boolean>>}) => {
   // const [copied, setCopied] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
+  const [title,setTitle] = useState("")
   // const formatDate = (dateString: string): string => {
   //   const date = new Date(dateString);
   //   console.log("date", dateString);
@@ -45,10 +46,10 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
 
 
 
-  const handlePrint = useReactToPrint({
-    contentRef: pdfRef,
-    documentTitle: "My CV"
-  });
+  // const handlePrint = useReactToPrint({
+  //   contentRef: pdfRef,
+  //   documentTitle: "My CV"
+  // });
   if (!cvData) {
     return (
       <div className="flex justify-center items-center h-[80vh]">
@@ -68,8 +69,12 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
   }
 
     const createCv = async()=>{
+      if(!title){
+        toast.error("Please enter a title")
+        return
+      }
     try {
-      const res = await api.post("/cv/create-cv",{data:cvData})
+      const res = await api.post("/cv/create-cv",{data:cvData,title:title})
       if(res.status === 200){
         toast.success("CV Created Successfully")
       }
@@ -138,9 +143,14 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
         >
           ✕
         </button>
-       <button onClick={handlePrint} className="bg-green-600 px-3 py-2 mb-2 text-white text-center rounded">Print</button>
+        <div className="flex items-center gap-2">
        <button onClick={createCv} className="bg-green-600 px-3 py-2 mb-2 text-white text-center rounded">Create CV</button>
-        {/* modal content — make scrollable and nicely padded */}
+       <input type="text" placeholder="Enter resume title"
+       onChange={(e)=>setTitle(e.target.value)}
+       className="w-full rounded px-3 py-2 mb-2 md:w-[200px]"
+       ></input>
+       </div>
+          {/* modal content — make scrollable and nicely padded */}
         <div
           ref={pdfRef}
           className="bg-white rounded-lg overflow-auto max-h-[90vh] no-scrollbar print-area"
