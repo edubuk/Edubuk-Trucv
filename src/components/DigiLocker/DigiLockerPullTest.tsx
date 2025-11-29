@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import toast from "react-hot-toast";
 import ThreeDotLoader from "../Loader/ThreeDotLoader";
+import LoadingButton from "../LoadingButton";
 
 
 type Profile = {
@@ -222,6 +223,7 @@ export default function DigiLockerTest({
   const [consent, setConsent] = useState(false);
   const [year, setYear] = useState<string>();
   const [rollno,setRollno] = useState<string>();
+  const [regno,setRegno] = useState<string>();
   let issuerName =null;
   let description =null;
   let orgId =null;
@@ -248,7 +250,7 @@ export default function DigiLockerTest({
     case "PostGraduation":
       issuerName = getValues(`educations.${index}.institutionName`);
       description = "PostGraduation Certificate";
-      doctype = "PGCER"
+      doctype = "DGCER"
       orgId = getValues(`educations.${index}.orgId`);
       break;
   }
@@ -272,8 +274,12 @@ export default function DigiLockerTest({
     if(!rollno || !year){
       return toast.error("year and rollno required");
     }
+    if(doctype === "DGCER" && !regno){
+      return toast.error("regno required");
+    }
     try {
-      const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgId}&doctype=${doctype}`,
+      setLoading(true);
+      const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgId}&doctype=${doctype}&regno=${regno}`,
       {rollno, year}
       )
       console.log("Issued docs:", r);
@@ -295,7 +301,7 @@ export default function DigiLockerTest({
       }
     } catch (e: any) {
       setErrorMsg(e?.response?.data?.error?.error_description);
-    }
+    }finally{setLoading(false)}
   };
 
   // Helpers for PKCE
@@ -418,19 +424,26 @@ export default function DigiLockerTest({
             <div className="font-medium text-slate-800">{profile.eaadhaar === "Y" ? "Yes" : "No"}</div>
           </div>
         </div>
-        <label>Enter {description} roll no and passing year</label>
+        <label>Enter below your {description} related required data</label>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="text"
-            placeholder="Enter Roll Number"
+            placeholder="Enter Roll Number*"
             value={rollno}
             onChange={(e) => setRollno(e.target.value)}
             className="rounded-lg w-full px-3 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#03257e]"
           />
 
+          {doctype === "DGCER" && <input
+            type="text"
+            placeholder="Enter Registration Number*"
+            value={regno}
+            onChange={(e) => setRegno(e.target.value)}
+            className="rounded-lg w-full px-3 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#03257e]"
+          />}
           <input
             type="text"
-            placeholder="Enter Passing Year"
+            placeholder="Enter Passing Year*"
             value={year}
             onChange={(e) => setYear(e.target.value)}
             className="rounded-lg w-full px-3 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#03257e]"
@@ -457,14 +470,16 @@ export default function DigiLockerTest({
         )}
 
         <div className="mt-4 flex items-center gap-3">
-          <button
+          {loading?<LoadingButton 
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium bg-[#03257e] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105 transition"
+          />:<button
             type="button"
             onClick={fetchIssued}
             disabled={!consent}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium bg-[#03257e] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105 transition"
           >
             Fetch {description}
-          </button>
+          </button>}
 
           {uri && (
             <button type="button" className="ml-2 bg-green-500 text-white rounded-lg py-2 px-4">Save Document</button>
