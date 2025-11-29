@@ -19,7 +19,7 @@ const SelfAttestButton = (
       )}
     >
       <CheckCircle size={26} className="size-5 mr-3" />{" "}
-      {isAttested ? "Self attested" : (required ? "Self attest*" : "Self attest")}
+      {isAttested ? "Self attested" : (required ? "Self attest*" : "Self attest*")}
     </Button>
   );
 };

@@ -220,47 +220,6 @@ export const AwardDetails = ({
     });
   }
 
-  // const emailHandler = async (index: number) => {
-  //   try {
-  //     const emailId = getValues(`awards.${index}.issuerEmail`);
-  //     const applicantName = user?.name;
-  //     const documentName = getValues(`awards.${index}.name`);
-  //     const documentType = getValues(`awards.${index}.organisation`);
-  //     const documentViewUrl = getValues(`awards.${index}.docUri`);
-  //     if (!emailId || !documentViewUrl || !documentName || !documentType)
-  //       return toast.error("Please fill first above all the input fields");
-  //     setLoading(true);
-  //     const result = await fetch(`${API_BASE_URL}/doc/email-issuer`, {
-  //       method: "POST",
-  //       credentials: "include",
-  //       body: JSON.stringify({
-  //         emailId: emailId,
-  //         documentViewUrl: documentViewUrl,
-  //         documentName: documentName,
-  //         documentType: documentType,
-  //         applicantName: applicantName,
-  //       }),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const data = await result.json();
-  //     if (!data.success) {
-  //       toast.error(data.message);
-  //       setLoading(false);
-  //     }
-
-  //     if (data.status === "Succeeded") {
-  //       toast.success(`${data.message} to entered email id`);
-  //       setLoading(false);
-  //     }
-  //   } catch (error: any) {
-  //     toast.error(error.message ?? error ?? "something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const includedIds = useMemo(
     () => new Set(cvData.educations.map((e: any) => e.id)),
     [cvData]
@@ -379,7 +338,7 @@ export const AwardDetails = ({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                     <div>
-                      <label className="">Select your relevant field</label>
+                      <label className="">Select your relevant field*</label>
                       <select
                         value={a.level}
                         onChange={(e) =>
@@ -406,7 +365,7 @@ export const AwardDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <Badge className="text-[#006666] size-4" />
-                              {a.level}
+                              {a.level}*
                             </div>
                           </FormLabel>
                           <FormControl>
@@ -428,7 +387,7 @@ export const AwardDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <Building2 className="text-[#006666] size-4" />
-                              Organisation
+                              Organisation*
                             </div>
                           </FormLabel>
                           <FormControl>
@@ -451,8 +410,8 @@ export const AwardDetails = ({
                             <div className="flex items-center gap-1">
                               <Calendar className="text-[#006666] size-4" />
                               {a.level === "Course"
-                                ? "From (eg. 10/11/2015):"
-                                : "Date of achievement"}
+                                ? "From (eg. 10/11/2015)*"
+                                : "Date of achievement*"}
                             </div>
                           </FormLabel>
                           <FormControl>
@@ -471,7 +430,7 @@ export const AwardDetails = ({
                             <FormLabel>
                               <div className="flex items-center gap-1">
                                 <Calendar className="text-[#006666] size-4" />
-                                To (eg. 10/11/2018)
+                                To (eg. 10/11/2018)*
                               </div>
                             </FormLabel>
                             <FormControl>
@@ -490,12 +449,12 @@ export const AwardDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <FileText className="text-[#006666] size-4" />
-                              Description
+                              Description*
                             </div>
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Description"
+                              placeholder="Description(write as paragraph format)"
                               className="w-full"
                               {...field}
                             />

@@ -282,10 +282,9 @@ export default function DigiLockerTest({
       const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgId}&doctype=${doctype}&regno=${regno}`,
       {rollno, year}
       )
-      console.log("Issued docs:", r);
-      if (r.data.uri) {
+      if (r.ok) {
         setUri(r.data.uri);
-        setValue(`educations.${index}.proof`, r.data.uri, {
+        setValue(`educations.${index}.docUri`, r.data.uri, {
           shouldValidate: true,
           shouldDirty: true,
         });
@@ -463,12 +462,6 @@ export default function DigiLockerTest({
           </label>
         </div>
 
-        {uri && (
-          <p className="mt-4 text-sm font-semibold">
-            Document found: <a href={`${API_BASE_URL}/api/dl/view-doc?docUri=${uri}`} target="_blank" className="underline text-[#006666]">View Document</a>
-          </p>
-        )}
-
         <div className="mt-4 flex items-center gap-3">
           {loading?<LoadingButton 
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium bg-[#03257e] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105 transition"
@@ -482,7 +475,7 @@ export default function DigiLockerTest({
           </button>}
 
           {uri && (
-            <button type="button" className="ml-2 bg-green-500 text-white rounded-lg py-2 px-4">Save Document</button>
+            <button type="button" className="ml-2 bg-green-500 text-white rounded-lg py-2 px-4" onClick={()=>setOpenDigiLocker(false)}>Save Document</button>
           )}
         </div>
 

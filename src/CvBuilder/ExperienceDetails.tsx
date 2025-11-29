@@ -372,7 +372,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                     <FormLabel>
                                                         <div className="flex items-center gap-1">
                                                             <Building className="text-[#006666] size-4" />
-                                                            Company Name
+                                                            Company Name*
                                                         </div>
                                                     </FormLabel>
                                                     <FormControl>
@@ -394,7 +394,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                     <FormLabel>
                                                         <div className="flex items-center gap-1">
                                                             <BriefcaseBusiness className="text-[#006666] size-4" />
-                                                            Position
+                                                            Position*
                                                         </div>
                                                     </FormLabel>
                                                     <FormControl>
@@ -416,7 +416,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                     <FormLabel>
                                                         <div className="flex items-center gap-1">
                                                             <Calendar className="text-[#006666] size-4" />
-                                                            From (eg. 10/11/2015)
+                                                            From (eg. 10/11/2015)*
                                                         </div>
                                                     </FormLabel>
                                                     <FormControl>
@@ -434,7 +434,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                     <FormLabel>
                                                         <div className="flex items-center gap-1">
                                                             <Calendar className="text-[#006666] size-4" />
-                                                            To (eg. 10/11/2018)
+                                                            To (eg. 10/11/2018)*
                                                         </div>
                                                     </FormLabel>
                                                     <FormControl>
@@ -452,7 +452,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                     <FormLabel>
                                                         <div className="flex items-center gap-1">
                                                             <FileText className="text-[#006666] size-4" />
-                                                            Skills
+                                                            Skills*
                                                         </div>
                                                     </FormLabel>
                                                     <FormControl>
@@ -474,12 +474,12 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                     <FormLabel>
                                                         <div className="flex items-center gap-1">
                                                             <FileText className="text-[#006666] size-4" />
-                                                            Description
+                                                            Description*
                                                         </div>
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Textarea
-                                                            placeholder="Description"
+                                                            placeholder="Description(write as paragraph format)"
                                                             className="w-full"
                                                             {...field}
                                                         />

@@ -292,7 +292,7 @@ export const ProjectDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <FolderOpenIcon className="text-[#006666] size-4" />
-                              Project Name
+                              Project Name*
                             </div>
                           </FormLabel>
                           <FormControl>
@@ -336,7 +336,7 @@ export const ProjectDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <Calendar className="text-[#006666] size-4" />
-                              From (eg. 10/11/2015)
+                              From (eg. 10/11/2015)*
                             </div>
                           </FormLabel>
                           <FormControl>
@@ -354,7 +354,7 @@ export const ProjectDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <Calendar className="text-[#006666] size-4" />
-                              To (eg. 10/11/2018)
+                              To (eg. 10/11/2018)*
                             </div>
                           </FormLabel>
                           <FormControl>
@@ -372,7 +372,7 @@ export const ProjectDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <FileText className="text-[#006666] size-4" />
-                              Skills
+                              Skills*
                             </div>
                           </FormLabel>
                           <FormControl>
@@ -394,12 +394,12 @@ export const ProjectDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <FileText className="text-[#006666] size-4" />
-                              Description
+                              Description*
                             </div>
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Description"
+                              placeholder="Description(write as paragraph format)"
                               className="w-full"
                               {...field}
                             />

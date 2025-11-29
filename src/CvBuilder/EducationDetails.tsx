@@ -25,6 +25,7 @@ import {
   ExternalLink,
   BookOpen,
   Replace,
+  CheckCircle,
 } from "lucide-react";
 import { StepCard } from "./StepCard";
 // import { uploadFile } from "@/uploadFile";
@@ -424,7 +425,7 @@ export const EducationDetails = ({
                       {/* Level - use Controller-like binding via setValue so RHF knows about change */}
                       <div>
                         <label className="text-black text-sm font-semibold pb-2">
-                          Select your education level
+                          Select your education level*
                         </label>
                         <select
                           value={field.level}
@@ -463,7 +464,7 @@ export const EducationDetails = ({
                               <FormLabel>
                                 <div className="flex items-center gap-1">
                                   <Calendar className="text-[#006666] size-4" />
-                                  Start date
+                                  Start date*
                                 </div>
                               </FormLabel>
                               <FormControl>
@@ -485,7 +486,7 @@ export const EducationDetails = ({
                               <FormLabel>
                                 <div className="flex items-center gap-1">
                                   <Calendar className="text-[#006666] size-4" />
-                                  End date
+                                  End date*
                                 </div>
                               </FormLabel>
                               <FormControl>
@@ -518,8 +519,8 @@ export const EducationDetails = ({
                                   <Building className="text-[#006666] size-4" />
                                   {field.level === "Secondary School" ||
                                   field.level === "Higher Secondary School"
-                                    ? "Board Name (e.g. CBSE/ICSE)"
-                                    : "Institute Name"}
+                                    ? "Board Name (e.g. CBSE/ICSE)*"
+                                    : "Institute Name*"}
                                 </div>
                               </FormLabel>
                               <FormControl>
@@ -569,8 +570,8 @@ export const EducationDetails = ({
                                   <School className="text-[#006666] size-4" />
                                   {field.level === "Secondary School" ||
                                   field.level === "Higher Secondary School"
-                                    ? "Institution Name"
-                                    : "Degree(e.g. BTech,BSc.)"}
+                                    ? "Institution Name*"
+                                    : "Degree(e.g. BTech,BSc.)*"}
                                 </div>
                               </FormLabel>
                               <FormControl>
@@ -600,13 +601,16 @@ export const EducationDetails = ({
                                   <Percent className="text-[#006666] size-4" />
                                   {field.level === "Secondary School" ||
                                   field.level === "Higher Secondary School"
-                                    ? "Percentage"
-                                    : "GPA"}
+                                    ? "Percentage*"
+                                    : "GPA*"}
                                 </div>
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="Percentage"
+                                  placeholder={field.level === "Secondary School" ||
+                                  field.level === "Higher Secondary School"
+                                    ? "Percentage*"
+                                    : "GPA*"}
                                   className="w-full"
                                   {...f}
                                 />
@@ -618,7 +622,7 @@ export const EducationDetails = ({
                       </div>
 
                       {/* Proof Upload & DigiLocker area (single row UI) */}
-                      {(!field.verified)
+                      {(!field.verified || !getValues(`educations.${index}.docUri`))
                       &&<div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -801,6 +805,9 @@ export const EducationDetails = ({
                           </div>
                         </div>
                       </div>}
+                      {getValues(`educations.${index}.docUri`)&&<div className="flex items-center p-4 text-green-600 gap-2">
+                        <CheckCircle size={18}/> <p>Document saved</p>
+                        </div>}
                       {openDigiLocker && index===idx&& (
                         <DigiLockerTest
                           setOpenDigiLocker={setOpenDigiLocker}
