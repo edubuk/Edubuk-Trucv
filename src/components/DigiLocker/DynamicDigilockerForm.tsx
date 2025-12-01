@@ -82,6 +82,8 @@ export default function DynamicDigilockerForm({
     }finally{setLoading(false)}
   };
 
+
+
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-1">
         <div className="flex flex-wrap items-center gap-4">
@@ -146,14 +148,14 @@ export default function DynamicDigilockerForm({
           </label>
         </div>
       <div className="flex items-center gap-2">
-        <button
+        {uri?<a href={`https://trucv.org/api/dl/view-doc?docUri=${uri}`} target="_blank" rel="noopener noreferrer">View Document</a>:<button
         type="button"  
         onClick={() => onSubmitWrapper()}   
         disabled={isSubmitting || loading || !consent}
         className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-60"
       >
-        {isSubmitting || loading ? "Sending..." : "Submit"}
-      </button>
+        {isSubmitting || loading ? "fetching..." : "Submit"}
+      </button>}
         {uri&&<button
         type="button"                 
         onClick={() => setOpenDigiLocker(false)}   
