@@ -339,7 +339,7 @@ export default function DigiLockerTest({
   },[]);
 
   // If there's no connected profile, show the Digilocker pull card (static JSX)
-  if (profile?.digilockerid) {
+  if (!profile?.digilockerid) {
     return (
       loading?
       <>
@@ -362,7 +362,7 @@ export default function DigiLockerTest({
   // Otherwise show connected UI + fetch/docs area
   return (
     <>
-    {<div>
+    {profile&&openDigiLocker&&<div>
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" aria-hidden="true" />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="relative bg-white p-6 rounded-2xl shadow-2xl max-w-3xl w-full">
