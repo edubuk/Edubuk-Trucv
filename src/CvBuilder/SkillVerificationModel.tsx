@@ -30,7 +30,7 @@ const SkillVerificationModel: React.FC<SkillVerificationProps> = ({
       setLoading(true);
       const isOrgEmailId = emailValidator(emailId);
       if (!isOrgEmailId) {
-        return setErrorMsg("Please enter valid email id");
+        return setErrorMsg("Institutional/oraganizational email id is required");
       }
       const response = await fetch(
         `${API_BASE_URL}/issuer/send-email-forSkills/${emailId}`,

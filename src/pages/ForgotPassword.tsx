@@ -68,13 +68,15 @@ function ForgotForm() {
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
-      console.log("data",data);
       if(data.status==="Succeeded")
       {
         toast.success(data.message);
         setDone(true);
+      }else{
+        toast.error(data.message);
       }
-    } catch (err) {
+    } catch (err:any) {
+      toast.error(err.message || err || "somethinmg went wrong");
       setError("Something went wrong. Please try again later.");
     } finally {
       setLoading(false);

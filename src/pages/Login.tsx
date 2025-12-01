@@ -51,9 +51,10 @@ export default function LoginPage(): JSX.Element {
             } else {
                 toast.error(data.message)
             }
-
-        } catch (err) {
-            toast.error("Something went wrong. Try again.")
+            
+        } catch (err:any) {
+            console.log("error",err);
+            toast.error(err.response.data.message);
         } finally {
             setLoading(false);
         }

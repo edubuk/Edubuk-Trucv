@@ -48,7 +48,7 @@ export const EducationItemSchema = z.object({
   docUri: z.string().optional(),
   orgId:z.string().optional(),
 }).superRefine((data,ctx)=>{
-    if(data.docUri)
+    if(data.docUri && !data.verified)
   {
     if(!data.issuerEmailId)
     {
@@ -144,6 +144,14 @@ export const ProjectItemSchema = z.object({
   skills:z.string().min(1,"skill is required").refine((s)=>s.includes(","),"Separate multiple skills using commas (e.g., React, Node.js)"),
   description: z.string().optional(),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
+}).superRefine((data,ctx)=>{
+  if(data.duration.from && data.duration.to)
+  {
+    if(data.duration.from > data.duration.to)
+    {
+      ctx.addIssue({message:"Start date should be less than end date",path:["duration","from"],code: z.ZodIssueCode.custom})
+    }
+  }
 });
 
 export const ProjectSchema = z.object({

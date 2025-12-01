@@ -92,7 +92,9 @@ export const EducationDetails = ({
   // local UI state for proof dialog/upload (example)
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
   const submitFormHandler = async (index:number) => {
+    console.log("error", errors);
     const isValid = await form.trigger(`educations.${index}`);
     if (!isValid) return;
     console.log("error", errors);
@@ -622,7 +624,7 @@ export const EducationDetails = ({
                       </div>
 
                       {/* Proof Upload & DigiLocker area (single row UI) */}
-                      {(!field.verified || !getValues(`educations.${index}.docUri`))
+                      {!(field.verified || getValues(`educations.${index}.docUri`))
                       &&<div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -806,7 +808,7 @@ export const EducationDetails = ({
                         </div>
                       </div>}
                       {getValues(`educations.${index}.docUri`)&&<div className="flex items-center p-4 text-green-600 gap-2">
-                        <CheckCircle size={18}/> <p>Document saved</p>
+                        <CheckCircle size={18}/> <p>Document fetched</p>
                         </div>}
                       {openDigiLocker && index===idx&& (
                         <DigiLockerTest

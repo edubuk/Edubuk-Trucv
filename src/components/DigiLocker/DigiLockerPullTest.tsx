@@ -3,9 +3,9 @@ import api from "@/lib/api";
 import { API_BASE_URL } from "@/main";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import toast from "react-hot-toast";
 import ThreeDotLoader from "../Loader/ThreeDotLoader";
 import LoadingButton from "../LoadingButton";
+import DynamicDigilockerForm from "./DynamicDigilockerForm";
 
 
 type Profile = {
@@ -14,6 +14,13 @@ type Profile = {
   dob?: string;
   gender?: string;
   eaadhaar?: "Y" | "N";
+};
+
+type FieldSpec = {
+  label: string;
+  paramname: string;
+  valuelist: string | null;
+  example: string | null;
 };
 
 
@@ -215,15 +222,11 @@ export default function DigiLockerTest({
   const DIGILOCKER_AUTH_URL ="https://digilocker.meripehchaan.gov.in/public/oauth2/1/authorize";
   const [profile, setProfile] = useState<Profile | null>(null);
   const form = useFormContext();
-  const { getValues, setValue } = form;
+  const { getValues} = form;
   //const [status, setStatus] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [loading,setLoading] = useState<boolean>(false);
-  const [uri, setUri] = useState<string>();
-  const [consent, setConsent] = useState(false);
-  const [year, setYear] = useState<string>();
-  const [rollno,setRollno] = useState<string>();
-  const [regno,setRegno] = useState<string>();
+  const [dlFormFields,setDlFormFields] = useState<FieldSpec[]>([]);
   let issuerName =null;
   let description =null;
   let orgId =null;
@@ -269,39 +272,19 @@ export default function DigiLockerTest({
     }finally{setLoading(false)}
   };
 
-  const fetchIssued = async () => {
-    //setStatus("Loading issued documents…");
-    if(!rollno || !year){
-      return toast.error("year and rollno required");
-    }
-    if(doctype === "DGCER" && !regno){
-      return toast.error("regno required");
-    }
+  const fetchParams = async()=>{
     try {
-      setLoading(true);
-      const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgId}&doctype=${doctype}&regno=${regno}`,
-      {rollno, year}
-      )
-      if (r.ok) {
-        setUri(r.data.uri);
-        setValue(`educations.${index}.docUri`, r.data.uri, {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
-        //setting value for the verification validations
-        setValue(`educations.${index}.status`, "verified");
-        setValue(`educations.${index}.verifiedThrough`, "DigiLocker");
-        setValue(`educations.${index}.verified`, true);
-      } else {
-        setErrorMsg("No document found");
+      const res:any = await api.post(`api/dl/pullParams?orgid=${orgId}&doctype=${doctype}`)
+      console.log("res",res)
+      if (res.data.ok) {
+        console.log("response",res.data.data);
+        setDlFormFields(res.data.data);
       }
-      if (!r.response.data.ok) {
-        setErrorMsg(r?.response?.data?.error?.error_description);
-      }
-    } catch (e: any) {
-      setErrorMsg(e?.response?.data?.error?.error_description);
-    }finally{setLoading(false)}
-  };
+    } catch (error:any) {
+      setErrorMsg(error?.response?.data?.error?.error_description);
+      console.log("error",error);
+    }
+  }
 
   // Helpers for PKCE
   function base64URLEncode(str: ArrayBuffer | Uint8Array): string {
@@ -356,7 +339,7 @@ export default function DigiLockerTest({
   },[]);
 
   // If there's no connected profile, show the Digilocker pull card (static JSX)
-  if (!profile?.digilockerid) {
+  if (profile?.digilockerid) {
     return (
       loading?
       <>
@@ -379,7 +362,7 @@ export default function DigiLockerTest({
   // Otherwise show connected UI + fetch/docs area
   return (
     <>
-    {(profile && openDigiLocker)&&<div>
+    {<div>
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" aria-hidden="true" />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="relative bg-white p-6 rounded-2xl shadow-2xl max-w-3xl w-full">
@@ -401,7 +384,7 @@ export default function DigiLockerTest({
           </button>
         </div>
 
-        <div className="mt-4 bg-slate-50 border border-slate-100 rounded-lg p-4 grid gap-2">
+        {/* <div className="mt-4 bg-slate-50 border border-slate-100 rounded-lg p-4 grid gap-2">
           <div className="flex justify-between text-sm text-slate-600">
             <div>Name:</div>
             <div className="font-medium text-slate-800">{profile.name}</div>
@@ -422,8 +405,8 @@ export default function DigiLockerTest({
             <div>eAadhaar available:</div>
             <div className="font-medium text-slate-800">{profile.eaadhaar === "Y" ? "Yes" : "No"}</div>
           </div>
-        </div>
-        <label>Enter below your {description} related required data</label>
+        </div> */}
+        {/* <label>Enter below your {description} related required data</label>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="text"
@@ -460,24 +443,25 @@ export default function DigiLockerTest({
             />
             <span className="text-slate-600">I provide my consent to share my educational documents with the <span className="font-semibold text-slate-800">{issuerName}</span> for the purpose of fetching <span className="font-semibold text-slate-800">{description}</span> into DigiLocker.</span>
           </label>
-        </div>
+        </div> */}
+        {dlFormFields?.length>0&&<DynamicDigilockerForm 
+        fields={dlFormFields} 
+        index={index}
+        setOpenDigiLocker={setOpenDigiLocker}
+        description={description || ""}
+        issuerName={issuerName || ""}
+        doctype={doctype || ""}
+        orgid = {orgId || ""}
+        setErrorMsg = {setErrorMsg}
+        />}
 
-        <div className="mt-4 flex items-center gap-3">
-          {loading?<LoadingButton 
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium bg-[#03257e] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105 transition"
-          />:<button
-            type="button"
-            onClick={fetchIssued}
-            disabled={!consent}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium bg-[#03257e] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105 transition"
-          >
-            Fetch {description}
-          </button>}
-
-          {uri && (
-            <button type="button" className="ml-2 bg-green-500 text-white rounded-lg py-2 px-4" onClick={()=>setOpenDigiLocker(false)}>Save Document</button>
-          )}
-        </div>
+        {dlFormFields?.length>0?"":<div className="mt-4 flex items-center gap-3">
+        {loading?<LoadingButton 
+        className="ml-2 bg-[#03257e] text-white rounded-lg py-2 px-4"
+        />:
+        <button type="button" className="ml-2 bg-[#03257e] text-white rounded-lg py-2 px-4" onClick={fetchParams}>Fetch Parameters</button>
+        }
+        </div>}
 
         {errorMsg && (
           <div className="text-red-500 mt-3 text-sm">{errorMsg}</div>
