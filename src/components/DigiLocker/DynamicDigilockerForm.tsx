@@ -60,10 +60,10 @@ export default function DynamicDigilockerForm({
       const body = values;
       console.log("body",body)
       const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgid}&doctype=${doctype}`,body)
-      console.log("response",r.data.data);
-      if (r.data.data.ok) {
-        setUri(r.data.data.data.uri);
-        setValue(`educations.${index}.docUri`, r.data.data.data.uri, {
+      console.log("response",r.data);
+      if (r.data.ok) {
+        setUri(r.data.data.uri);
+        setValue(`educations.${index}.docUri`, r.data.data.uri, {
           shouldValidate: true,
           shouldDirty: true,
         });
