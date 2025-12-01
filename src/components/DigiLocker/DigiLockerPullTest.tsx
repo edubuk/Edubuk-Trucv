@@ -384,7 +384,7 @@ export default function DigiLockerTest({
           </button>
         </div>
 
-        {/* <div className="mt-4 bg-slate-50 border border-slate-100 rounded-lg p-4 grid gap-2">
+        <div className="mt-4 bg-slate-50 border border-slate-100 rounded-lg p-4 grid gap-2">
           <div className="flex justify-between text-sm text-slate-600">
             <div>Name:</div>
             <div className="font-medium text-slate-800">{profile.name}</div>
@@ -405,7 +405,7 @@ export default function DigiLockerTest({
             <div>eAadhaar available:</div>
             <div className="font-medium text-slate-800">{profile.eaadhaar === "Y" ? "Yes" : "No"}</div>
           </div>
-        </div> */}
+        </div>
         {/* <label>Enter below your {description} related required data</label>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
