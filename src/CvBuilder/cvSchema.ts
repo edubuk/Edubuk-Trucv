@@ -45,7 +45,7 @@ export const EducationItemSchema = z.object({
   docHash:z.string().optional(),
   status:z.enum(["pending","verified","rejected","inProgress"]),
   verifiedThrough:z.string().optional(),
-  docUri:z.string().url().optional().or(z.literal("")),
+  docUri:z.string().optional().or(z.literal("")),
   orgId:z.string().optional(),
 }).superRefine((data,ctx)=>{
     if(data.docUri && !data.verified)

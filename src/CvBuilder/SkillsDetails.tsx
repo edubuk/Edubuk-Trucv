@@ -249,10 +249,15 @@ export const SkillDetails = ({
                 className="px-4 py-2 bg-[#006666] text-white hover:bg-[#008888] transition"
               >
                 Add Skill
-              </Button>
+              </Button> 
             </div>
             <div className="flex justify-end items-center w-full">
-            <Button type="button" className="px-4 py-2 bg-[#03257e] text-white active:scale-[0.99] transition items-align-right" onClick={() => setOpenModel(true)}>Verify Below Listed Skills</Button>
+            <Button 
+            title="Select internal checkbox to include the skill in verification list"
+            type="button" 
+            className="px-4 py-2 bg-[#03257e] text-white active:scale-[0.99] transition items-align-right" 
+            disabled={selectedSkill?.skills?.length===0}
+            onClick={() => setOpenModel(true)}>Verify Below Listed Skills</Button>
             </div>
             {/* Skills list */}
             <div className="mt-3 space-y-3">
@@ -288,7 +293,7 @@ export const SkillDetails = ({
                     {/* Bar row: name + level dropdown + self-attest + remove */}
                     <div className="flex flex-wrap items-center gap-3 border p-3 rounded bg-white">
                       {/* Skill name (editable inline if you want) */}
-                        <input
+                        {isMongoId(s.id) && <input
                             type="checkbox"
                             className="border-[#008888] h-4 w-4"
                             // checked if this row's id exists in cvData.educations
@@ -302,7 +307,7 @@ export const SkillDetails = ({
                             }
                             onChange={() => handleSkillInclude(index)}
                             aria-label={`Include skills ${index + 1} in CV`}
-                          />
+                          />}
                       <div className="flex-1 text-sm font-medium text-slate-800">
                         <FormField
                           control={control}
