@@ -1,6 +1,7 @@
 import { StepCard } from "./StepCard";
 import {
   Calendar,
+  Delete,
   FileText,
   FolderOpenIcon,
   Link,
@@ -25,10 +26,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { IStepCard } from "./PersonalDetails";
 import { Button } from "@/components/ui/button";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
-import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import { useEffect, useState,useMemo } from "react";
 import { isMongoId } from "@/lib/utils";
+import api from "@/lib/api";
 
 export const ProjectDetails = ({
   step,
@@ -38,6 +39,8 @@ export const ProjectDetails = ({
   cvData,
 }: IStepCard) => {
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [loading,setLoading]= useState<boolean>(false);
+  const [idx,setIdx]= useState<number>();
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(ProjectSchema),
     defaultValues: {
@@ -86,16 +89,12 @@ export const ProjectDetails = ({
   const projectSubmitHandler = async (data: ProjectFormValues) => {
     console.log("project form values", data);
     try {
+      setLoading(true);
       const payload = data.projects;
-      const res = await fetch(`${API_BASE_URL}/doc/save-projects`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({ data: payload }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const res = await api.post(`/doc/save-projects`, {
+        data: payload,
       });
-      const result = await res.json();
+      const result = await res.data;
       if (result.success) {
         toast.success(result.message);
         setRefresh((prev) => !prev);
@@ -105,16 +104,15 @@ export const ProjectDetails = ({
     } catch (error: any) {
       console.log(error);
       toast.error(error.message || "Something went wrong");
+    }finally{
+      setLoading(false);
     }
   };
 
   const fetchProjDocs = async () => {
     try {
-      const data = await fetch(`${API_BASE_URL}/doc/projects-docs`, {
-        method: "GET",
-        credentials: "include",
-      });
-      const res = await data.json();
+      const data = await api.get(`/doc/projects-docs`);
+      const res = await data.data;
       console.log("data", res);
       if (res.success) {
         const projects = res.projects.map((doc: any) => ({
@@ -140,20 +138,14 @@ export const ProjectDetails = ({
 
   const updateHandler = async (index: number) => {
     try {
+      setLoading(true);
+      setIdx(index);
       const payload = getValues(`projects.${index}`);
       console.log("payload", payload);
-      const data = await fetch(
-        `${API_BASE_URL}/doc/update-projDoc/${payload.id}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          body: JSON.stringify({ data: payload }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const res = await data.json();
+      const data = await api.put(`/doc/update-projDoc/${payload.id}`, {
+        data: payload,
+      });
+      const res = await data.data;
       if (!res.success) {
         toast.error(res.message);
         return;
@@ -162,8 +154,29 @@ export const ProjectDetails = ({
       setRefresh((prev) => !prev);
     } catch (error) {
       toast.error("something went wrong");
-    }
+    }finally{setLoading(false)}
   };
+
+  const deleteHandler = async (index: number) => {
+        try {
+          setLoading(true);
+          setIdx(index);
+          const payload = getValues(`projects.${index}`);
+          const res = await api.delete(`/doc/delete-projDoc/${payload.id}`);
+          console.log("res",res)
+          if (!res.data.success) {
+            toast.error(res.data.message);
+            return;
+          }
+          toast.success(res.data.message);
+          setRefresh((prev) => !prev);
+        } catch (error: any) {
+          toast.error(error.message ?? error ?? "something went wrong");
+        }finally{
+          setLoading(false)
+        }
+      };
+
   useEffect(() => {
     fetchProjDocs();
   }, [step === 5, refresh]);
@@ -266,11 +279,12 @@ export const ProjectDetails = ({
                     />
                     {isMongoId(p.id) ? (
                       <button
+                      disabled={loading}
                         type="button"
                         onClick={() => updateHandler(index)}
-                        className="mt-2 px-3 py-1 rounded bg-[#f14419] border border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/90 active:scale-[0.99] transition"
+                        className="mt-2 px-3 py-1 rounded bg-[#006666] border border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
                       >
-                        <Replace size={14} /> Update
+                        <Replace size={14} /> {loading&&idx===index?"Updating...":"Update"}
                       </button>
                     ) : (
                       <button
@@ -281,6 +295,14 @@ export const ProjectDetails = ({
                         <Trash2 size={14} /> Remove
                       </button>
                     )}
+                    {isMongoId(p.id)&&<Button
+                      type="button"
+                      disabled={loading}
+                      onClick={() => deleteHandler(index)}
+                      className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                    >
+                      <Delete size={18} /> Delete
+                    </Button>}
                   </div>
                 </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">

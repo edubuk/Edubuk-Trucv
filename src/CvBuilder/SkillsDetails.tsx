@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { CheckCircle, Trash2 } from "lucide-react";
+import { CheckCircle, Delete, Trash2 } from "lucide-react";
 import { StepCard } from "./StepCard";
 import { IStepCard } from "./PersonalDetails";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
-import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import { isMongoId } from "@/lib/utils";
 import LoadingButton from "@/components/LoadingButton";
 import SkillVerificationModel from "./SkillVerificationModel";
+import api from "@/lib/api";
 
 export const SkillDetails = ({
   step,
@@ -30,6 +30,8 @@ export const SkillDetails = ({
 }: IStepCard) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModel,setOpenModel] = useState<boolean>(false);
+  const [refresh,setRefresh] = useState<boolean>(false);
+  const [idx,setIdx]= useState<number>();
   const [selectedSkill,setSelectedSkill] = useState<any>({
     skills:[]
   });
@@ -41,7 +43,6 @@ export const SkillDetails = ({
   });
 
   const { control, setValue, handleSubmit, getValues } = form;
-
   const { fields, append, remove } = useFieldArray({
     control,
     name: "skills",
@@ -94,20 +95,16 @@ export const SkillDetails = ({
     console.log("form values", data);
     try {
       setLoading(true);
-      const doc = await fetch(`${API_BASE_URL}/doc/save-skills`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({ data: data }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const doc = await api.post(`/doc/save-skills`, {
+        data: data
       });
-      const response = await doc.json();
+      const response = await doc.data;
       console.log("data", response);
       if (!response.success) {
         return toast.error(response.message || "Something went wrong");
       }
       toast.success(response.message);
+      setRefresh((prev) => !prev);
     } catch (error: any) {
       console.log("error", error);
       toast.error(error.message || error || "Something went wrong");
@@ -118,11 +115,8 @@ export const SkillDetails = ({
 
   const fetchSkills = async () => {
     try {
-      const docs = await fetch(`${API_BASE_URL}/doc/skill-docs`, {
-        method: "GET",
-        credentials: "include",
-      });
-      const response = await docs.json();
+      const docs = await api.get(`/doc/skill-docs`);
+      const response = await docs.data;
       console.log("data", response.skills);
       if (response.success) {
         const skills = response?.skills.map((doc: any) => ({
@@ -143,7 +137,7 @@ export const SkillDetails = ({
 
   useEffect(() => {
     fetchSkills();
-  }, [step === 4, loading]);
+  }, [step === 4,refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.skills.map((e: any) => e.id)),
@@ -179,6 +173,24 @@ export const SkillDetails = ({
       }
     });
   }
+
+  const deleteHandler = async (index: number) => {
+        try {
+          setLoading(true);
+          setIdx(index);
+          const payload = getValues(`skills.${index}`);
+          const res = await api.delete(`/doc/delete-skillDoc/${payload.id}`);
+          console.log("res",res)
+          if (!res.data.success) {
+            toast.error(res.data.message);
+            return;
+          }
+          toast.success(res.data.message);
+          setRefresh((prev) => !prev);
+        } catch (error: any) {
+          toast.error(error.data.message || error.message || error || "something went wrong");
+        }finally{setLoading(false)}
+      };
 
   function handleSkillInclude(index: number) {
     const payload = buildEducationPayload(index);
@@ -377,16 +389,23 @@ export const SkillDetails = ({
                           )}
                         />
 
-                        {!isMongoId(s.id) && (
+                        {isMongoId(s.id)? 
                           <button
+                            type="button"
+                            onClick={() => deleteHandler(index)}
+                            className=" px-2 py-1 rounded border shadow-lg border-red-600 bg-transparent text-red-600 text-sm flex font-semibold items-center gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                          >
+                            <Delete size={18} />
+                            {loading&&idx===index?"Deleting...":"Delete"}
+                          </button>
+                        :<button
                             type="button"
                             onClick={() => removeSkill(index)}
                             className=" px-2 py-1 rounded border shadow-lg border-red-600 bg-transparent text-red-600 text-sm flex font-semibold items-center gap-2 hover:bg-red-50 active:scale-[0.99] transition"
                           >
                             <Trash2 size={18} />
                             Remove
-                          </button>
-                        )}
+                          </button>}
                       </div>
                     </div>
                   </React.Fragment>

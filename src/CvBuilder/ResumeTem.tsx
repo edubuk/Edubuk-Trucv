@@ -23,12 +23,14 @@ import { ICvData } from "./CvBuilder";
 import { TypeAward, TypeEducation, TypeExperience, TypeProject, TypeSkill } from "./cvSchema";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 //import PdfDownloader from "@/components/PDFDownloader/PdfDownloader";
 
 const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch<React.SetStateAction<boolean>>}) => {
   // const [copied, setCopied] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
   const [title,setTitle] = useState("")
+  const navigate = useNavigate();
   // const formatDate = (dateString: string): string => {
   //   const date = new Date(dateString);
   //   console.log("date", dateString);
@@ -77,6 +79,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
       const res = await api.post("/cv/create-cv",{data:cvData,title:title})
       if(res.status === 200){
         toast.success("CV Created Successfully")
+        navigate("/dashboard")
       }
     } catch (error) {
       toast.error("Something went wrong")
@@ -273,7 +276,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
                         <i>{exp.jobRole}</i>
                       </div>
                       <p className="text-[#000000] text-right">
-                        {exp.duration.from} - {exp.duration.to}
+                        {exp.duration.from}-{exp.duration.to}
                       </p>
                     </div>
                     <ul className="list-disc list-inside text-[#000000] mt-2 pl-6">
@@ -284,6 +287,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
                           .map((point, i) => (
                             <li key={i}>{point.endsWith(".") ? point : `${point}.`}</li>
                           ))}
+                      <li >Skills: <strong>{exp.skills}</strong></li>
                     </ul>
                   </div>
                 ))}
@@ -313,6 +317,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
                             <li key={i}>{point.endsWith(".") ? point : `${point}.`}</li>
                           ))}
                       </ul>
+                      <li >Skills: <strong>{project.skills}</strong></li>
                     </div>
                   </div>
                 ))}
@@ -330,7 +335,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
                       <div className="flex justify-between items-center">
                         <h3 className="font-bold text-[#000000]">{award.name}</h3>
                         <p className="text-[#000000] text-right">
-                          {award.duration.from} - {award.duration.to}
+                          {award.duration.from}
                         </p>
                       </div>
                       <ul className="list-disc list-inside text-[#000000] mt-2 pl-6">

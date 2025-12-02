@@ -16,12 +16,12 @@ import { PersonalDetailsItem, personalDetailsSchema } from "./cvSchema";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
 import { Button } from "@/components/ui/button";
 import { uploadFile } from "@/uploadFile";
-import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
 import { useUserData } from "@/context/AuthContext";
 import { Textarea } from "@/components/ui/textarea";
 import { ICvData } from "./CvBuilder";
+import api from "@/lib/api";
 
 
 export interface IStepCard {
@@ -158,15 +158,10 @@ useEffect(() => {
         console.log("personal data", data);
         try{
             setLoading(true);
-            const updateUser = await fetch(`${API_BASE_URL}/user/update-userInfo`,{
-                method:"PUT",
-                credentials:"include",
-                body:JSON.stringify({name:data.fullName,phoneNumber:data.phoneNumber,address:data.location,userImageUrl:data.imageUrl,linkedInUrl:data.linkedin,githubUrl:data.github,selfAttested:data.selfAttested,yearOfExp:data.yearOfExp,profession:profession,profileSummary:data.profileSummary}),
-                headers:{
-                    "Content-Type":"application/json"
-                }
+            const updateUser = await api.put(`/user/update-userInfo`,{
+                name:data.fullName,phoneNumber:data.phoneNumber,address:data.location,userImageUrl:data.imageUrl,linkedInUrl:data.linkedin,githubUrl:data.github,selfAttested:data.selfAttested,yearOfExp:data.yearOfExp,profession:profession,profileSummary:data.profileSummary
             })
-            const res = await updateUser.json();
+            const res = await updateUser.data;
             console.log("res",res);
             if(res.success)
             {

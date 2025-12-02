@@ -68,7 +68,7 @@ useEffect(() => {
               <Route path="/admin" element={<Layout><AdminUsersPage/></Layout>} />
               <Route path="/pricing" element={<ProtectedRoute><SubscriptionPlans /></ProtectedRoute>} />
               <Route path="/create-cv" element={<Layout><HomePage /></Layout>} />
-              <Route path="/dashboard" element={<ProtectedRoute><Layout><DashBoard /></Layout></ProtectedRoute>} />
+              <Route path="/dashboard" element={<Layout><DashBoard /></Layout>} />
               <Route path="/register" element={<Register />} />
             </Routes>
           </Suspense>

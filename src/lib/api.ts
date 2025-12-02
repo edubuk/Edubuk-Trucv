@@ -76,8 +76,8 @@ api.interceptors.response.use(
     const status = error.response?.status || 0;
     const isAuthError = status === 401;
     console.log("error response",error.response)
-    if(error.response?.status===429){
-      toast.error(error.response.data)
+    if(error.response?.status>=400){
+      toast.error(error.response.data.message || error.response.data.error)
     }
     const isRefreshEndpoint =
       originalRequest?.url?.includes("/user/refresh-token") ?? false;

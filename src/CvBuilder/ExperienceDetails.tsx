@@ -1,6 +1,6 @@
 import { useEffect, useState ,useMemo} from "react";
 import { StepCard } from "./StepCard"
-import { Briefcase, BriefcaseBusiness, Building, Calendar, ExternalLink, FileText, Paperclip, PlusCircle, Replace, Trash2 } from "lucide-react"
+import { Briefcase, BriefcaseBusiness, Building, Calendar, CheckCircle, Clock, Delete, ExternalLink, FileText, Paperclip, PlusCircle, Replace, Trash2 } from "lucide-react"
 import { ExperienceSchema, ExperienceFormValues } from "./cvSchema";
 import {
     Form,
@@ -18,10 +18,10 @@ import { IStepCard } from "./PersonalDetails";
 import { Button } from "@/components/ui/button";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
 import { handleProofUploaded } from "./uploadProof";
-import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
+import api from "@/lib/api";
 //import { useUserData } from "@/context/AuthContext";
 
 export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: IStepCard) => {
@@ -104,15 +104,10 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
     try {
         setIdx(index);
       setLoading(true);
-      const result = await fetch(`${API_BASE_URL}/doc/save-expDoc`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({data:payload}),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const result = await api.post(`/doc/save-expDoc`, {
+      data:payload
       });
-      const res = await result.json();
+      const res = await result.data;
       if (!res.success) {
         toast.error(res.message);
         setLoading(false);
@@ -130,34 +125,30 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
 
     const fetchExpDocs = async () => {
             try {
-                const data = await fetch(`${API_BASE_URL}/doc/experience-docs`, {
-                    method: "GET",
-                    credentials: "include",
-                })
-                const res = await data.json();
+                const data = await api.get(`/doc/experience-docs`);
+                const res = await data.data;
                 console.log("data", res);
                 if (res.success) {
-                        const experiences    = res.documents.map((doc: any) => ({
-                            id: doc._id ?? uid("exp"), // ensure unique id for RHF key
-                            expDocId:doc.expDocId ?? "",
-                            companyName: doc.companyName ?? "",
-                            jobRole: doc.jobRole ?? "",
-                            duration: {
-                                from: doc.duration?.from ?? "",
-                                to: doc.duration?.to ?? "",
-                            },
-                            skills: doc.skills ?? "",
-                            description: doc.description ?? "",
-                            selfAttested: doc.selfAttested ?? false,
-                            isEmailSend: doc.isEmailSend ?? false,
-                            docUri:doc.docUri??"",
-                            issuerEmailId:doc.issuerEmailId??"",
-                            verified: doc.verified ?? false,
-                            status: doc.status ?? "pending",
-                        }));
-    
-                        // Update form values
-                        form.reset({ experiences });
+                const experiences    = res.documents.map((doc: any) => ({
+                    id: doc._id ?? uid("exp"), // ensure unique id for RHF key
+                    expDocId:doc.expDocId ?? "",
+                    companyName: doc.companyName ?? "",
+                    jobRole: doc.jobRole ?? "",
+                    duration: {
+                        from: doc.duration?.from ?? "",
+                        to: doc.duration?.to ?? "",
+                    },
+                    skills: doc.skills ?? "",
+                    description: doc.description ?? "",
+                    selfAttested: doc.selfAttested ?? false,
+                    isEmailSend: doc.isEmailSend ?? false,
+                    docUri:doc.docUri??"",
+                    issuerEmailId:doc.issuerEmailId??"",
+                    verified: doc.verified ?? false,
+                    status: doc.status ?? "pending",
+                }));
+                // Update form values
+                form.reset({ experiences });
                 }
             } catch (error) {
                 toast.error("something went wrong");
@@ -172,15 +163,10 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
             try {
                 const payload = getValues(`experiences.${index}`);
                 console.log("payload",payload);
-                const data = await fetch(`${API_BASE_URL}/doc/update-expDoc/${payload.id}`,{
-                    method:"PUT",
-                    credentials:"include",
-                    body:JSON.stringify({data:payload}),
-                    headers:{
-                        "Content-Type":"application/json"
-                    }
+                const data = await api.put(`/doc/update-expDoc/${payload.id}`,{
+                    data:payload
                 })
-                const res = await data.json();
+                const res = await data.data;
                 if(!res.success){
                     toast.error(res.message);
                     return;
@@ -192,6 +178,25 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
             }
         }
 
+    const deleteHandler = async (index: number) => {
+        try {
+            setLoading(true);
+            setIdx(index);
+          const payload = getValues(`experiences.${index}`);
+          const res = await api.delete(`/doc/delete-expDoc/${payload.id}`);
+          console.log("res",res)
+          if (!res.data.success) {
+            toast.error(res.data.message);
+            return;
+          }
+          toast.success(res.data.message);
+          setRefresh((prev) => !prev);
+          setLoading(false);
+        } catch (error: any) {
+          toast.error(error.message ?? error ?? "something went wrong");
+          setLoading(false);
+        }
+      };
 
         const uploadDocHandler = async(file:File,index:number)=>{
             if (!file) return;
@@ -213,50 +218,6 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
               shouldDirty: true,
             });
           }
-
-    // const emailHandler = async (index: number) => {
-    //         try {
-    //             const emailId = getValues(`experiences.${index}.issuerEmail`);
-    //             const applicantName = user?.name;
-    //             const documentName = getValues(`experiences.${index}.jobRole`);
-    //             const documentType = getValues(`experiences.${index}.companyName`);
-    //             const documentViewUrl = getValues(`experiences.${index}.docUri`);
-    //             const skills = getValues(`experiences.${index}.skills`);
-    
-    //             if (!emailId || !documentViewUrl || !documentName || !documentType || !skills)
-    //                 return toast.error("Please fill first above all the input fields");
-    //             setLoading(true);
-    //             const result = await fetch(`${API_BASE_URL}/doc/email-issuer?skills=${skills}`, {
-    //                 method: "POST",
-    //                 credentials: "include",
-    //                 body: JSON.stringify({
-    //                     emailId: emailId,
-    //                     documentViewUrl: documentViewUrl,
-    //                     documentName: documentName,
-    //                     documentType: documentType,
-    //                     applicantName: applicantName
-    //                 }),
-    //                 headers: {
-    //                     "Content-Type": "application/json"
-    //                 }
-    //             })
-    //             const data = await result.json();
-    //             if (!data.success) {
-    //                 toast.error(data.message);
-    //                 setLoading(false);
-    //             }
-    
-    //             if (data.status === "Succeeded") {
-    //                 toast.success(`${data.message} to entered email id`)
-    //                 setLoading(false);
-    
-    //             }
-    //         } catch (error: any) {
-    //             toast.error(error.message ?? error ?? "something went wrong")
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     }
 
 
           const includedIds = useMemo(
@@ -324,9 +285,12 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                     </div>}
                                 <div key={field.rhfKey} className="border p-4 rounded bg-white">
                                     <div className="flex justify-between flex-wrap items-center mb-2">
-                                       <div className="text-sm font-medium text-[#03257e]">
-                                        Company {field.id}
-                                        </div>
+                                        <div className="text-md flex gap-1 items-center text-slate-500 break-all">
+                          Company {field.id} 
+                          {isMongoId(field.id) && (field.verified?
+                          <p className="flex items-center font-bold text-lg gap-1 text-[#008888]"> <CheckCircle size={18}/>Verified</p>
+                          :<p className="flex items-center text-lg font-bold gap-1 text-[#f14419]"><Clock size={18}/> Pending</p>)}
+                        </div>
                                         <div className="flex items-center justify-end gap-2">
                                             <FormField
                                                 control={control}
@@ -345,11 +309,11 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                             />
                                             {isMongoId(field.id)? <Button
                                                     type="button"
-                                                    disabled={field.verified}
+                                                    disabled={field.verified || loading}
                                                     onClick={()=>updateHandler(index)}
-                                                    className="mt-2 px-3 py-1 rounded border bg-[#F14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/90 active:scale-[0.99] transition"
+                                                    className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
                                                 >
-                                                    <Replace size={18} /> Update
+                                                    <Replace size={18} /> {loading&&idx===index?"Updating...":"Update"}
                                                 </Button>:
                                                 <button
                                                     type="button"
@@ -358,6 +322,14 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                 >
                                                     <Trash2 size={14} /> Remove
                                                 </button>}
+                                                {isMongoId(field.id)&&<Button
+                                                   disabled={field.verified || loading}
+                                                   type="button"
+                                                   onClick={() => deleteHandler(index)}
+                                                   className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                                                 >
+                                                   <Delete size={18} /> Delete
+                                                 </Button>}
                                         </div>
                                     </div>
                                     <div className="flex justify-start items-center gap-1">

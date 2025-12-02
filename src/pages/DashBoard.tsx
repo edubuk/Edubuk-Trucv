@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 //import OnChainData from "./OnChainData";
 import CvById from "./CvById";
 //import { connectWallet } from "@/api/contract.api";
@@ -128,6 +128,10 @@ const DashBoard = () => {
              console.log("error while fetching docs",error)
         }
        }
+
+    useEffect(()=>{
+        userCvs();
+    },[])
 
   return (
     <div className="flex flex-col justify-center items-center h-auto w-full">

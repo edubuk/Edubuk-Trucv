@@ -26,18 +26,20 @@ import {
   BookOpen,
   Replace,
   CheckCircle,
+  Delete,
+  Clock,
 } from "lucide-react";
 import { StepCard } from "./StepCard";
 // import { uploadFile } from "@/uploadFile";
 import { DropDown } from "@/components/ui/dropdown";
 import { handleProofUploaded } from "./uploadProof";
 import DigiLockerTest from "@/components/DigiLocker/DigiLockerPullTest";
-import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
 //import { useUserData } from "@/context/AuthContext";
 import { isMongoId } from "@/lib/utils";
 import { ICvData } from "./CvBuilder";
+import api from "@/lib/api";
 
 export const EducationDetails = ({
   step,
@@ -103,15 +105,10 @@ export const EducationDetails = ({
     try {
       setIdx(index);
       setLoading(true);
-      const result = await fetch(`${API_BASE_URL}/doc/save-doc`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({ data: payload }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const result = await api.post(`/doc/save-eduDoc`, {
+        data:payload
       });
-      const res = await result.json();
+      const res = await result.data;
       if (!res.success) {
         toast.error(res.message);
         setLoading(false);
@@ -163,11 +160,8 @@ export const EducationDetails = ({
 
   const fetchEducationsDocs = async () => {
     try {
-      const data = await fetch(`${API_BASE_URL}/doc/education-docs`, {
-        method: "GET",
-        credentials: "include",
-      });
-      const res = await data.json();
+      const data = await api.get(`/doc/education-docs`);
+      const res = await data.data;
       console.log("data", res);
       if (res.success) {
         const educations = res.documents.map((doc: any) => ({
@@ -205,15 +199,10 @@ export const EducationDetails = ({
     try {
       const payload = getValues(`educations.${index}`);
       console.log("payload", payload);
-      const data = await fetch(`${API_BASE_URL}/doc/update-doc/${payload.id}`, {
-        method: "PATCH",
-        credentials: "include",
-        body: JSON.stringify({ data: payload }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const data = await api.put(`/doc/update-eduDoc/${payload.id}`, {
+        data:payload
       });
-      const res = await data.json();
+      const res = await data.data;
       if (!res.success) {
         toast.error(res.message);
         return;
@@ -222,6 +211,25 @@ export const EducationDetails = ({
       setRefresh((prev) => !prev);
     } catch (error) {
       toast.error("something went wrong");
+    }
+  };
+
+  const deleteHandler = async (index: number) => {
+    try {
+      setIdx(index);
+      setLoading(true);
+      const payload = getValues(`educations.${index}`);
+      const res = await api.delete(`/doc/delete-eduDoc/${payload.id}`);
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return;
+      }
+      toast.success(res.data.message);
+      setRefresh((prev) => !prev);
+      setLoading(false);
+    } catch (error: any) {
+      toast.error(error.message ?? error ?? "something went wrong");
+      setLoading(false);
     }
   };
 
@@ -345,8 +353,11 @@ export const EducationDetails = ({
                             : "College"}{" "}
                           entry
                         </div>
-                        <div className="text-xs text-slate-500 break-all sm:truncate sm:max-w-[280px]">
-                          {field.id}
+                        <div className="text-xs flex gap-1 items-center text-slate-500 break-all sm:truncate sm:max-w-[280px]">
+                          {field.id} 
+                          {isMongoId(field.id) && (field.verified?
+                          <p className="flex items-center font-bold text-lg gap-1 text-[#008888]"> <CheckCircle size={18}/>Verified</p>
+                          :<p className="flex items-center text-lg font-bold gap-1 text-[#f14419]"><Clock size={18}/> Pending</p>)}
                         </div>
                       </div>
 
@@ -375,9 +386,9 @@ export const EducationDetails = ({
                             disabled={field.verified}
                             type="button"
                             onClick={() => updateHandler(index)}
-                            className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                            className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/80 active:scale-[0.99] transition"
                           >
-                            <Replace size={14} /> Update
+                            <Replace size={18} /> {loading&&idx===index?"Updating...":"Update"}
                           </Button>
                         ) : (
                           <button
@@ -385,9 +396,17 @@ export const EducationDetails = ({
                             onClick={() => removeEducation(index)}
                             className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
                           >
-                            <Trash2 size={14} /> Remove
+                            <Trash2 size={18} /> Remove
                           </button>
                         )}
+                        {isMongoId(field.id)&&<Button
+                            disabled={field.verified || loading}
+                            type="button"
+                            onClick={() => deleteHandler(index)}
+                            className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                          >
+                            <Delete size={18} /> Delete
+                          </Button>}
                       </div>
                     </div>
 

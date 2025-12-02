@@ -7,6 +7,7 @@ import { ProjectDetails } from "./ProjectsDetails";
 import { AwardDetails } from "./AwardDetails";
 import { v4 as uuidv4 } from "uuid";
 import Resume from "./ResumeTem";
+import { Button } from "@mui/material";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
 
 
@@ -129,18 +130,20 @@ export default function CVBuilder() {
             <div className="pt-4 border-t mt-6 flex items-center justify-between">
               <div className="text-sm text-slate-500">{step ? `Open: Step ${step} of 7` : "No step open"}</div>
               <div className="flex gap-2">
-                <button
+                <Button
+                disabled={step===1}
                   onClick={() => setStep((s) => Math.max(1, (s || 1) - 1))}
                   className="px-3 py-1 rounded border"
                 >
-                  Prev
-                </button>
-                <button
-                  onClick={() => setStep((s) => Math.min(7, (s || 1) + 1))}
+                  Prev Step
+                </Button>
+                <Button
+                disabled={step===6}
+                  onClick={() => setStep((s) => Math.min(6, (s || 1) + 1))}
                   className="px-3 py-1 rounded bg-[#03257e] text-white"
                 >
-                  Next
-                </button>
+                  Next Step
+                </Button>
               </div>
             </div>
           </div>

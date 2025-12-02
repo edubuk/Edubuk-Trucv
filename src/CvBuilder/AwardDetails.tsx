@@ -5,6 +5,7 @@ import {
   Badge,
   Building2,
   Calendar,
+  Delete,
   ExternalLink,
   FileText,
   Paperclip,
@@ -30,11 +31,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
 import { handleProofUploaded } from "./uploadProof";
-import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 //import { useUserData } from "@/context/AuthContext";
 import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
+import api from "@/lib/api";
 
 export const AwardDetails = ({
   step,
@@ -108,15 +109,10 @@ export const AwardDetails = ({
     try {
       setIdx(index);
       setLoading(true);
-      const result = await fetch(`${API_BASE_URL}/doc/save-awards`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({data:payload}),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const result = await api.post(`/doc/save-awards`, {
+        data:payload
       });
-      const res = await result.json();
+      const res = await result.data;
       if (!res.success) {
         toast.error(res.message);
         setLoading(false);
@@ -134,11 +130,8 @@ export const AwardDetails = ({
 
   const fetchExpDocs = async () => {
     try {
-      const data = await fetch(`${API_BASE_URL}/doc/award-docs`, {
-        method: "GET",
-        credentials: "include",
-      });
-      const res = await data.json();
+      const data = await api.get(`/doc/award-docs`);
+      const res = await data.data;
       console.log("data", res);
       if (res.success) {
         const awards = res.awards.map((doc: any) => ({
@@ -174,20 +167,16 @@ export const AwardDetails = ({
 
   const updateHandler = async (index: number) => {
     try {
+      setLoading(true);
+      setIdx(index);
       const payload = getValues(`awards.${index}`);
       console.log("payload", payload);
-      const data = await fetch(
-        `${API_BASE_URL}/doc/update-awardDoc/${payload.id}`,
+      const data = await api.put(`/doc/update-awardDoc/${payload.id}`,
         {
-          method: "PUT",
-          credentials: "include",
-          body: JSON.stringify({ data: payload }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          data:payload
         }
       );
-      const res = await data.json();
+      const res = await data.data;
       if (!res.success) {
         toast.error(res.message);
         return;
@@ -196,7 +185,7 @@ export const AwardDetails = ({
       setRefresh((prev) => !prev);
     } catch (error) {
       toast.error("something went wrong");
-    }
+    }finally{setLoading(false)}
   };
 
   const uploadDocHandler = async(file:File,index:number)=>{
@@ -219,6 +208,26 @@ export const AwardDetails = ({
       shouldDirty: true,
     });
   }
+
+  const deleteHandler = async (index: number) => {
+    try {
+      setLoading(true);
+      setIdx(index);
+      const payload = getValues(`awards.${index}`);
+      const res = await api.delete(`/doc/delete-awardDoc/${payload.id}`);
+      console.log("res",res)
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return;
+      }
+      toast.success(res.data.message);
+      setRefresh((prev) => !prev);
+    } catch (error: any) {
+      toast.error(error.data.message || error.message || error || "something went wrong");
+    }finally{
+      setLoading(false);
+    }
+  };
 
   const includedIds = useMemo(
     () => new Set(cvData.educations.map((e: any) => e.id)),
@@ -320,9 +329,9 @@ export const AwardDetails = ({
                         disabled={a.verified}
                           type="button"
                           onClick={() => updateHandler(index)}
-                          className="mt-2 px-3 py-1 rounded bg-[#f14419] border border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/90 active:scale-[0.99] transition"
+                          className="mt-2 px-3 py-1 rounded bg-[#006666] border border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
                         >
-                          <Replace size={14} /> Update
+                          <Replace size={14} /> {loading&&idx===index?"Updating...":"Update"}
                         </Button>
                       ) : (
                         <button
@@ -333,6 +342,14 @@ export const AwardDetails = ({
                           <Trash2 size={14} /> Remove
                         </button>
                       )}
+                      {isMongoId(a.id)&&<Button
+                          disabled={a.verified || loading}
+                          type="button"
+                          onClick={() => deleteHandler(index)}
+                          className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                        >
+                          <Delete size={18} />Delete
+                        </Button>}
                     </div>
                   </div>
 

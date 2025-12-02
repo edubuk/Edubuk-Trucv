@@ -308,6 +308,7 @@ const Resume: React.FC = () => {
                             </li>
                           ))}
                     </ul>
+                    <li >Skills: <strong>{exp.skills}</strong></li>
                   </div>
                 ))}
               </section>
@@ -341,6 +342,7 @@ const Resume: React.FC = () => {
                               </li>
                             ))}
                       </ul>
+                      <li >Skills: <strong>{project.skills}</strong></li>
                     </div>
                   </div>
                 ))}
