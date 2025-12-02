@@ -520,34 +520,39 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                             />
 
                                                             {/* Visible content */}
-                                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                                                                <div className="flex flex-col gap-2">
-                                                                    <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
-                                                                        <Paperclip className="h-4 w-4 text-[#171515]" />
-                                                                        <span className="text-sm text-gray-800">{selectedFileName ?? "Upload File"}</span>
-                                                                    </div>
-                                                                    <p className="text-xs text-[#f14419]">Accepted: .jpg .jpeg .png .pdf — max 5MB</p>
-                                                                </div>
-
-                                                                <div className="flex items-center gap-2">
-                                                                    {form.getValues(`experiences.${index}.docUri`)&&<span className="text-green-600">File Uploaded</span>}
-
-                                                                    {selectedFileName && (
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() => {
-                                                                                // clear file input visually — if you need to clear the actual input element value, you can
-                                                                                // keep a ref to the input and set inputRef.current.value = ""
-                                                                                setSelectedFileName(null);
-                                                                                // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
-                                                                            }}
-                                                                            className="text-sm px-3 py-1 rounded-md border border-transparent hover:bg-gray-100"
-                                                                        >
-                                                                            Clear
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-2">
+                                        {form.getValues(
+                                            `experiences.${index}.docUri`
+                                          )?<div className="flex items-center gap-2">
+                                            <span className="text-green-600">
+                                              File Uploaded
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                // clear file input visually — if you need to clear the actual input element value, you can
+                                                // keep a ref to the input and set inputRef.current.value = ""
+                                                setSelectedFileName(null);
+                                                // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
+                                              }}
+                                              className="text-sm px-3 py-1 text-[#f14419] rounded-md border border-[#f14419] hover:bg-[#f14419] hover:text-white"
+                                            >
+                                              Clear
+                                            </button>
+                                          </div>:<div className="flex flex-col gap-2">
+                                          <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
+                                            <Paperclip className="h-4 w-4 text-[#171515]" />
+                                            <span className="text-sm text-gray-800">
+                                              {selectedFileName ??
+                                                "Upload File"}
+                                            </span>
+                                          </div>
+                                          <p className="text-xs text-[#f14419]">
+                                            Accepted:.jpg .jpeg .png .pdf — max
+                                            5MB
+                                          </p>
+                                        </div>}
+                                      </div>
                                                         </div>
                                                     </FormControl>
 

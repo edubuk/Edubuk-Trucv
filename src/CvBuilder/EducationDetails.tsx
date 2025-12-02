@@ -57,7 +57,7 @@ export const EducationDetails = ({
   const [refresh, setRefresh] = useState<boolean>(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   //const { user } = useUserData();
-  const [idx,setIdx]= useState<number>();
+  const [idx, setIdx] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
   const [openDigiLocker, setOpenDigiLocker] = useState<boolean>(false);
   const form = useForm<EducationFormValues>({
@@ -81,7 +81,7 @@ export const EducationDetails = ({
     },
   });
 
-  const { control,setValue, formState, getValues} = form;
+  const { control, setValue, formState, getValues } = form;
   const { errors } = formState;
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -93,7 +93,7 @@ export const EducationDetails = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const submitFormHandler = async (index:number) => {
+  const submitFormHandler = async (index: number) => {
     console.log("error", errors);
     const isValid = await form.trigger(`educations.${index}`);
     if (!isValid) return;
@@ -106,7 +106,7 @@ export const EducationDetails = ({
       const result = await fetch(`${API_BASE_URL}/doc/save-doc`, {
         method: "POST",
         credentials: "include",
-        body: JSON.stringify({data:payload}),
+        body: JSON.stringify({ data: payload }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -160,47 +160,6 @@ export const EducationDetails = ({
     });
   };
 
-  // const emailHandler = async (index: number) => {
-  //   try {
-  //     const emailId = getValues(`educations.${index}.issuerEmailId`);
-  //     const applicantName = user?.name;
-  //     const documentName = getValues(`educations.${index}.level`);
-  //     const documentType = getValues(`educations.${index}.boardNameOrDegree`);
-  //     const documentViewUrl = getValues(`educations.${index}.docUri`);
-
-  //     if (!emailId || !documentViewUrl || !documentName || !documentType)
-  //       return toast.error("Please fill first above all the input fields");
-  //     setLoading(true);
-  //     const result = await fetch(`${API_BASE_URL}/doc/email-issuer`, {
-  //       method: "POST",
-  //       credentials: "include",
-  //       body: JSON.stringify({
-  //         emailId: emailId,
-  //         documentViewUrl: documentViewUrl,
-  //         documentName: documentName,
-  //         documentType: documentType,
-  //         applicantName: applicantName,
-  //       }),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const data = await result.json();
-  //     if (!data.success) {
-  //       toast.error(data.message);
-  //       setLoading(false);
-  //     }
-
-  //     if (data.status === "Succeeded") {
-  //       toast.success(`${data.message} to entered email id`);
-  //       setLoading(false);
-  //     }
-  //   } catch (error: any) {
-  //     toast.error(error.message ?? error ?? "something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const fetchEducationsDocs = async () => {
     try {
@@ -223,8 +182,8 @@ export const EducationDetails = ({
             to: doc.duration?.to ?? "",
           },
           selfAttested: doc.selfAttested ?? false,
-          docUri:doc.docUri??"",
-          issuerEmailId:doc.issuerEmailId??"",
+          docUri: doc.docUri ?? "",
+          issuerEmailId: doc.issuerEmailId ?? "",
           isEmailSend: doc.isEmailSend ?? false,
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
@@ -266,26 +225,35 @@ export const EducationDetails = ({
     }
   };
 
-  const uploadDocHandler = async(file:File,index:number)=>{
-            if (!file) return;
-            setSelectedFileName(file.name);
-            const uploadRes = await handleProofUploaded({
-              file,
-              setIsUploading,
-              setUploadError,
-              setSelectedFileName,
-            });
-            if(!uploadRes) return;
-            const {url,docHash} = uploadRes;
-            setValue(`educations.${index}.docUri`, url, {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-            setValue(`educations.${index}.docHash`, docHash, {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-          }
+  const uploadDocHandler = async (file: File, index: number) => {
+    if (!file) return;
+   try {
+    setSelectedFileName(file.name);
+    setIdx(index);
+    const uploadRes = await handleProofUploaded({
+      file,
+      setIsUploading,
+      setUploadError,
+      setSelectedFileName,
+    });
+    console.log("upload res", uploadRes);
+    if (!uploadRes) return;
+    const { url, docHash } = uploadRes;
+    setValue(`educations.${index}.docUri`, url, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    setValue(`educations.${index}.docHash`, docHash, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+   } catch (error) {
+    toast.error("something went wrong");
+   }finally{
+     setSelectedFileName(null);
+     setIsUploading(false);
+   }
+  };
 
   const includedIds = useMemo(
     () => new Set(cvData.educations.map((e: any) => e.id)),
@@ -344,27 +312,29 @@ export const EducationDetails = ({
                     key={field.rhfKey}
                     className="border p-4 md:p-6 rounded-xl bg-white shadow-sm"
                   >
-                    {isMongoId(field.id) && <div className="flex justify-start items-center gap-2">
-                      <input
-                        type="checkbox"
-                        className="border-[#008888] h-4 w-4"
-                        // checked if this row's id exists in cvData.educations
-                        checked={
-                          includedIds.has(field.id) ||
-                          cvData.educations.some(
-                            (e: any) =>
-                              e.id ===
-                              (form.getValues(`educations.${index}.id`) ||
-                                field.id)
-                          )
-                        }
-                        onChange={() => handleToggleInclude(index)}
-                        aria-label={`Include education ${index + 1} in CV`}
-                      />
-                      <p className="text-[#008888]">
-                        Select to include this data in your resume
-                      </p>
-                    </div>}
+                    {isMongoId(field.id) && (
+                      <div className="flex justify-start items-center gap-2">
+                        <input
+                          type="checkbox"
+                          className="border-[#008888] h-4 w-4"
+                          // checked if this row's id exists in cvData.educations
+                          checked={
+                            includedIds.has(field.id) ||
+                            cvData.educations.some(
+                              (e: any) =>
+                                e.id ===
+                                (form.getValues(`educations.${index}.id`) ||
+                                  field.id)
+                            )
+                          }
+                          onChange={() => handleToggleInclude(index)}
+                          aria-label={`Include education ${index + 1} in CV`}
+                        />
+                        <p className="text-[#008888]">
+                          Select to include this data in your resume
+                        </p>
+                      </div>
+                    )}
 
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
@@ -402,7 +372,7 @@ export const EducationDetails = ({
                         />
                         {isMongoId(field.id) ? (
                           <Button
-                          disabled={field.verified}
+                            disabled={field.verified}
                             type="button"
                             onClick={() => updateHandler(index)}
                             className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
@@ -534,7 +504,7 @@ export const EducationDetails = ({
                                       ? "boardNameOrDegree"
                                       : "institutionName"
                                   }`}
-                                  index = {index}
+                                  index={index}
                                   options={[
                                     {
                                       orgId: "",
@@ -609,10 +579,12 @@ export const EducationDetails = ({
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder={field.level === "Secondary School" ||
-                                  field.level === "Higher Secondary School"
-                                    ? "Percentage*"
-                                    : "GPA*"}
+                                  placeholder={
+                                    field.level === "Secondary School" ||
+                                    field.level === "Higher Secondary School"
+                                      ? "Percentage*"
+                                      : "GPA*"
+                                  }
                                   className="w-full"
                                   {...f}
                                 />
@@ -624,176 +596,205 @@ export const EducationDetails = ({
                       </div>
 
                       {/* Proof Upload & DigiLocker area (single row UI) */}
-                      {!(field.verified || getValues(`educations.${index}.docUri`))
-                      &&<div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                            <label className="text-sm font-medium text-gray-700">
-                              Get your document from{" "}
-                              <span className="text-[#6334FA] font-semibold">
-                                DigiLocker
-                              </span>{" "}
-                              (Recommended)
-                            </label>
-                            <button
-                              type="button"
-                              onClick={() => {setOpenDigiLocker(true);setIdx(index)}}
-                              className="border border-[#6334FA] rounded-lg p-1.5 hover:bg-[#6334FA]/10 transition flex items-center justify-center"
-                            >
-                              <img
-                                className="h-8 w-28 object-contain"
-                                src={DigilockerImg}
-                                alt="digilocker"
-                              />
-                            </button>
+                      {!(
+                        field.verified ||
+                        (getValues(`educations.${index}.docUri`) &&
+                          getValues(`educations.${index}.verified`))
+                      ) && (
+                        <div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                              <label className="text-sm font-medium text-gray-700">
+                                Get your document from{" "}
+                                <span className="text-[#6334FA] font-semibold">
+                                  DigiLocker
+                                </span>{" "}
+                                (Recommended)
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setOpenDigiLocker(true);
+                                  setIdx(index);
+                                }}
+                                className="border border-[#6334FA] rounded-lg p-1.5 hover:bg-[#6334FA]/10 transition flex items-center justify-center"
+                              >
+                                <img
+                                  className="h-8 w-28 object-contain"
+                                  src={DigilockerImg}
+                                  alt="digilocker"
+                                />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                        <div className="relative border-t border-gray-300 my-2">
-                          <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2">
-                            OR
-                          </p>
-                        </div>
+                          <div className="relative border-t border-gray-300 my-2">
+                            <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2">
+                              OR
+                            </p>
+                          </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center">
-                          {/* Upload / proof column */}
-                          <FormField
-                            control={form.control}
-                            name={`educations.${index}.docUri`}
-                            render={() => (
-                              <FormItem className="flex-1">
-                                <FormLabel>
-                                  <div className="flex items-start md:items-center gap-2">
-                                    <Paperclip className="h-5 w-5 text-gray-700" />
-                                    <div className="text-sm text-gray-700">
-                                      Upload your document and enter issuer email id to send a email to the issuer for verification.<br></br>
-                                      {/* <span className="text-[#03257e]">Note: Please ensure before enter the email id is correct and belong to the issuer </span> */}
-                                    </div>
-                                  </div>
-                                </FormLabel>
-
-                                <FormControl>
-                                  {/* Styled drop area / button */}
-                                  <div className="relative w-full p-1 bg-white">
-                                    <input
-                                      id={`proof-file-${index}`}
-                                      type="file"
-                                      accept=".jpg,.jpeg,.png,.pdf"
-                                      onChange={(e)=>uploadDocHandler(e.target.files?.[0]!,index) }
-                                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                      aria-label={`Upload proof for education ${
-                                        index + 1
-                                      }`}
-                                    />
-
-                                    {/* Visible content */}
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-2">
-                                      <div className="flex flex-col gap-2">
-                                        <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
-                                          <Paperclip className="h-4 w-4 text-[#171515]" />
-                                          <span className="text-sm text-gray-800">
-                                            {selectedFileName ?? "Upload File"}
-                                          </span>
-                                        </div>
-                                        <p className="text-xs text-[#f14419]">
-                                          Accepted:.jpg .jpeg .png .pdf — max
-                                          5MB
-                                        </p>
-
-                                        {/* {!form.getValues(`educations.${index}.proof`) && <div className="text-xs text-[#f14419]">
-                                                                                Accepted: .jpg .jpeg .png .pdf — max 5MB
-                                                                            </div>} */}
-                                      </div>
-
-                                      <div className="flex items-center gap-2">
-                                        {form.getValues(
-                                          `educations.${index}.docUri`
-                                        ) && (
-                                          <span className="text-green-600">
-                                            File Uploaded
-                                          </span>
-                                        )}
-
-                                        {selectedFileName && (
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              // clear file input visually — if you need to clear the actual input element value, you can
-                                              // keep a ref to the input and set inputRef.current.value = ""
-                                              setSelectedFileName(null);
-                                              // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
-                                            }}
-                                            className="text-sm px-3 py-1 rounded-md border border-transparent hover:bg-gray-100"
-                                          >
-                                            Clear
-                                          </button>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </FormControl>
-
-                                <FormMessage />
-
-                                {/* upload / error states already in your codebase */}
-                                {uploadError && (
-                                  <p className="mt-2 text-sm text-red-600 font-medium">
-                                    {uploadError}
-                                  </p>
-                                )}
-                                {isUploading && (
-                                  <p className="mt-2 text-sm text-green-600">
-                                    Uploading document — please wait…
-                                  </p>
-                                )}
-
-                                {/* If you have a stored URL in the form value, show a preview link */}
-                                {form.getValues(
-                                  `educations.${index}.docUri`
-                                ) && (
-                                  <a
-                                    href={form.getValues(
-                                      `educations.${index}.docUri`
-                                    )}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="mt-3 flex w-32 justify-center items-center text-sm text-[#008888] rounded border border-[#008888] px-2 py-1 gap-1"
-                                  >
-                                    View proof{" "}
-                                    <ExternalLink className="size-4" />
-                                  </a>
-                                )}
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* Issuer email + send button column */}
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center">
+                            {/* Upload / proof column */}
                             <FormField
-                              control={control}
-                              name={`educations.${index}.issuerEmailId`}
-                              render={({ field: f }) => (
-                                <>
-                                  <label
-                                    htmlFor={`issuerEmail-${index}`}
-                                    className="min-w-[110px] text-sm font-medium text-gray-700"
-                                  >
-                                    Issuer Email:
-                                  </label>
+                              control={form.control}
+                              name={`educations.${index}.docUri`}
+                              render={() => (
+                                <FormItem className="flex-1">
+                                  <FormLabel>
+                                    <div className="flex items-start md:items-center gap-2">
+                                      <Paperclip className="h-5 w-5 text-gray-700" />
+                                      <div className="text-sm text-gray-700">
+                                        Upload your document and enter issuer
+                                        email id to send a email to the issuer
+                                        for verification.<br></br>
+                                        {/* <span className="text-[#03257e]">Note: Please ensure before enter the email id is correct and belong to the issuer </span> */}
+                                      </div>
+                                    </div>
+                                  </FormLabel>
 
-                                  <div className="flex-1 flex gap-2 items-center">
-                                    <Input
-                                      id={`issuerEmail-${index}`}
-                                      placeholder="Enter issuer's email address"
-                                      className="w-full rounded-lg px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6334FA] focus:border-[#6334FA]"
-                                      {...f}
-                                    />
-                                    <FormMessage />
-                                  </div>
-                                </>
+                                  <FormControl>
+                                    {/* Styled drop area / button */}
+                                    <div className="relative w-full p-1 bg-white">
+                                      <input
+                                        id={`proof-file-${index}`}
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                        onChange={(e) =>
+                                          uploadDocHandler(
+                                            e.target.files?.[0]!,
+                                            index
+                                          )
+                                        }
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        aria-label={`Upload proof for education ${
+                                          index + 1
+                                        }`}
+                                      />
+
+                                      {/* Visible content */}
+                                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-2">
+                                        {form.getValues(
+                                            `educations.${index}.docUri`
+                                          )?<div className="flex items-center gap-2">
+                                            <span className="text-green-600">
+                                              File Uploaded
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                // clear file input visually — if you need to clear the actual input element value, you can
+                                                // keep a ref to the input and set inputRef.current.value = ""
+                                                setSelectedFileName(null);
+                                                // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
+                                              }}
+                                              className="text-sm px-3 py-1 text-[#f14419] rounded-md border border-[#f14419] hover:bg-[#f14419] hover:text-white"
+                                            >
+                                              Clear
+                                            </button>
+                                          </div>:<div className="flex flex-col gap-2">
+                                          <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
+                                            <Paperclip className="h-4 w-4 text-[#171515]" />
+                                            <span className="text-sm text-gray-800">
+                                              {selectedFileName ??
+                                                "Upload File"}
+                                            </span>
+                                          </div>
+                                          <p className="text-xs text-[#f14419]">
+                                            Accepted:.jpg .jpeg .png .pdf — max
+                                            5MB
+                                          </p>
+                                        </div>}
+
+                                        {/* <div className="flex items-center gap-2">
+                                          {form.getValues(
+                                            `educations.${index}.docUri`
+                                          ) && (
+                                            <span className="text-green-600">
+                                              File Uploaded
+                                            </span>
+                                          )}
+
+                                          {selectedFileName && (
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                // clear file input visually — if you need to clear the actual input element value, you can
+                                                // keep a ref to the input and set inputRef.current.value = ""
+                                                setSelectedFileName(null);
+                                                // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
+                                              }}
+                                              className="text-sm px-3 py-1 rounded-md border border-transparent hover:bg-gray-100"
+                                            >
+                                              Clear
+                                            </button>
+                                          )}
+                                        </div> */}
+                                      </div>
+                                    </div>
+                                  </FormControl>
+
+                                  <FormMessage />
+
+                                  {/* upload / error states already in your codebase */}
+                                  {uploadError && (
+                                    <p className="mt-2 text-sm text-red-600 font-medium">
+                                      {uploadError}
+                                    </p>
+                                  )}
+                                  {isUploading && (
+                                    <p className="mt-2 text-sm text-green-600">
+                                      Uploading document — please wait…
+                                    </p>
+                                  )}
+
+                                  {/* If you have a stored URL in the form value, show a preview link */}
+                                  {form.getValues(
+                                    `educations.${index}.docUri`
+                                  ) && (
+                                    <a
+                                      href={form.getValues(
+                                        `educations.${index}.docUri`
+                                      )}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="mt-3 flex w-32 justify-center items-center text-sm text-[#008888] rounded border border-[#008888] px-2 py-1 gap-1"
+                                    >
+                                      View proof{" "}
+                                      <ExternalLink className="size-4" />
+                                    </a>
+                                  )}
+                                </FormItem>
                               )}
                             />
 
-                            {/* <Button
+                            {/* Issuer email + send button column */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+                              <FormField
+                                control={control}
+                                name={`educations.${index}.issuerEmailId`}
+                                render={({ field: f }) => (
+                                  <>
+                                    <label
+                                      htmlFor={`issuerEmail-${index}`}
+                                      className="min-w-[110px] text-sm font-medium text-gray-700"
+                                    >
+                                      Issuer Email:
+                                    </label>
+
+                                    <div className="flex-1 flex gap-2 items-center">
+                                      <Input
+                                        id={`issuerEmail-${index}`}
+                                        placeholder="Enter issuer's email address"
+                                        className="w-full rounded-lg px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6334FA] focus:border-[#6334FA]"
+                                        {...f}
+                                      />
+                                      <FormMessage />
+                                    </div>
+                                  </>
+                                )}
+                              />
+
+                              {/* <Button
                               type="button"
                               onClick={() => emailHandler(index)}
                               className="whitespace-nowrap"
@@ -804,13 +805,16 @@ export const EducationDetails = ({
                                 "Send Email To Issuer"
                               )}
                             </Button> */}
+                            </div>
                           </div>
                         </div>
-                      </div>}
-                      {getValues(`educations.${index}.docUri`)&&<div className="flex items-center p-4 text-green-600 gap-2">
-                        <CheckCircle size={18}/> <p>Document fetched</p>
-                        </div>}
-                      {openDigiLocker && index===idx&& (
+                      )}
+                      {getValues(`educations.${index}.docUri`) && getValues(`educations.${index}.verified`) && (
+                        <div className="flex items-center p-4 text-green-600 gap-2">
+                          <CheckCircle size={18} /> <p>Document Saved</p>
+                        </div>
+                      )}
+                      {openDigiLocker && index === idx && (
                         <DigiLockerTest
                           setOpenDigiLocker={setOpenDigiLocker}
                           openDigiLocker={openDigiLocker}
@@ -819,18 +823,19 @@ export const EducationDetails = ({
                         />
                       )}
                     </div>
-                    {loading ? (
-                index===idx&&<LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]" />
-              ) : (
-                !isMongoId(field.id)&&<Button
-                  type="button"
-                  onClick={() => submitFormHandler(index)}
-                  className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
-                >
-                  Save
-                </Button>
-
-              )}
+                    {loading
+                      ? index === idx && (
+                          <LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]" />
+                        )
+                      : !isMongoId(field.id) && (
+                          <Button
+                            type="button"
+                            onClick={() => submitFormHandler(index)}
+                            className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+                          >
+                            Save
+                          </Button>
+                        )}
                   </div>
                 );
               })}

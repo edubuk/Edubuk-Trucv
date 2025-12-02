@@ -16,7 +16,7 @@ setSelectedFileName:React.Dispatch<React.SetStateAction<string | null>>,
             "application/pdf",
         ];
         const allowedExtensions = [".jpg", ".jpeg", ".png", ".pdf"];
-        const maxSize = 10 * 1024 * 1024; // 10MB limit (optional)
+        const maxSize = 5 * 1024 * 1024; // 5MB limit (optional)
 
         if (!file) return { isValid: false, error: "No file selected" };
 
