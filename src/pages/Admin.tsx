@@ -36,6 +36,7 @@ interface IUserDoc {
   institutionName:string,
   gpa:string,
   companyName:string,
+  organisation:string,
   jobRole:string,
   skills:string,
   description:string,
@@ -125,7 +126,8 @@ export default function AdminUserProfilesPage() {
   const [cvIds, setCvIds] = useState([]);
   const [educationDocs, setEducationDocs] = useState({
     educations: [],
-    experiences: []
+    experiences: [],
+    awards:[],
   });
   
   const { user } = useUserData();
@@ -162,23 +164,6 @@ export default function AdminUserProfilesPage() {
       setPageNum(pageNum + 1);
   }
 
-
-  // const userDocsHandler = async (userId: string) => {
-  //   try {
-  //     console.log({ userId })
-  //     const docs = await fetch(`${API_BASE_URL}/admin/users-docs?userId=${userId}`)
-  //     const docsData = await docs.json();
-  //     if (!docsData.success) {
-  //       toast.error(docsData.message);
-  //       throw new Error(docsData.message)
-  //     }
-  //     setUserDocs(docsData.docs)
-  //     console.log(docsData)
-  //   } catch (error: any) {
-  //     console.log("error while fetching docs", error)
-  //     toast.error("Something went wrong", error)
-  //   }
-  // }
 
   //const verifiedCount = useMemo(() => userDocs.reduce((sum, u) => (sum + (u.status === "verified" ? 1 : 0)), 0), [userDocs]);
   //const totalCerts = useMemo(() => userDocs.reduce((sum) => sum + 1, 0), [userDocs]);
@@ -437,7 +422,30 @@ export default function AdminUserProfilesPage() {
                       </div>
                         </button>
                       ))}
-                    </div> : <p className="text-center text-[#f14419] py-2">No Certificate Found</p>}
+                      {educationDocs?.awards.map((cert: any) => (
+                        <button
+                          key={cert?.awDocIdId}
+                          className="group bg-white border border-gray-100 rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow"
+                          aria-label={`Open ${cert.level}`}
+                          onClick={() => { setActiveCert(cert); setActiveUser(userData); setMintResult(null); }}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="text-sm text-gray-500">{cert.organisation || "Issuer —"}</div>
+                              <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.level}</div>
+                            </div>
+                            <StatusBadge status={cert?.status || "pending"} />
+                          </div>
+                          <div className="mt-3 flex items-center justify-between">
+                            <MethodChip method={cert?.verifiedThrough || "email"} />
+                            <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
+                          </div>
+                          <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                        View details <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                      </div>
+                        </button>
+                      ))}
+                    </div> : loading?<ThreeDotLoader w={12} h={12} yPos="center"/>:<p className="text-center text-[#f14419] py-2">No Certificate Found</p>}
                     { (expandedUserId === userData._id)&&viewUserData &&
                       <div
                         role="dialog"
@@ -566,7 +574,7 @@ export default function AdminUserProfilesPage() {
                   <div className="p-4 sm:p-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2 text-sm">
-                        <div className="flex items-center justify-between"><span className="text-gray-500">Issued By</span><span className="font-medium">{activeCert?.companyName??activeCert?.institutionName}</span></div>
+                        <div className="flex items-center justify-between"><span className="text-gray-500">Issued By</span><span className="font-medium">{activeCert?.companyName??activeCert?.institutionName??activeCert?.organisation}</span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Issued To</span><span className="font-medium">{activeUser?.name}</span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Issued On</span><span className="font-medium">{formatDate(activeCert?.createdAt)}</span></div>
                         {(activeCert?.issuerEmailId &&activeCert.status==="verified") && <div className="flex items-center justify-between"><span className="text-gray-500">Approved By</span><span className="font-medium">{activeCert?.issuerEmailId}</span></div>}

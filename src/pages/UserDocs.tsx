@@ -59,6 +59,22 @@ export interface IExperienceDoc{
     createdAt:string,
     updatedAt:string,
 }
+export interface IAwardDoc{
+    userId:string,
+    awardDocId:string,
+    awardName:string,
+    awardDescription:string,
+    organisation:string,
+    selfAttested:boolean,
+    isEmailSend?:boolean,
+    issuerEmailId?:string,
+    verified?:boolean,
+    status?:VerificationStatus,
+    verifiedThrough?:VerificationMethod,
+    docUri?:string,
+    createdAt:string,
+    updatedAt:string,
+}
 
 // Types
 export type VerificationStatus = "verified" | "pending" | "rejected" | "inProgress";
@@ -100,7 +116,7 @@ const MethodChip: React.FC<{ method: VerificationMethod }> = ({ method }) => {
   );
 };
 
-export default function UserDocs({educationDocs,experienceDocs}: {educationDocs: IEducationDoc[],experienceDocs:IExperienceDoc[]}) {
+export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educationDocs: IEducationDoc[],experienceDocs:IExperienceDoc[],awardDocs:IAwardDoc[]}) {
     const {user} = useUserData();
     console.log("edu data",educationDocs)
 
@@ -178,6 +194,28 @@ export default function UserDocs({educationDocs,experienceDocs}: {educationDocs:
                         <div>
                           <div className="text-sm text-gray-500">{cert.companyName || "Issuer —"}</div>
                           <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.jobRole}</div>
+                        </div>
+                        <StatusBadge status={cert?.status||"pending"} />
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <MethodChip method={cert?.verifiedThrough!}/>
+                        <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
+                      </div>
+                      <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                        View details <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                      </a>
+                    </button>
+                  ))}
+                  {awardDocs?.map((cert) => (
+                    <button
+                      key={cert?.awardDocId}
+                      className="group bg-white border border-gray-100 rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow"
+                      aria-label={`Open ${cert.awardName}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="text-sm text-gray-500">{cert.organisation || "Issuer —"}</div>
+                          <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.awardName}</div>
                         </div>
                         <StatusBadge status={cert?.status||"pending"} />
                       </div>

@@ -27,7 +27,7 @@ const handlerLogout = async () => {
       const logoutResult = await logoutData.json();
       console.log("logoutResult",logoutResult);
       if(!logoutResult.success){
-        toast.error("Your session is expired. Please relogin")
+        //toast.error("Your session is expired. Please relogin")
       }
         } catch (error) {
             console.error("Logout failed:", error);
@@ -76,8 +76,8 @@ api.interceptors.response.use(
     const status = error.response?.status || 0;
     const isAuthError = status === 401;
     console.log("error response",error.response)
-    if(error.response?.status>=400){
-      toast.error(error.response.data.message || error.response.data.error)
+    if(error.response?.status===429){
+      toast.error(error.data.messsage || error.response.data)
     }
     const isRefreshEndpoint =
       originalRequest?.url?.includes("/user/refresh-token") ?? false;

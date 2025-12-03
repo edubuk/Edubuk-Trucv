@@ -107,7 +107,7 @@ export const SkillDetails = ({
       setRefresh((prev) => !prev);
     } catch (error: any) {
       console.log("error", error);
-      toast.error(error.message || error || "Something went wrong");
+      toast.error(error.response.data.message || error || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -305,8 +305,9 @@ export const SkillDetails = ({
                     {/* Bar row: name + level dropdown + self-attest + remove */}
                     <div className="flex flex-wrap items-center gap-3 border p-3 rounded bg-white">
                       {/* Skill name (editable inline if you want) */}
-                        {isMongoId(s.id) && <input
+                        {isMongoId(s.id) && s.endoresBy?<CheckCircle className="text-[#006666]"/>: <input
                             type="checkbox"
+                            disabled={s.endoresBy?true:false}
                             className="border-[#008888] h-4 w-4"
                             // checked if this row's id exists in cvData.educations
                             checked={

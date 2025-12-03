@@ -13,12 +13,12 @@ import api from "@/lib/api";
 const DashBoard = () => {
     //const [isActiveButton , setActiveButton] = useState<boolean>(true);
     const [cvData, setCvData] = useState([]);
-    const [educationDocs,setEducationDocs] = useState({
-      educations:[]
+    const [userDocs,setUserDocs] = useState({
+      educations:[],
+      experiences:[],
+      awards:[],
     });
-    const [experienceDocs,setExperienceDocs] = useState({
-      experiences:[]
-    });
+    
     // const [projectDocs,setProjectDocs] = useState<ExperienceFormValues>({
     //   experiences:[]
     // });
@@ -100,13 +100,12 @@ const DashBoard = () => {
              console.log("data",data);
              if(!data.success)
              {
-              setEducationDocs({educations:[]})
+              setUserDocs({educations:[],experiences:[],awards:[]})
                  toast.error(data.message);
                  return;
              }
-             setEducationDocs(data.data);
-             setExperienceDocs(data.data);
-             console.log("education data",educationDocs)
+             setUserDocs({educations:data.data.educations,experiences:data.data.experiences,awards:data.data.awards});
+             console.log("education data",userDocs)
          } catch (error) {
              toast.error("something went wrong");
              console.log("error while fetching docs",error)
@@ -168,7 +167,7 @@ const DashBoard = () => {
 
           {/* {selected === "nft" && <NFTGallery contractAddress={contractNFTAddress} abi={abiNFT} account={account!}/>} */}
 
-          {selected === "docs" && <UserDocs educationDocs={educationDocs.educations} experienceDocs={experienceDocs.experiences} />}
+          {selected === "docs" && <UserDocs educationDocs={userDocs.educations} experienceDocs={userDocs.experiences} awardDocs = {userDocs.awards}/>}
         </div>
     </div>
   )
