@@ -567,7 +567,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                             Issuer Email:
                                                         </label>
 
-                                                        <div className="flex-1 flex gap-2 items-center">
+                                                        <div className="flex-1 flex-col gap-2 items-center">
                                                             <Input
                                                                 id={`issuerEmail-${index}`}
                                                                 placeholder="Enter issuer's email address"

@@ -41,6 +41,34 @@ import { isMongoId } from "@/lib/utils";
 import { ICvData } from "./CvBuilder";
 import api from "@/lib/api";
 
+
+const collegeOptions = [
+                        {
+                          orgId: "001447",
+                          name: "Council for the Indian School Certificate Examination (CISCE)",
+                        },
+                        {
+                          orgId: "000027",
+                          name: "Central Board of Secondary Education(CBSE)",
+                        },
+                        {
+                          orgId: "001925",
+                          name: "UP State Board of High School and Intermediate Education(UP Board)",
+                        },
+                        {
+                          orgId: "003513",
+                          name: "Dr. A.P.J. Abdul Kalam University",
+                        },
+                        {
+                          orgId: "000607",
+                          name: "STATE BOARD OF TECHNICAL EDUCATION, BIHAR",
+                        },
+                        {
+                          orgId:"000098",
+                          name:"Maharashtra State Board of Secondary and Higher Secondary Education, Pune"
+                        }
+                      ]
+
 export const EducationDetails = ({
   step,
   setStep,
@@ -524,20 +552,7 @@ export const EducationDetails = ({
                                       : "institutionName"
                                   }`}
                                   index={index}
-                                  options={[
-                                    {
-                                      orgId: "",
-                                      name: "Indian Council of Secondary Education(ICSE)",
-                                    },
-                                    {
-                                      orgId: "000027",
-                                      name: "Central Board of Secondary Education(CBSE)",
-                                    },
-                                    {
-                                      orgId: "001925",
-                                      name: "UP State Board of High School and Intermediate Education",
-                                    },
-                                  ]}
+                                  options={collegeOptions}
                                   {...f}
                                 />
                               </FormControl>
@@ -800,7 +815,7 @@ export const EducationDetails = ({
                                       Issuer Email:
                                     </label>
 
-                                    <div className="flex-1 flex gap-2 items-center">
+                                    <div className="flex-1 flex-col gap-2 items-center">
                                       <Input
                                         id={`issuerEmail-${index}`}
                                         placeholder="Enter issuer's email address"

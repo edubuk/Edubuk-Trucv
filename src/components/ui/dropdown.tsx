@@ -32,7 +32,7 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
   (
     {
       className,
-      placeholder = "-- Select --",
+      placeholder = "Search with full board or college name",
       searchable = true,
       onSearch,
       fetcher = defaultFetcher,
