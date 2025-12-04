@@ -49,12 +49,47 @@ const Resume: React.FC = () => {
       projects:[],
       awards:[],
     })
+
+      const pageStyle = `
+    @media all {
+  .page-break {
+    display: none;
+  }
+}
+
+@media print {
+  html, body {
+    height: initial !important;
+    overflow: initial !important;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+@media print {
+  .page-break {
+    margin-top: 1rem;
+    display: block;
+    page-break-before: auto;
+  }
+}
+
+@page {
+  size: auto;
+  margin: 20mm;
+}
+  `;
+
+  const handlePrint = useReactToPrint({
+    contentRef: pdfRef,
+    documentTitle: "My CV",
+    pageStyle, // inject the styles into print document
+  });
   
   const [loading,setLoading] = useState(false);
-    const handlePrint = useReactToPrint({
-    contentRef: pdfRef,
-    documentTitle: "My CV"
-  });
+  //   const handlePrint = useReactToPrint({
+  //   contentRef: pdfRef,
+  //   documentTitle: "My CV"
+  // });
   // const formatDate = (dateString: string): string => {
   //   const date = new Date(dateString);
   //   console.log("date", dateString);
@@ -164,6 +199,7 @@ const Resume: React.FC = () => {
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <div ref={pdfRef} id="cv-preview-wrapper" className="px-6 py-5 font-family">
+            <div>
             <header className="pb-4 mb-4 text-center">
               <h1 className="text-4xl font-semibold text-[#000000]">
                 {cvData.personal.fullName}
@@ -307,8 +343,8 @@ const Resume: React.FC = () => {
                               {point.endsWith(".") ? point : `${point}.`}
                             </li>
                           ))}
+                          <li >Skills: <strong>{exp.skills}</strong></li>
                     </ul>
-                    <li >Skills: <strong>{exp.skills}</strong></li>
                   </div>
                 ))}
               </section>
@@ -341,8 +377,8 @@ const Resume: React.FC = () => {
                                 {point.endsWith(".") ? point : `${point}.`}
                               </li>
                             ))}
+                            <li >Skills: <strong>{project.skills}</strong></li>
                       </ul>
-                      <li >Skills: <strong>{project.skills}</strong></li>
                     </div>
                   </div>
                 ))}
@@ -420,6 +456,7 @@ const Resume: React.FC = () => {
               </section>
             )}
           </div>
+        </div>
         </div>
       </div>
     </div>

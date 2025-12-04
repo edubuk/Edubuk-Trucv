@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import Resume from "./ResumeTem";
 import { Button } from "@mui/material";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
-
+import { dummyCvData } from "./cvDummyData";
 
 // --- Helpers ---
 const uid = (prefix = "id") => `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
@@ -83,7 +83,7 @@ export interface ICvData{
 export default function CVBuilder() {
   const [step, setStep] = useState<number>(1); // which accordion is open
   const [previewCV,setPreviewCV] = useState<boolean>(false);
-  const [cvData,setCvData] = useState<ICvData>({
+  const [cvData,setCvData] = useState<any>({
     personal:{
       fullName:"",
       email:"",
@@ -110,6 +110,13 @@ export default function CVBuilder() {
           <div className="col-span-7 p-2 sm:p-6 bg-slate-50 space-y-3">
             <button className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg" onClick={()=>setPreviewCV(true)}>Preview CV</button>
             {previewCV&&<Resume cvData={cvData} setPreviewCV={setPreviewCV}/>}
+            <div className="flex gap-1">
+              {dummyCvData.map((cvData,i)=>{
+                return(
+                  <button key={i} onClick={()=>{setCvData(cvData);setPreviewCV(true)}} className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg">{cvData.personal.fullName}</button>
+                )
+              })}
+            </div>
             <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubuk.com" className="text-[#006666] underline">support@edubuk.com</a> or <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a></p>
             {/* Step 1 */}
             

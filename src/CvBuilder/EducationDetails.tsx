@@ -338,7 +338,6 @@ export const EducationDetails = ({
               Add education entries. Choose school or college. Each entry can be
               self-attested and have proof uploaded.
             </p>
-
             <div className="mt-4 space-y-4">
               {fields.map((field, index) => {
                 // Use field values if you need quick read-only access:

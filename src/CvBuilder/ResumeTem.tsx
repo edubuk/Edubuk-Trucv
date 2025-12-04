@@ -316,8 +316,8 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
                           .map((point, i) => (
                             <li key={i}>{point.endsWith(".") ? point : `${point}.`}</li>
                           ))}
+                          <li >Skills: <strong>{project.skills}</strong></li>
                       </ul>
-                      <li >Skills: <strong>{project.skills}</strong></li>
                     </div>
                   </div>
                 ))}

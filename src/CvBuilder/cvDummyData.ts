@@ -1,0 +1,1093 @@
+export const dummyCvData = [
+    {
+  "personal": {
+    "fullName": "Aisha Kapoor",
+    "email": "aisha.kapoor@example.com",
+    "phone": "918765432100",
+    "city": "Bandra West, Mumbai, India",
+    "linkedin": "https://www.linkedin.com/in/aisha-kapoor-react",
+    "github": "https://github.com/aisha-react",
+    "summary": "Frontend / React Developer focused on building accessible, high-performance single-page applications and design systems. Strong experience with React, TypeScript, Next.js, state management, testing, and performance optimization. Passionate about developer experience and shipping production-quality interfaces."
+  },
+  "educations": [
+    {
+      "id": "edu-ssc-001",
+      "eduDocId": "doc-ssc-aisha-001",
+      "level": "Secondary School",
+      "boardNameOrDegree": "CBSE",
+      "institutionName": "St. Mary's Convent School",
+      "gpa": "90",
+      "duration": { "from": "2014-04-01", "to": "2015-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/aisha-ssc.pdf",
+      "issuerEmailId": "aisha.kapoor@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "edu-hsc-002",
+      "eduDocId": "doc-hsc-aisha-002",
+      "level": "Higher Secondary School",
+      "boardNameOrDegree": "CBSE",
+      "institutionName": "St. Mary's Convent School",
+      "gpa": "92",
+      "duration": { "from": "2016-04-01", "to": "2017-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/aisha-hsc.pdf",
+      "issuerEmailId": "aisha.kapoor@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "edu-grad-003",
+      "eduDocId": "doc-grad-aisha-003",
+      "level": "Graduation",
+      "boardNameOrDegree": "B.Tech Computer Science",
+      "institutionName": "Mumbai University",
+      "gpa": "8.6",
+      "duration": { "from": "2018-08-01", "to": "2022-05-31" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/aisha-degree.pdf",
+      "issuerEmailId": "aisha.kapoor@example.com",
+      "isEmailSend": true,
+      "verified": false,
+      "status": "pending"
+    }
+  ],
+  "experiences": [
+    {
+      "id": "exp-001",
+      "expDocId": "exp-doc-aisha-001",
+      "companyName": "PixelWave Labs",
+      "jobRole": "Senior React Developer",
+      "duration": { "from": "2024-03-01", "to": "present" },
+      "skills": "React,TypeScript,Next.js,Redux,GraphQL,Tailwind,Cypress",
+      "description": "Led a team of 4 frontend developers to re-architect a legacy monolith into a modular React + Next.js frontend. Designed and implemented a component-driven design system with Storybook and automated visual regression tests.\n\nKey contributions:\n• Implemented SSR/ISR strategies in Next.js to improve SEO and first contentful paint for landing pages.\n• Replaced legacy class-based components with typed functional components (React + TypeScript), reducing runtime errors and enabling better DX.\n• Built a client-side caching layer with GraphQL and normalized cache to reduce redundant network requests by 45%.\n• Introduced code-splitting and route-based lazy loading to cut initial bundle size by 38%.\n• Owned CI/CD for frontend: linting, unit tests, E2E tests (Cypress), and automated deployments to Vercel.",
+      "selfAttested": true,
+      "isEmailSend": true,
+      "docUri": "https://example.blob/pixelwave-aisha-exp.pdf",
+      "issuerEmailId": "hr@pixelwave.example.com",
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "exp-002",
+      "expDocId": "exp-doc-aisha-002",
+      "companyName": "ShopEase",
+      "jobRole": "Frontend Engineer",
+      "duration": { "from": "2022-06-01", "to": "2024-02-28" },
+      "skills": "React,Redux Toolkit,REST,Performance,Tailwind,Accessibility",
+      "description": "Built core e-commerce flows (catalog, product detail, cart, checkout) used by 200k+ monthly users. Focused on reliability, accessibility (WCAG AA), and conversion optimization.\n\nHighlights:\n• Implemented optimistic UI updates and error recovery for checkout flows, reducing failed payments due to UI issues by 60%.\n• Created an a/b testing framework for UI experiments leading to a 7% uplift in add-to-cart rate for targeted cohorts.\n• Improved accessibility: added semantic markup, keyboard navigation, ARIA attributes, and performed audits with Axe and manual testing.\n• Mentored 3 junior engineers on frontend best practices, testing, and accessibility.",
+      "selfAttested": true,
+      "isEmailSend": false,
+      "docUri": "https://example.blob/shopease-aisha-exp.pdf",
+      "issuerEmailId": "people@shopease.example.com",
+      "verified": false,
+      "status": "verified"
+    },
+    {
+      "id": "exp-003",
+      "expDocId": "exp-doc-aisha-003",
+      "companyName": "Freelance / Consulting",
+      "jobRole": "React Consultant",
+      "duration": { "from": "2020-09-01", "to": "2022-05-30" },
+      "skills": "React,Performance,Component Design,UX",
+      "description": "Delivered frontend consulting for early-stage startups: architecture reviews, component libraries, and performance audits.\n\nNotable engagements:\n• Migrated a marketing site to Next.js with analytics and performance optimizations — improved Lighthouse performance from 45 to 88.\n• Built accessible UI components for a healthcare startup, including keyboard-first modal and ARIA-compliant form controls.\n• Advised on bundle-splitting and image optimization strategies, delivering 30–50% load time reductions.",
+      "selfAttested": true,
+      "isEmailSend": false,
+      "docUri": "",
+      "issuerEmailId": "",
+      "verified": false,
+      "status": "pending"
+    }
+  ],
+  "skills": [
+    { "id": "skill-001", "skillName": "React", "level": "expert", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "skill-002", "skillName": "TypeScript", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "skill-003", "skillName": "Next.js", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "skill-004", "skillName": "Redux Toolkit", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "skill-005", "skillName": "Tailwind CSS", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "skill-006", "skillName": "Cypress / Jest", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "skill-007", "skillName": "Web Performance", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "skill-008", "skillName": "Accessibility (WCAG)", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" }
+  ],
+  "projects": [
+    {
+      "id": "proj-001",
+      "projectName": "Design System & Component Library",
+      "projectUrl": "https://github.com/aisha-react/design-system",
+      "duration": { "from": "2024-05-01", "to": "2025-01-15" },
+      "skills": "React,TypeScript,Storybook,Chromatic,Tailwind",
+      "description": "Created a production-ready design system used across 5 product teams. Features:\n• Atomic component architecture (atoms → molecules → organisms) with strict TypeScript types and Figma tokens.\n• Storybook stories for every component, integrated with Chromatic for visual regression testing.\n• Theming support (light/dark, brand/custom tokens) and runtime token switching for multi-brand deployments.\n• Automated accessibility and unit tests for components, ensuring consistent keyboard & screen reader behavior.",
+      "selfAttested": true
+    },
+    {
+      "id": "proj-002",
+      "projectName": "High-Performance Product Listing",
+      "projectUrl": "",
+      "duration": { "from": "2023-10-01", "to": "2024-02-28" },
+      "skills": "React,Virtualization,GraphQL,Pagination",
+      "description": "Built a highly-performant product listing with infinite scroll and virtualization. Achievements:\n• Implemented windowed list virtualization to render 10× fewer DOM nodes and reduce repaint cost.\n• Implemented cursor-based pagination with GraphQL and offline caching strategies.\n• Optimized image delivery (responsive srcset, lazy-loading, preconnect) and achieved consistent 60 FPS scrolling on mid-range devices.",
+      "selfAttested": true
+    },
+    {
+      "id": "proj-003",
+      "projectName": "Accessible Checkout Flow",
+      "projectUrl": "",
+      "duration": { "from": "2022-08-01", "to": "2023-06-01" },
+      "skills": "React,ARIA,Forms,Testing",
+      "description": "Led the accessibility overhaul of the checkout flow to meet WCAG AA. Deliverables:\n• Redesigned forms with clear labels, error announcements, and focus management.\n• Implemented progressive disclosure for optional steps to minimize cognitive load.\n• Added keyboard-only and screen-reader test suites; reduced checkout abandonment for keyboard users by 18%.",
+      "selfAttested": true
+    }
+  ],
+  "awards": [
+    {
+      "id": "award-001",
+      "awardDocId": "",
+      "level": "Award",
+      "name": "Outstanding Frontend Contributor",
+      "organisation": "PixelWave Labs",
+      "duration": { "from": "2025-06-01", "to": "" },
+      "description": "Recognized for leading the frontend migration to Next.js and delivering measurable performance and SEO improvements across the product suite.",
+      "selfAttested": true,
+      "issuerEmailId": "hr@pixelwave.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "award-002",
+      "awardDocId": "",
+      "level": "Certificate",
+      "name": "Accessibility Champion",
+      "organisation": "ShopEase",
+      "duration": { "from": "2024-01-20", "to": "" },
+      "description": "Awarded for implementing WCAG-compliant solutions and mentoring teams on inclusive design practices.",
+      "selfAttested": true,
+      "issuerEmailId": "people@shopease.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "award-003",
+      "awardDocId": "",
+      "level": "Course",
+      "name": "Advanced React & Performance Optimization",
+      "organisation": "Frontend Masters",
+      "duration": { "from": "2023-11-10", "to": "2023-12-05" },
+      "description": "Completed an intensive course focused on advanced React patterns, performance profiling, and concurrent features.",
+      "selfAttested": true,
+      "issuerEmailId": "courses@frontendmasters.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    }
+  ]
+},
+
+{
+  "personal": {
+    "fullName": "Karan Bhatt",
+    "email": "karan.bhatt@example.com",
+    "phone": "919987776655",
+    "city": "Hinjewadi Phase 2, Pune, India",
+    "linkedin": "https://www.linkedin.com/in/karan-bhatt-blockchain",
+    "github": "https://github.com/karan-web3",
+    "summary": "Blockchain Developer with expertise in Solidity, EVM-based chains, smart contract security, token standards, and decentralized infrastructure. Experienced in building production-ready dApps, DeFi flows, multi-chain deployments, and secure wallet integrations. Passionate about gas-optimized contract development, cryptographic primitives, and designing tamper-proof decentralized systems."
+  },
+  "educations": [
+    {
+      "id": "kb-edu-ssc",
+      "eduDocId": "doc-karan-ssc-001",
+      "level": "Secondary School",
+      "boardNameOrDegree": "CBSE",
+      "institutionName": "DAV Public School",
+      "gpa": "88",
+      "duration": { "from": "2014-04-01", "to": "2015-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/karan-ssc.pdf",
+      "issuerEmailId": "karan.bhatt@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "kb-edu-hsc",
+      "eduDocId": "doc-karan-hsc-002",
+      "level": "Higher Secondary School",
+      "boardNameOrDegree": "CBSE",
+      "institutionName": "DAV Public School",
+      "gpa": "90",
+      "duration": { "from": "2016-04-01", "to": "2017-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/karan-hsc.pdf",
+      "issuerEmailId": "karan.bhatt@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "kb-edu-grad",
+      "eduDocId": "doc-karan-grad-003",
+      "level": "Graduation",
+      "boardNameOrDegree": "B.Tech Computer Engineering",
+      "institutionName": "MIT World Peace University",
+      "gpa": "8.7",
+      "duration": { "from": "2018-08-01", "to": "2022-06-15" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/karan-degree.pdf",
+      "issuerEmailId": "karan.bhatt@example.com",
+      "isEmailSend": true,
+      "verified": false,
+      "status": "pending"
+    }
+  ],
+  "experiences": [
+    {
+      "id": "kb-exp-001",
+      "expDocId": "exp-doc-karan-001",
+      "companyName": "BlockForge Labs",
+      "jobRole": "Blockchain Developer",
+      "duration": { "from": "2024-01-15", "to": "present" },
+      "skills": "Solidity,EVM,Hardhat,Foundry,OpenZeppelin,Chainlink,Ganache,AWS",
+      "description": "Designed and deployed production-grade smart contracts across Ethereum, Polygon, BNB Chain, and Avalanche networks. Worked closely on DeFi flows, role-based permissioning, multi-signature wallets, and gas-efficient architecture.\n\nKey contributions:\n• Built a fully on-chain staking + reward distribution system using time-weighted reward curves and snapshot accounting.\n• Implemented upgradable proxy contracts (UUPS) reducing future migration downtime and enabling safe feature rollout.\n• Integrated Chainlink price feeds and VRF for secure randomness, ensuring trustless reward mechanisms.\n• Developed Foundry-based fuzz tests covering edge cases, overflow exploits, reentrancy attempts, and signature forgery.\n• Collaborated with backend team to design ABI schemas, event indexing, and real-time event streaming pipelines.\n• Reduced contract deployment gas by 28% using custom errors, optimized struct packing, and assembly-level SLOAD minimization.",
+      "selfAttested": true,
+      "isEmailSend": true,
+      "docUri": "https://example.blob/blockforge-karan-exp.pdf",
+      "issuerEmailId": "hr@blockforge.example.com",
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "kb-exp-002",
+      "expDocId": "exp-doc-karan-002",
+      "companyName": "Web3Nest",
+      "jobRole": "Smart Contract Engineer",
+      "duration": { "from": "2022-08-01", "to": "2023-12-20" },
+      "skills": "Solidity,ethers.js,IPFS,ERC-20,ERC-721,Subgraphs,Security",
+      "description": "Developed token protocols, NFT contract suites, metadata systems, and auction mechanisms for multiple Web3 clients.\n\nHighlights:\n• Built a multi-phase NFT sale contract with allowlist, Dutch auction, and royalty enforcement (ERC-2981).\n• Designed role-based permissioning using AccessControl and executed controlled mint flows with Merkle proofs.\n• Integrated IPFS pinning, metadata refresh pipelines, and dynamic trait-based rarity calculations.\n• Wrote custom subgraphs for indexing contract events and improving dApp responsiveness by ~40%.\n• Conducted internal security audits detecting vulnerabilities: reentrancy, tx-origin auth, and unsafe delegatecalls.",
+      "selfAttested": true,
+      "isEmailSend": false,
+      "docUri": "https://example.blob/web3nest-karan-exp.pdf",
+      "issuerEmailId": "security@web3nest.example.com",
+      "verified": false,
+      "status": "verified"
+    }
+  ],
+  "skills": [
+    { "id": "kb-skill-01", "skillName": "Solidity", "level": "expert", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "kb-skill-02", "skillName": "EVM Internals", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "kb-skill-03", "skillName": "Hardhat", "level": "expert", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "kb-skill-04", "skillName": "Foundry", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "kb-skill-05", "skillName": "Web3.js", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "kb-skill-06", "skillName": "ethers.js", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "kb-skill-07", "skillName": "Smart Contract Security", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" }
+  ],
+  "projects": [
+    {
+      "id": "kb-proj-001",
+      "projectName": "DeFi Yield Farming Protocol",
+      "projectUrl": "https://github.com/karan-web3/yield-farming-protocol",
+      "duration": { "from": "2024-04-01", "to": "2024-08-20" },
+      "skills": "Solidity,Chainlink,OpenZeppelin,Graph Protocol,Security",
+      "description": "Built a fully on-chain yield farming protocol supporting flexible staking weights, reward pools, and epoch-based distribution.\n\nTechnical details:\n• Created deterministic reward cycles using block timestamps + Chainlink keeper automation.\n• Implemented slashing logic for early withdrawals with treasury redistribution.\n• Built real-time analytics dashboard powered by custom subgraph indexing contract events.\n• Added automated security checks for reentrancy, overflow, access violations, and reward manipulation.\n• Designed gas-optimized reward distribution logic using packed structs and minimal SSTORE cycles.",
+      "selfAttested": true
+    },
+    {
+      "id": "kb-proj-002",
+      "projectName": "Multi-Signature Wallet (3/5 Threshold)",
+      "projectUrl": "https://github.com/karan-web3/multisig-wallet",
+      "duration": { "from": "2023-11-10", "to": "2024-02-15" },
+      "skills": "Solidity,Security,ECDSA,Meta Transactions",
+      "description": "Developed a secure multisig wallet enabling 3-of-5 signature approvals for executing on-chain operations.\n\nFeatures:\n• EIP-712 typed data signing for off-chain approvals.\n• Event-driven execution with protection against signature replay attacks.\n• Internal access control ensuring only verified owners can initiate proposals.\n• Optimized verification logic to reduce gas during execution by ~18%.",
+      "selfAttested": true
+    },
+    {
+      "id": "kb-proj-003",
+      "projectName": "Cross-Chain NFT Minting System",
+      "projectUrl": "",
+      "duration": { "from": "2023-03-01", "to": "2023-07-15" },
+      "skills": "Solidity,ERC-721,IPFS,Message Passing",
+      "description": "Created a cross-chain NFT minting experience using message-passing architecture.\n\n• Users mint NFTs on Polygon and bridge metadata to Ethereum for final settlement.\n• Integrated IPFS metadata pipelines with rarity computation and multi-chain token URI syncing.\n• Utilized events + off-chain relayers to sync state between L2 and L1 contracts seamlessly.\n• Achieved 100% deterministic cross-chain state consistency across multiple test scenarios.",
+      "selfAttested": true
+    }
+  ],
+  "awards": [
+    {
+      "id": "kb-award-001",
+      "awardDocId": "",
+      "level": "Award",
+      "name": "Smart Contract Security Award",
+      "organisation": "BlockForge Labs",
+      "duration": { "from": "2025-06-10", "to": "" },
+      "description": "Received the Smart Contract Security Excellence award for identifying critical vulnerabilities in internal staking contracts and introducing improved auditing guidelines.",
+      "selfAttested": true,
+      "issuerEmailId": "security@blockforge.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "kb-award-002",
+      "awardDocId": "",
+      "level": "Certificate",
+      "name": "Ethereum Smart Contract Developer",
+      "organisation": "Blockchain Council",
+      "duration": { "from": "2023-09-01", "to": "2023-10-01" },
+      "description": "Completed a rigorous certification focused on Solidity, EVM architecture, smart contract deployment, and security best practices.",
+      "selfAttested": true,
+      "issuerEmailId": "",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "kb-award-003",
+      "awardDocId": "",
+      "level": "Course",
+      "name": "Advanced Solidity & EVM Internals",
+      "organisation": "Secureum",
+      "duration": { "from": "2022-11-10", "to": "2022-12-15" },
+      "description": "Completed Secureum Solidity bootcamp specializing in EVM storage patterns, opcode-level gas optimization, and advanced smart contract auditing techniques.",
+      "selfAttested": true,
+      "issuerEmailId": "academy@secureum.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    }
+  ]
+},
+
+{
+  "personal": {
+    "fullName": "Ritvik Sharma",
+    "email": "ritvik.sharma@example.com",
+    "phone": "919998887766",
+    "city": "Goregaon East, Mumbai, India",
+    "linkedin": "https://www.linkedin.com/in/ritvik-sharma-sde",
+    "github": "https://github.com/ritvik-sde",
+    "summary": "Software Development Engineer specializing in backend systems, distributed architectures, high-scale APIs, and cloud-native services. Strong at system design, microservices, DevOps, performance optimization, and building reliable real-world production software. Passionate about building fault-tolerant systems and improving developer efficiency."
+  },
+  "educations": [
+    {
+      "id": "rs-edu-ssc",
+      "eduDocId": "doc-ritvik-ssc-001",
+      "level": "Secondary School",
+      "boardNameOrDegree": "CBSE",
+      "institutionName": "Ryan International School",
+      "gpa": "89",
+      "duration": { "from": "2014-04-01", "to": "2015-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ritvik-ssc.pdf",
+      "issuerEmailId": "ritvik.sharma@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "rs-edu-hsc",
+      "eduDocId": "doc-ritvik-hsc-002",
+      "level": "Higher Secondary School",
+      "boardNameOrDegree": "CBSE",
+      "institutionName": "Ryan International School",
+      "gpa": "92",
+      "duration": { "from": "2016-04-01", "to": "2017-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ritvik-hsc.pdf",
+      "issuerEmailId": "ritvik.sharma@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "rs-edu-grad",
+      "eduDocId": "doc-ritvik-grad-003",
+      "level": "Graduation",
+      "boardNameOrDegree": "B.Tech Computer Science",
+      "institutionName": "IIT Hyderabad",
+      "gpa": "8.9",
+      "duration": { "from": "2018-08-01", "to": "2022-05-30" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ritvik-degree.pdf",
+      "issuerEmailId": "ritvik.sharma@example.com",
+      "isEmailSend": true,
+      "verified": false,
+      "status": "pending"
+    }
+  ],
+  "experiences": [
+    {
+      "id": "rs-exp-001",
+      "expDocId": "exp-doc-ritvik-001",
+      "companyName": "SkyRoute Technologies",
+      "jobRole": "SDE II (Backend)",
+      "duration": { "from": "2023-02-10", "to": "present" },
+      "skills": "Node.js,TypeScript,Go,AWS,Docker,Kubernetes,PostgreSQL,Redis,Microservices,Event-Driven Architecture",
+      "description": "Built large-scale backend microservices powering logistics automation systems used by major enterprises. Designed robust API platforms, optimized distributed workloads, and improved overall system reliability.\n\nKey contributions:\n• Designed an event-driven inventory pipeline using Kafka + Kubernetes that processes **2.5M events/day** with 99.99% uptime.\n• Migrated monolithic services into independent microservices, reducing deployment time by 60% and API latency by 35%.\n• Built an internal authentication & authorization service using JWT + RBAC, cutting auth failures by 42%.\n• Implemented Redis caching + write-through patterns to reduce DB load by 55% and improve throughput.\n• Instrumented services with OpenTelemetry, enabling distributed tracing and significantly improving debugging.\n• Built CI/CD workflows using GitHub Actions + AWS CodePipeline for safe deployments.\n• Conducted performance profiling (pprof, flamegraphs) and eliminated multiple CPU bottlenecks in Go services.",
+      "selfAttested": true,
+      "isEmailSend": true,
+      "docUri": "https://example.blob/skyroute-ritvik-exp.pdf",
+      "issuerEmailId": "hr@skyroute.example.com",
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "rs-exp-002",
+      "expDocId": "exp-doc-ritvik-002",
+      "companyName": "Paymint",
+      "jobRole": "Software Engineer",
+      "duration": { "from": "2022-06-01", "to": "2023-01-15" },
+      "skills": "Java,Spring Boot,AWS,Lambda,DynamoDB,CI/CD",
+      "description": "Contributed to a high-availability payments platform handling thousands of financial transactions per minute.\n\nHighlights:\n• Built Spring Boot microservices processing real-time payment routing with configurable retry strategies.\n• Designed idempotent transaction processing logic to prevent double-spends.\n• Integrated AWS Lambda + SQS for background asynchronous tasks (statement sync, ledger updates).\n• Designed fraud detection checks reducing false positives by 18%.\n• Authored internal SDKs for payment signature generation using HMAC + SHA-256.\n• Improved unit test coverage from 56% → 87% and built integration tests using TestContainers.",
+      "selfAttested": true,
+      "isEmailSend": false,
+      "docUri": "https://example.blob/paymint-ritvik-exp.pdf",
+      "issuerEmailId": "techlead@paymint.example.com",
+      "verified": false,
+      "status": "verified"
+    },
+    {
+      "id": "rs-exp-003",
+      "expDocId": "exp-doc-ritvik-003",
+      "companyName": "Freelance",
+      "jobRole": "Backend Consultant",
+      "duration": { "from": "2021-04-01", "to": "2022-05-20" },
+      "skills": "API Design,MySQL,Node.js,Security",
+      "description": "Provided advisory and backend development services to early-stage startups.\n\n• Rebuilt an API gateway with modular routing, auth layers, and throttling.\n• Conducted security audits identifying SQLi, broken auth flows, insecure JWT handling.\n• Built a scalable MySQL + Redis caching layer for a food-tech startup.",
+      "selfAttested": true,
+      "isEmailSend": false,
+      "docUri": "",
+      "issuerEmailId": "",
+      "verified": false,
+      "status": "pending"
+    }
+  ],
+  "skills": [
+    { "id": "rs-skill-001", "skillName": "Node.js", "level": "expert", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "rs-skill-002", "skillName": "Go", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "rs-skill-003", "skillName": "Java", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "rs-skill-004", "skillName": "System Design", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "rs-skill-005", "skillName": "PostgreSQL", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "rs-skill-006", "skillName": "Redis", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "rs-skill-007", "skillName": "Microservices", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" }
+  ],
+  "projects": [
+    {
+      "id": "rs-proj-001",
+      "projectName": "Distributed Task Scheduler",
+      "projectUrl": "https://github.com/ritvik-sde/distributed-scheduler",
+      "duration": { "from": "2024-01-01", "to": "2024-05-01" },
+      "skills": "Go,Redis Streams,Leader Election,Distributed Locks",
+      "description": "Designed a fault-tolerant distributed job scheduler where multiple worker nodes execute tasks reliably.\n\nCore features:\n• Redis-based distributed locking with fallback to Redlock algorithm.\n• Automatic leader election + failover handling.\n• Job retry policies, dead-letter queues, and priority handling.\n• Execution reports sent via WebSocket + SSE for dashboards.\n• Horizontal scaling to hundreds of workers per cluster without central bottlenecks.",
+      "selfAttested": true
+    },
+    {
+      "id": "rs-proj-002",
+      "projectName": "High-Throughput Payment Aggregator",
+      "projectUrl": "",
+      "duration": { "from": "2023-06-01", "to": "2023-12-01" },
+      "skills": "Java,Spring Boot,Reactive Streams,PostgreSQL",
+      "description": "Built a microservice that aggregates payment events from gateways and normalizes transactions for downstream services.\n\nTechnical highlights:\n• Leveraged Spring WebFlux for non-blocking IO, handling up to **12k req/sec**.\n• Added reactive retry strategies with backoff and jitter.\n• Database write batching reduced DB contention by 40%.\n• Implemented a transaction integrity system using logical hashing.",
+      "selfAttested": true
+    },
+    {
+      "id": "rs-proj-003",
+      "projectName": "Authentication & User Service",
+      "projectUrl": "",
+      "duration": { "from": "2022-02-01", "to": "2022-06-01" },
+      "skills": "Node.js,JWT,OAuth2,MySQL,Redis",
+      "description": "Designed a fully featured user authentication & authorization service.\n\n• OTP login + email login flows\n• OAuth2 integrations (Google + GitHub)\n• Device fingerprinting + suspicious login alerts\n• Token rotation logic with Redis-based invalidation\n• Secure password hashing with Argon2id",
+      "selfAttested": true
+    }
+  ],
+  "awards": [
+    {
+      "id": "rs-award-001",
+      "awardDocId": "",
+      "level": "Award",
+      "name": "High Impact Engineer Award",
+      "organisation": "SkyRoute Technologies",
+      "duration": { "from": "2024-12-10", "to": "" },
+      "description": "Awarded for redesigning the company's event-driven order pipeline which improved throughput, reduced operational load, and increased reliability across services.",
+      "selfAttested": true,
+      "issuerEmailId": "lead@skyroute.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "rs-award-002",
+      "awardDocId": "",
+      "level": "Certificate",
+      "name": "AWS Solutions Architect – Associate",
+      "organisation": "Amazon Web Services",
+      "duration": { "from": "2023-08-01", "to": "2023-09-01" },
+      "description": "Completed AWS SAA certification with strong emphasis on distributed systems, networking, and scalable cloud architectures.",
+      "selfAttested": true,
+      "issuerEmailId": "",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "verified"
+    },
+    {
+      "id": "rs-award-003",
+      "awardDocId": "",
+      "level": "Course",
+      "name": "Advanced System Design",
+      "organisation": "Educative.io",
+      "duration": { "from": "2022-10-01", "to": "2022-12-01" },
+      "description": "Completed an expert-level course covering large-scale systems, caching strategies, sharding, consistency models, and designing globally distributed apps.",
+      "selfAttested": true,
+      "issuerEmailId": "team@educative.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    }
+  ]
+},
+
+{
+  "personal": {
+    "fullName": "Ananya Mehta",
+    "email": "ananya.mehta@example.com",
+    "phone": "919887766554",
+    "city": "Indiranagar, Bengaluru, India",
+    "linkedin": "https://www.linkedin.com/in/ananya-mehta-ai",
+    "github": "https://github.com/ananya-ai",
+    "summary": "AI Engineer with expertise in LLMs, NLP, computer vision, embeddings architecture, and scalable machine learning pipelines. Experienced in building production-grade AI microservices, vector search engines, retrieval-augmented generation (RAG) systems, and model optimization for low-latency inference. Strong foundation in Python, PyTorch, TensorFlow, MLOps, and cloud-based deployment on AWS/GCP."
+  },
+
+  "educations": [
+    {
+      "id": "am-edu-ssc",
+      "eduDocId": "doc-ananya-ssc-001",
+      "level": "Secondary School",
+      "boardNameOrDegree": "ICSE",
+      "institutionName": "Bishop Cotton Girls' School",
+      "gpa": "91",
+      "duration": { "from": "2014-04-01", "to": "2015-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ananya-ssc.pdf",
+      "issuerEmailId": "ananya.mehta@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "am-edu-hsc",
+      "eduDocId": "doc-ananya-hsc-002",
+      "level": "Higher Secondary School",
+      "boardNameOrDegree": "ISC",
+      "institutionName": "Bishop Cotton Girls' School",
+      "gpa": "94",
+      "duration": { "from": "2016-04-01", "to": "2017-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ananya-hsc.pdf",
+      "issuerEmailId": "ananya.mehta@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "am-edu-grad",
+      "eduDocId": "doc-ananya-grad-003",
+      "level": "Graduation",
+      "boardNameOrDegree": "B.Tech Artificial Intelligence & Data Science",
+      "institutionName": "IIIT Bangalore",
+      "gpa": "9.0",
+      "duration": { "from": "2018-08-01", "to": "2022-06-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ananya-degree.pdf",
+      "issuerEmailId": "ananya.mehta@example.com",
+      "isEmailSend": true,
+      "verified": false,
+      "status": "pending"
+    }
+  ],
+
+  "experiences": [
+    {
+      "id": "am-exp-001",
+      "expDocId": "exp-doc-ananya-001",
+      "companyName": "Cortex AI Systems",
+      "jobRole": "AI Engineer",
+      "duration": { "from": "2023-03-01", "to": "present" },
+      "skills": "Python,PyTorch,Transformers,LLMs,RAG,Vector Search,Elasticsearch,LangChain,AWS,MLOps,FastAPI",
+      "description": "Architected and deployed production-grade AI services across LLM, NLP, and computer vision domains. Built scalable, low-latency inference pipelines powering real-time enterprise applications.\n\nKey contributions:\n• Designed a full RAG pipeline using sentence-transformer embeddings, Elasticsearch vector search, and optimized chunking strategies, reducing hallucinations by 40%.\n• Fine-tuned LLaMA/GPT models for domain-specific classification, summarization, and Q&A tasks with PEFT/LoRA techniques.\n• Built high-availability AI microservices using FastAPI + Uvicorn + AWS ECS with auto-scaling based on token throughput.\n• Integrated async batching + KV-cache reuse reducing inference time from 850ms → 210ms for high-traffic endpoints.\n• Created a feature store + model registry workflow using MLflow + S3 enabling automated version rollbacks.\n• Implemented GPU monitoring + autoscaling policies reducing cloud compute cost by ~30%.",
+      "selfAttested": true,
+      "isEmailSend": true,
+      "docUri": "https://example.blob/cortex-ananya-exp.pdf",
+      "issuerEmailId": "hr@cortexai.example.com",
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "am-exp-002",
+      "expDocId": "exp-doc-ananya-002",
+      "companyName": "DeepVision Analytics",
+      "jobRole": "Machine Learning Engineer",
+      "duration": { "from": "2022-06-15", "to": "2023-02-10" },
+      "skills": "TensorFlow,CV,YOLOv8,OpenCV,Data Pipelines,Model Optimization",
+      "description": "Developed computer vision pipelines for industrial inspection systems and automated metadata labeling services.\n\nHighlights:\n• Trained YOLOv8 models achieving 94% mAP for defect detection in manufacturing environments.\n• Designed augmentation-heavy data pipelines improving accuracy for limited-sample datasets.\n• Converted heavy TF models to ONNX + TensorRT reducing inference latency by 55% on edge devices.\n• Worked with classical CV methods (ORB, SIFT) for fallback detection modes in low-light scenarios.\n• Built an internal annotation tool using React + FastAPI used by 15+ operators daily.",
+      "selfAttested": true,
+      "isEmailSend": false,
+      "docUri": "https://example.blob/deepvision-ananya-exp.pdf",
+      "issuerEmailId": "lead@deepvision.example.com",
+      "verified": false,
+      "status": "verified"
+    }
+  ],
+
+  "skills": [
+    { "id": "am-skill-01", "skillName": "Python", "level": "expert", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "am-skill-02", "skillName": "PyTorch", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "am-skill-03", "skillName": "Transformers / LLMs", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "am-skill-04", "skillName": "MLOps", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "am-skill-05", "skillName": "Vector Databases", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "am-skill-06", "skillName": "TensorFlow", "level": "intermediate", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "am-skill-07", "skillName": "Computer Vision", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" }
+  ],
+
+  "projects": [
+    {
+      "id": "am-proj-001",
+      "projectName": "Enterprise RAG Platform",
+      "projectUrl": "https://github.com/ananya-ai/enterprise-rag",
+      "duration": { "from": "2024-02-01", "to": "2024-08-01" },
+      "skills": "RAG,Embeddings,Elasticsearch,LLMs,Chunking,LangChain,FastAPI",
+      "description": "Developed a complete RAG system used internally by enterprise clients for document automation and knowledge retrieval.\n\nCore components:\n• Custom recursive chunking strategy preserving semantic flow for legal/medical documents.\n• Used bge-large embeddings + Elasticsearch 8.12 vector search with HNSW indexing.\n• Implemented multi-hop retrieval with dynamic context scoring and deduplication.\n• Built FastAPI inference layer integrating rate limiting and user-specific context windows.\n• Achieved 62% reduction in hallucination for summarization/Q&A tasks.",
+      "selfAttested": true
+    },
+    {
+      "id": "am-proj-002",
+      "projectName": "LLM Fine-Tuning Pipeline",
+      "projectUrl": "",
+      "duration": { "from": "2023-10-01", "to": "2024-01-15" },
+      "skills": "LoRA,PEFT,HuggingFace,Quantization,AWS Sagemaker",
+      "description": "Built an automated LLM fine-tuning pipeline for text classification, summarization, and structured extraction tasks.\n\nFeatures:\n• PEFT-based LoRA training enabling 6× faster fine-tuning.\n• 4-bit QLoRA enabling large models to train on single A100 GPU.\n• Integrated hyperparameter sweeps with W&B.\n• Deployed optimized models to SageMaker endpoints with autoscaling based on TPS.",
+      "selfAttested": true
+    },
+    {
+      "id": "am-proj-003",
+      "projectName": "Computer Vision Inspection System",
+      "projectUrl": "",
+      "duration": { "from": "2022-04-01", "to": "2022-12-01" },
+      "skills": "YOLOv8,TensorRT,OpenCV,Edge AI",
+      "description": "Designed a real-time defect detection system for manufacturing lines.\n\n• Achieved 60 FPS processing on Jetson Xavier using TensorRT optimizations.\n• Customized YOLO heads for multi-class outputs.\n• Designed ROI-based detection logic minimizing false positives.\n• Delivered edge deployment with OTA model updates.",
+      "selfAttested": true
+    }
+  ],
+
+  "awards": [
+    {
+      "id": "am-award-001",
+      "awardDocId": "",
+      "level": "Award",
+      "name": "AI Innovation Award",
+      "organisation": "Cortex AI Systems",
+      "duration": { "from": "2024-12-10", "to": "" },
+      "description": "Awarded for designing the RAG system that significantly reduced inference hallucination and improved enterprise-level document automation workflows.",
+      "selfAttested": true,
+      "issuerEmailId": "lead@cortexai.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "am-award-002",
+      "awardDocId": "",
+      "level": "Certificate",
+      "name": "Deep Learning Specialization",
+      "organisation": "DeepLearning.AI (Andrew Ng)",
+      "duration": { "from": "2023-07-01", "to": "2023-09-01" },
+      "description": "Completed the 5-course Deep Learning Specialization covering CNNs, RNNs, optimization algorithms, and applied ML workflows.",
+      "selfAttested": true,
+      "issuerEmailId": "",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "verified"
+    },
+    {
+      "id": "am-award-003",
+      "awardDocId": "",
+      "level": "Course",
+      "name": "Generative AI Engineering",
+      "organisation": "Google Cloud",
+      "duration": { "from": "2022-12-10", "to": "2023-01-20" },
+      "description": "Completed hands-on training in LLMs, embeddings, prompt engineering, vector databases, and real-world generative AI workflows on GCP.",
+      "selfAttested": true,
+      "issuerEmailId": "ai-academy@google.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    }
+  ]
+},
+{
+  "personal": {
+    "fullName": "Ishaan Mehta",
+    "email": "ishaan.mehta@example.com",
+    "phone": "919887766554",
+    "city": "Koramangala, Bengaluru, India",
+    "linkedin": "https://www.linkedin.com/in/ishaan-mehta-ai",
+    "github": "https://github.com/ishaan-ai",
+    "summary": "AI Engineer specializing in LLM applications, vector retrieval systems, multimodal models, and scalable ML pipelines. Experienced in designing intelligent microservices, optimizing inference latency, and shipping production-ready AI systems. Strong foundation in NLP, deep learning, embeddings, RAG pipelines, and cloud-based ML deployment."
+  },
+  "educations": [
+    {
+      "id": "im-edu-ssc",
+      "eduDocId": "doc-ishaan-ssc-001",
+      "level": "Secondary School",
+      "boardNameOrDegree": "ICSE",
+      "institutionName": "Greenwood High School",
+      "gpa": "91",
+      "duration": { "from": "2014-03-01", "to": "2015-03-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ishaan-ssc.pdf",
+      "issuerEmailId": "ishaan.mehta@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "im-edu-hsc",
+      "eduDocId": "doc-ishaan-hsc-002",
+      "level": "Higher Secondary School",
+      "boardNameOrDegree": "ICSE",
+      "institutionName": "Greenwood High School",
+      "gpa": "93",
+      "duration": { "from": "2016-03-01", "to": "2017-03-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ishaan-hsc.pdf",
+      "issuerEmailId": "ishaan.mehta@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "im-edu-grad",
+      "eduDocId": "doc-ishaan-grad-003",
+      "level": "Graduation",
+      "boardNameOrDegree": "B.Tech AI & Data Science",
+      "institutionName": "IIT Gandhinagar",
+      "gpa": "9.0",
+      "duration": { "from": "2018-08-01", "to": "2022-05-31" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/ishaan-degree.pdf",
+      "issuerEmailId": "ishaan.mehta@example.com",
+      "isEmailSend": true,
+      "verified": false,
+      "status": "pending"
+    }
+  ],
+  "experiences": [
+    {
+      "id": "im-exp-001",
+      "expDocId": "exp-doc-ishaan-001",
+      "companyName": "DeepCortex AI",
+      "jobRole": "AI Engineer",
+      "duration": { "from": "2023-01-10", "to": "present" },
+      "skills": "Python,PyTorch,Transformers,LangChain,FAISS,ElasticSearch,OpenAI APIs,HuggingFace,Ray Serve,MLOps",
+      "description": "Designed scalable AI microservices and intelligent retrieval pipelines using LLMs, embeddings, and multimodal models. Worked across research, optimization, and production deployment.\n\nKey contributions:\n• Built a RAG 2.0 pipeline using hybrid search (vector + BM25) achieving **72% boost** in factual recall for enterprise Q&A.\n• Fine-tuned Llama-2 and Mistral models for domain-specific tasks (legal summarization, email automation, contract analysis).\n• Developed latency-optimized inference services using quantization (INT4) and batching, reducing operational cost by **40%**.\n• Architected an async inference router using Ray Serve with auto-scaling based on CPU/GPU utilization.\n• Improved embeddings-based semantic search by converting large PDFs into structured chunks using layout detection, OCR, and per-section embeddings.\n• Built a monitoring dashboard for LLM hallucination detection using automatic grounding + confidence scores.\n• Wrote system-level documentation, benchmarking suites, load-test scripts, and internal MLOps guidelines.",
+      "selfAttested": true,
+      "isEmailSend": true,
+      "docUri": "https://example.blob/deepcortex-ishaan-exp.pdf",
+      "issuerEmailId": "hr@deepcortex.example.com",
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "im-exp-002",
+      "expDocId": "exp-doc-ishaan-002",
+      "companyName": "CognitiveLayer",
+      "jobRole": "Machine Learning Engineer",
+      "duration": { "from": "2022-06-01", "to": "2022-12-20" },
+      "skills": "NLP,CNN,LSTM,Transformers,MLFlow,Model Deployment",
+      "description": "Worked on NLP-driven automation pipelines and document intelligence systems for enterprise clients.\n\nHighlights:\n• Built a document classifier using DistilBERT achieving **94% accuracy** on 12-class industry taxonomy.\n• Implemented MLFlow tracking for metrics, artifacts, and deployment workflows.\n• Designed an OCR + NER pipeline for extracting structured information from scanned financial documents.\n• Optimized inference models with ONNX Runtime, improving throughput by **3×** on CPU clusters.\n• Deployed models using Docker + FastAPI with auto-reload monitoring scripts.",
+      "selfAttested": true,
+      "isEmailSend": false,
+      "docUri": "https://example.blob/cognitivelayer-ishaan-exp.pdf",
+      "issuerEmailId": "team@cognitivelayer.example.com",
+      "verified": false,
+      "status": "verified"
+    }
+  ],
+  "skills": [
+    { "id": "im-skill-001", "skillName": "Python", "level": "expert", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "im-skill-002", "skillName": "PyTorch", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "im-skill-003", "skillName": "Transformers (HuggingFace)", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "im-skill-004", "skillName": "RAG Pipelines", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "im-skill-005", "skillName": "Vector Databases (FAISS/Weaviate)", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "im-skill-006", "skillName": "LangChain", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "im-skill-007", "skillName": "MLOps & Deployment", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" }
+  ],
+  "projects": [
+    {
+      "id": "im-proj-001",
+      "projectName": "Enterprise RAG Search Engine",
+      "projectUrl": "https://github.com/ishaan-ai/rag-platform",
+      "duration": { "from": "2024-04-01", "to": "2024-09-01" },
+      "skills": "Transformers,Embeddings,FAISS,LangChain,RAG2.0",
+      "description": "Built a production-grade RAG search platform integrating hybrid retrieval (vector + keyword), section-level scoring, and prompt-grounding.\n\nFeatures:\n• Chunking pipeline using semantic boundaries + visual layout detection\n• Vector store with HNSW indexing for 30M+ embeddings\n• Reranking using cross-encoder transformer models\n• Granular citation mapping to source paragraphs\n• Guardrails for hallucination detection using embedding cross-checks\n• 25–40% improvement in answer accuracy on enterprise datasets",
+      "selfAttested": true
+    },
+    {
+      "id": "im-proj-002",
+      "projectName": "Multimodal Chatbot (Image + Text)",
+      "projectUrl": "",
+      "duration": { "from": "2023-08-01", "to": "2023-11-30" },
+      "skills": "CLIP,Vision Transformers,OCR,LLMs",
+      "description": "Created a multimodal chatbot capable of interpreting text + image inputs.\n\n• Used CLIP embeddings for image → text alignment\n• Integrated OCR (EasyOCR + PaddleOCR) for scanned images\n• Implemented hybrid prompt template combining metadata, extracted text, and embeddings\n• Deployed using FastAPI + GPU batching for optimized inference latency",
+      "selfAttested": true
+    },
+    {
+      "id": "im-proj-003",
+      "projectName": "LLM-Based Email Auto-Responder",
+      "projectUrl": "",
+      "duration": { "from": "2022-10-01", "to": "2022-12-15" },
+      "skills": "NLP,LLMs,Automation",
+      "description": "Built an intelligent email auto-responder using intent classification and templated LLM prompts.\n\n• Fine-tuned classifier for routing support emails into categories\n• Automated summarization and drafting using prompt templates\n• Reduced manual ticket effort by 55%",
+      "selfAttested": true
+    }
+  ],
+  "awards": [
+    {
+      "id": "im-award-001",
+      "awardDocId": "",
+      "level": "Award",
+      "name": "AI Innovation Excellence Award",
+      "organisation": "DeepCortex AI",
+      "duration": { "from": "2024-06-01", "to": "" },
+      "description": "Awarded for building a high-accuracy enterprise RAG pipeline and significantly improving LLM grounding reliability across multiple clients.",
+      "selfAttested": true,
+      "issuerEmailId": "lead@deepcortex.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "im-award-002",
+      "awardDocId": "",
+      "level": "Certificate",
+      "name": "HuggingFace NLP Course",
+      "organisation": "HuggingFace",
+      "duration": { "from": "2023-05-01", "to": "2023-06-01" },
+      "description": "Completed hands-on training on Transformers, tokenizers, dataset pipelines, and fine-tuning encoder-decoder models.",
+      "selfAttested": true,
+      "issuerEmailId": "learning@huggingface.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "verified"
+    },
+    {
+      "id": "im-award-003",
+      "awardDocId": "",
+      "level": "Course",
+      "name": "Deep Learning Specialization",
+      "organisation": "DeepLearning.AI",
+      "duration": { "from": "2022-03-01", "to": "2022-05-15" },
+      "description": "Completed 5-course specialization focusing on neural networks, CNNs, sequence models, optimization, and deep learning production techniques.",
+      "selfAttested": true,
+      "issuerEmailId": "courses@deeplearningai.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    }
+  ]
+},
+{
+  "personal": {
+    "fullName": "Neeraj Mathur",
+    "email": "neeraj.mathur@example.com",
+    "phone": "919779998866",
+    "city": "Kormangala, Bengaluru, India",
+    "linkedin": "https://www.linkedin.com/in/neeraj-mathur-fullstack",
+    "github": "https://github.com/neeraj-fs",
+    "summary": "Full Stack Developer with expertise in building scalable, user-centric web applications using React, Next.js, Node.js, PostgreSQL, and cloud-native architectures. Strong focus on clean code, microservices, performance optimization, and end-to-end product development."
+  },
+  "educations": [
+    {
+      "id": "nm-edu-ssc",
+      "eduDocId": "doc-neeraj-ssc-001",
+      "level": "Secondary School",
+      "boardNameOrDegree": "CBSE",
+      "institutionName": "National Public School",
+      "gpa": "91",
+      "duration": { "from": "2014-04-01", "to": "2015-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/neeraj-ssc.pdf",
+      "issuerEmailId": "neeraj.mathur@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "nm-edu-hsc",
+      "eduDocId": "doc-neeraj-hsc-002",
+      "level": "Higher Secondary School",
+      "boardNameOrDegree": "CBSE",
+      "institutionName": "National Public School",
+      "gpa": "93",
+      "duration": { "from": "2016-04-01", "to": "2017-04-01" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/neeraj-hsc.pdf",
+      "issuerEmailId": "neeraj.mathur@example.com",
+      "isEmailSend": false,
+      "verified": true,
+      "status": "verified"
+    },
+    {
+      "id": "nm-edu-grad",
+      "eduDocId": "doc-neeraj-grad-003",
+      "level": "Graduation",
+      "boardNameOrDegree": "B.Tech Computer Science",
+      "institutionName": "VIT Vellore",
+      "gpa": "8.7",
+      "duration": { "from": "2018-08-01", "to": "2022-06-10" },
+      "selfAttested": true,
+      "docUri": "https://example.blob/neeraj-degree.pdf",
+      "issuerEmailId": "neeraj.mathur@example.com",
+      "isEmailSend": true,
+      "verified": false,
+      "status": "pending"
+    }
+  ],
+  "experiences": [
+    {
+      "id": "nm-exp-001",
+      "expDocId": "exp-doc-neeraj-001",
+      "companyName": "BrightStack Labs",
+      "jobRole": "Full Stack Developer",
+      "duration": { "from": "2023-03-01", "to": "present" },
+      "skills": "React,Next.js,Node.js,TypeScript,PostgreSQL,Redis,AWS,Docker,Kubernetes,Microservices",
+      "description": "Built and scaled multiple production applications handling thousands of daily users. Designed microservices, developed reusable frontend components, and optimized backend APIs.\n\nKey contributions:\n• Architected microservices-based backend using Node.js + PostgreSQL with load-balanced API gateways.\n• Built multiple Next.js apps with SSR/ISR, improving SEO visibility and reducing TTFB across product pages.\n• Designed a reusable UI component library with Tailwind + Storybook, accelerating frontend delivery speed for teams.\n• Implemented Redis caching and background workers (BullMQ) reducing API latency by 40%.\n• Designed an S3-based file upload pipeline with presigned URLs + image optimization.\n• Created CI/CD pipelines using GitHub Actions + AWS ECS for safe and automated deployments.\n• Improved Lighthouse performance score from 62 → 95 through aggressive code splitting and lazy loading.",
+      "selfAttested": true,
+      "isEmailSend": true,
+      "docUri": "https://example.blob/brightstack-neeraj-exp.pdf",
+      "issuerEmailId": "hr@brightstack.example.com",
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "nm-exp-002",
+      "expDocId": "exp-doc-neeraj-002",
+      "companyName": "CloudServe",
+      "jobRole": "Software Engineer — Full Stack",
+      "duration": { "from": "2022-07-01", "to": "2023-02-15" },
+      "skills": "React,Node.js,Express,MongoDB,AWS Lambda,SQS,DynamoDB",
+      "description": "Worked on key modules of an enterprise SaaS product enabling automated cloud resource provisioning.\n\nHighlights:\n• Built scalable REST APIs with Express + MongoDB, following clean architecture.\n• Implemented Lambda-based async workers processing 150k+ background tasks daily.\n• Designed authentication service with JWT + role-based authorization.\n• Reduced repeated DB queries with Redis + partial document caching.\n• Created dashboards with React + Recharts for cloud usage analytics.",
+      "selfAttested": true,
+      "isEmailSend": false,
+      "docUri": "https://example.blob/cloudserve-neeraj-exp.pdf",
+      "issuerEmailId": "teamlead@cloudserve.example.com",
+      "verified": false,
+      "status": "verified"
+    }
+  ],
+  "skills": [
+    { "id": "nm-skill-001", "skillName": "React", "level": "expert", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "nm-skill-002", "skillName": "Next.js", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "nm-skill-003", "skillName": "Node.js", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "nm-skill-004", "skillName": "PostgreSQL", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "nm-skill-005", "skillName": "MongoDB", "level": "advanced", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "nm-skill-006", "skillName": "AWS", "level": "intermediate", "selfAttested": true, "endoresBy": "", "endoresThrough": "" },
+    { "id": "nm-skill-007", "skillName": "DevOps / Docker", "level": "intermediate", "selfAttested": true, "endoresBy": "", "endoresThrough": "" }
+  ],
+  "projects": [
+    {
+      "id": "nm-proj-001",
+      "projectName": "End-to-End E-commerce Platform",
+      "projectUrl": "https://github.com/neeraj-fs/ecommerce-platform",
+      "duration": { "from": "2024-01-10", "to": "2024-05-01" },
+      "skills": "Next.js,Node.js,PostgreSQL,Stripe,Redis",
+      "description": "Developed an end-to-end e-commerce system with advanced features like multi-vendor, dynamic pricing, and analytics.\n\nTechnical highlights:\n• Modular microservices architecture: inventory, payments, orders, user service.\n• Stripe payment integration with intent-based flows + webhook resilience.\n• Admin analytics dashboard with server-rendered charts and caching strategy.\n• Product catalog search using Postgres full-text + indexes.",
+      "selfAttested": true
+    },
+    {
+      "id": "nm-proj-002",
+      "projectName": "Real-Time Collaboration Board",
+      "projectUrl": "",
+      "duration": { "from": "2023-08-05", "to": "2023-11-30" },
+      "skills": "React,Node.js,WebSockets,Redis Pub/Sub",
+      "description": "Built a Figma-like real-time collaboration tool.\n\n• Multi-user live cursor + drawing board\n• WebSocket channels for rooms & events\n• Optimistic UI sync + rollback logic for collisions\n• Server autoscaling with stateless WebSocket workers",
+      "selfAttested": true
+    },
+    {
+      "id": "nm-proj-003",
+      "projectName": "API Gateway & Auth Server",
+      "projectUrl": "",
+      "duration": { "from": "2022-12-01", "to": "2023-03-01" },
+      "skills": "Node.js,JWT,OAuth2,MySQL,Docker",
+      "description": "Built a custom API gateway and authentication service.\n\n• JWT + refresh token rotation\n• OAuth2 (Google + GitHub) integration\n• IP-based throttling & rate-limiting\n• RBAC for multi-tenant SaaS apps",
+      "selfAttested": true
+    }
+  ],
+  "awards": [
+    {
+      "id": "nm-award-001",
+      "awardDocId": "",
+      "level": "Award",
+      "name": "Outstanding Full Stack Developer",
+      "organisation": "BrightStack Labs",
+      "duration": { "from": "2024-11-10", "to": "" },
+      "description": "Recognized for architecting the new microservices platform and improving frontend performance for 3 flagship products.",
+      "selfAttested": true,
+      "issuerEmailId": "lead@brightstack.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    },
+    {
+      "id": "nm-award-002",
+      "awardDocId": "",
+      "level": "Certificate",
+      "name": "AWS Developer Associate",
+      "organisation": "Amazon Web Services",
+      "duration": { "from": "2023-05-01", "to": "2023-06-15" },
+      "description": "Certified AWS Developer with expertise in serverless, CI/CD, IAM, and cloud-native development.",
+      "selfAttested": true,
+      "issuerEmailId": "",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "verified"
+    },
+    {
+      "id": "nm-award-003",
+      "awardDocId": "",
+      "level": "Course",
+      "name": "Complete Full Stack Mastery",
+      "organisation": "Udemy",
+      "duration": { "from": "2022-11-01", "to": "2022-12-15" },
+      "description": "Completed advanced MERN + cloud deployment masterclass focusing on performance and production engineering.",
+      "selfAttested": true,
+      "issuerEmailId": "courses@udemy.example.com",
+      "docUri": "",
+      "isEmailSend": false,
+      "verified": false,
+      "status": "pending"
+    }
+  ]
+}
+
+
+]
