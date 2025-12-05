@@ -27,7 +27,7 @@ import { IStepCard } from "./PersonalDetails";
 import { Button } from "@/components/ui/button";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
 import toast from "react-hot-toast";
-import { useEffect, useState,useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
 
@@ -39,8 +39,8 @@ export const ProjectDetails = ({
   cvData,
 }: IStepCard) => {
   const [refresh, setRefresh] = useState<boolean>(false);
-  const [loading,setLoading]= useState<boolean>(false);
-  const [idx,setIdx]= useState<number>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [idx, setIdx] = useState<number>();
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(ProjectSchema),
     defaultValues: {
@@ -104,7 +104,7 @@ export const ProjectDetails = ({
     } catch (error: any) {
       console.log(error);
       toast.error(error.message || "Something went wrong");
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -154,63 +154,65 @@ export const ProjectDetails = ({
       setRefresh((prev) => !prev);
     } catch (error) {
       toast.error("something went wrong");
-    }finally{setLoading(false)}
+    } finally {
+      setLoading(false);
+    }
   };
 
   const deleteHandler = async (index: number) => {
-        try {
-          setLoading(true);
-          setIdx(index);
-          const payload = getValues(`projects.${index}`);
-          const res = await api.delete(`/doc/delete-projDoc/${payload.id}`);
-          console.log("res",res)
-          if (!res.data.success) {
-            toast.error(res.data.message);
-            return;
-          }
-          toast.success(res.data.message);
-          setRefresh((prev) => !prev);
-        } catch (error: any) {
-          toast.error(error.message ?? error ?? "something went wrong");
-        }finally{
-          setLoading(false)
-        }
-      };
+    try {
+      setLoading(true);
+      setIdx(index);
+      const payload = getValues(`projects.${index}`);
+      const res = await api.delete(`/doc/delete-projDoc/${payload.id}`);
+      console.log("res", res);
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return;
+      }
+      toast.success(res.data.message);
+      setRefresh((prev) => !prev);
+    } catch (error: any) {
+      toast.error(error.message ?? error ?? "something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchProjDocs();
   }, [step === 5, refresh]);
 
   const includedIds = useMemo(
-              () => new Set(cvData.projects.map((e: any) => e.id)),
-              [cvData]
-            );
-          
-            function buildEducationPayload(index: number) {
-              // grab the whole education row from RHF form values
-              const row = getValues(`projects.${index}`) || {};
-              // ensure a stable id — prefer existing ID from the form if present
-              const id = row.id || uid("prj");
-              return { ...row, id };
-            }
-          
-            function handleToggleInclude(index: number) {
-              const payload = buildEducationPayload(index);
-          
-              setCvData((prev: any) => {
-                const exists = prev.projects.some((e: any) => e.id === payload.id);
-                if (exists) {
-                  // remove
-                  return {
-                    ...prev,
-                    projects: prev.projects.filter((e: any) => e.id !== payload.id),
-                  };
-                } else {
-                  // add (append)
-                  return { ...prev, projects: [...prev.projects, payload] };
-                }
-              });
-            }
+    () => new Set(cvData.projects.map((e: any) => e.id)),
+    [cvData]
+  );
+
+  function buildEducationPayload(index: number) {
+    // grab the whole education row from RHF form values
+    const row = getValues(`projects.${index}`) || {};
+    // ensure a stable id — prefer existing ID from the form if present
+    const id = row.id || uid("prj");
+    return { ...row, id };
+  }
+
+  function handleToggleInclude(index: number) {
+    const payload = buildEducationPayload(index);
+
+    setCvData((prev: any) => {
+      const exists = prev.projects.some((e: any) => e.id === payload.id);
+      if (exists) {
+        // remove
+        return {
+          ...prev,
+          projects: prev.projects.filter((e: any) => e.id !== payload.id),
+        };
+      } else {
+        // add (append)
+        return { ...prev, projects: [...prev.projects, payload] };
+      }
+    });
+  }
 
   return (
     <Form {...form}>
@@ -240,8 +242,7 @@ export const ProjectDetails = ({
                         cvData.projects.some(
                           (e: any) =>
                             e.id ===
-                            (form.getValues(`projects.${index}.id`) ||
-                              p.id)
+                            (form.getValues(`projects.${index}.id`) || p.id)
                         )
                       }
                       onChange={() => handleToggleInclude(index)}
@@ -253,9 +254,10 @@ export const ProjectDetails = ({
                   </div>
                 )}
                 <div key={p.id} className="border p-4 rounded bg-white">
-                  <div className="flex justify-between flex-wrap items-center mb-2">
-                  <div className="text-sm font-medium text-[#03257e]">
-                    Project {p.id}
+                  <div className="flex justify-between flex-wrap items-center mb-2 w-full">
+                    <div className="text-sm font-medium text-black">
+                      Project <span className="text-xs text-gray-500">{p.id}</span>
+                    </div>
                   </div>
                   <div className="flex flex-wrap justify-end items-center gap-2">
                     <FormField
@@ -278,34 +280,37 @@ export const ProjectDetails = ({
                       )}
                     />
                     <div className="flex items-center gap-1">
-                    {isMongoId(p.id) ? (
-                      <button
-                      disabled={loading}
-                        type="button"
-                        onClick={() => updateHandler(index)}
-                        className="mt-2 px-3 py-1 rounded bg-[#006666] border border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
-                      >
-                        <Replace size={14} /> {loading&&idx===index?"Updating...":"Update"}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => removeProject(index)}
-                        className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
-                      >
-                        <Trash2 size={14} /> Remove
-                      </button>
-                    )}
-                    {isMongoId(p.id)&&<Button
-                      type="button"
-                      disabled={loading}
-                      onClick={() => deleteHandler(index)}
-                      className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
-                    >
-                      <Delete size={18} /> Delete
-                    </Button>}
+                      {isMongoId(p.id) ? (
+                        <button
+                          disabled={loading}
+                          type="button"
+                          onClick={() => updateHandler(index)}
+                          className="mt-2 px-3 py-1 rounded bg-[#006666] border border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
+                        >
+                          <Replace size={14} />{" "}
+                          {loading && idx === index ? "Updating..." : "Update"}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => removeProject(index)}
+                          className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                        >
+                          <Trash2 size={14} /> Remove
+                        </button>
+                      )}
+                      {isMongoId(p.id) && (
+                        <Button
+                          type="button"
+                          disabled={loading}
+                          onClick={() => deleteHandler(index)}
+                          className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                        >
+                          <Delete size={18} /> Delete
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                     <FormField
                       control={control}
@@ -431,7 +436,6 @@ export const ProjectDetails = ({
                         </FormItem>
                       )}
                     />
-                  </div>
                   </div>
                 </div>
               </>

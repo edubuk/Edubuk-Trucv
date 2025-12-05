@@ -5,10 +5,13 @@ import {
   Badge,
   Building2,
   Calendar,
+  CheckCircle,
+  Clock,
   Delete,
   ExternalLink,
   FileText,
   Paperclip,
+  PenLine,
   PlusCircle,
   Replace,
   Trash2,
@@ -299,12 +302,33 @@ export const AwardDetails = ({
                     </p>
                   </div>
                 )}
-                <div key={a.id} className="border p-4 rounded bg-white">
-                  <div className="flex justify-between flex-wrap items-center">
-                    <div className="text-sm font-medium text-[#03257e]">
-                      {a.level} Entry
+                  <div key={a.rhfKey} className="border p-4 rounded bg-white">
+                  <div className="flex justify-between flex-wrap items-center mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
+                      <div className="text-sm font-medium">Organisation</div>
+                      <div className="text-xs flex gap-1 items-center text-slate-500 break-all">
+                        {a.id}
+                        {isMongoId(a.id) &&
+                          (a.verified ? (
+                            <p className="flex items-center font-bold text-md sm:text-lg gap-1 text-[#008888]">
+                              {" "}
+                              <CheckCircle size={18} />
+                              Verified
+                            </p>
+                          ) : a.isEmailSend ? (
+                            <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#f14419]">
+                              <Clock size={18} />
+                              Pending
+                            </p>
+                          ) : (
+                            <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#03257e]">
+                              <PenLine size={18} />
+                              Self Attested
+                            </p>
+                          ))}
+                      </div>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
                       <FormField
                         control={control}
                         name={`awards.${index}.selfAttested`}
@@ -324,35 +348,41 @@ export const AwardDetails = ({
                           </FormItem>
                         )}
                       />
-                      {isMongoId(a.id) ? (
-                        <Button
-                        disabled={a.verified}
-                          type="button"
-                          onClick={() => updateHandler(index)}
-                          className="mt-2 px-3 py-1 rounded bg-[#006666] border border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
-                        >
-                          <Replace size={14} /> {loading&&idx===index?"Updating...":"Update"}
-                        </Button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => removeAward(index)}
-                          className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
-                        >
-                          <Trash2 size={14} /> Remove
-                        </button>
-                      )}
-                      {isMongoId(a.id)&&<Button
-                          disabled={a.verified || loading}
-                          type="button"
-                          onClick={() => deleteHandler(index)}
-                          className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
-                        >
-                          <Delete size={18} />Delete
-                        </Button>}
+                      <div className="flex items-center gap-1">
+                        {isMongoId(a.id) ? (
+                          <Button
+                            type="button"
+                            disabled={a.verified || loading}
+                            onClick={() => updateHandler(index)}
+                            className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
+                          >
+                            <Replace size={18} />{" "}
+                            {loading && idx === index
+                              ? "Updating..."
+                              : "Update"}
+                          </Button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => removeAward(index)}
+                            className="mt-2 px-1 sm:py-1 sm:px-3 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                          >
+                            <Trash2 size={14} /> Remove
+                          </button>
+                        )}
+                        {isMongoId(a.id) && (
+                          <Button
+                            disabled={a.verified || loading}
+                            type="button"
+                            onClick={() => deleteHandler(index)}
+                            className="mt-2 px-1 sm:py-1 sm:px-3 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                          >
+                            <Delete size={18} /> Delete
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                     <div>
                       <label className="">Select your relevant field*</label>

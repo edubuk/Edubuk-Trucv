@@ -28,6 +28,7 @@ import {
   CheckCircle,
   Delete,
   Clock,
+  PenLine,
 } from "lucide-react";
 import { StepCard } from "./StepCard";
 // import { uploadFile } from "@/uploadFile";
@@ -41,33 +42,32 @@ import { isMongoId } from "@/lib/utils";
 import { ICvData } from "./CvBuilder";
 import api from "@/lib/api";
 
-
 const collegeOptions = [
-                        {
-                          orgId: "001447",
-                          name: "Council for the Indian School Certificate Examination (CISCE)",
-                        },
-                        {
-                          orgId: "000027",
-                          name: "Central Board of Secondary Education(CBSE)",
-                        },
-                        {
-                          orgId: "001925",
-                          name: "UP State Board of High School and Intermediate Education(UP Board)",
-                        },
-                        {
-                          orgId: "003513",
-                          name: "Dr. A.P.J. Abdul Kalam University",
-                        },
-                        {
-                          orgId: "000607",
-                          name: "STATE BOARD OF TECHNICAL EDUCATION, BIHAR",
-                        },
-                        {
-                          orgId:"000098",
-                          name:"Maharashtra State Board of Secondary and Higher Secondary Education, Pune"
-                        }
-                      ]
+  {
+    orgId: "001447",
+    name: "Council for the Indian School Certificate Examination (CISCE)",
+  },
+  {
+    orgId: "000027",
+    name: "Central Board of Secondary Education(CBSE)",
+  },
+  {
+    orgId: "001925",
+    name: "UP State Board of High School and Intermediate Education(UP Board)",
+  },
+  {
+    orgId: "003513",
+    name: "Dr. A.P.J. Abdul Kalam University",
+  },
+  {
+    orgId: "000607",
+    name: "STATE BOARD OF TECHNICAL EDUCATION, BIHAR",
+  },
+  {
+    orgId: "000098",
+    name: "Maharashtra State Board of Secondary and Higher Secondary Education, Pune",
+  },
+];
 
 export const EducationDetails = ({
   step,
@@ -134,7 +134,7 @@ export const EducationDetails = ({
       setIdx(index);
       setLoading(true);
       const result = await api.post(`/doc/save-eduDoc`, {
-        data:payload
+        data: payload,
       });
       const res = await result.data;
       if (!res.success) {
@@ -185,7 +185,6 @@ export const EducationDetails = ({
     });
   };
 
-
   const fetchEducationsDocs = async () => {
     try {
       const data = await api.get(`/doc/education-docs`);
@@ -228,7 +227,7 @@ export const EducationDetails = ({
       const payload = getValues(`educations.${index}`);
       console.log("payload", payload);
       const data = await api.put(`/doc/update-eduDoc/${payload.id}`, {
-        data:payload
+        data: payload,
       });
       const res = await data.data;
       if (!res.success) {
@@ -263,32 +262,32 @@ export const EducationDetails = ({
 
   const uploadDocHandler = async (file: File, index: number) => {
     if (!file) return;
-   try {
-    setSelectedFileName(file.name);
-    setIdx(index);
-    const uploadRes = await handleProofUploaded({
-      file,
-      setIsUploading,
-      setUploadError,
-      setSelectedFileName,
-    });
-    console.log("upload res", uploadRes);
-    if (!uploadRes) return;
-    const { url, docHash } = uploadRes;
-    setValue(`educations.${index}.docUri`, url, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-    setValue(`educations.${index}.docHash`, docHash, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-   } catch (error) {
-    toast.error("something went wrong");
-   }finally{
-     setSelectedFileName(null);
-     setIsUploading(false);
-   }
+    try {
+      setSelectedFileName(file.name);
+      setIdx(index);
+      const uploadRes = await handleProofUploaded({
+        file,
+        setIsUploading,
+        setUploadError,
+        setSelectedFileName,
+      });
+      console.log("upload res", uploadRes);
+      if (!uploadRes) return;
+      const { url, docHash } = uploadRes;
+      setValue(`educations.${index}.docUri`, url, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      setValue(`educations.${index}.docHash`, docHash, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    } catch (error) {
+      toast.error("something went wrong");
+    } finally {
+      setSelectedFileName(null);
+      setIsUploading(false);
+    }
   };
 
   const includedIds = useMemo(
@@ -380,11 +379,24 @@ export const EducationDetails = ({
                             : "College"}{" "}
                           entry
                         </div>
-                        <div className="text-xs flex gap-1 items-center text-slate-500 break-all sm:truncate sm:max-w-[280px]">
-                          {field.id} 
-                          {isMongoId(field.id) && (field.verified?
-                          <p className="flex items-center font-bold text-lg gap-1 text-[#008888]"> <CheckCircle size={18}/>Verified</p>
-                          :field.isEmailSend?<p className="flex items-center text-lg font-bold gap-1 text-[#f14419]"><Clock size={18}/> Pending</p>:<p className="flex items-center text-lg font-bold gap-1 text-[#03257e]"><Clock size={18}/> Self Attested</p>)}
+                        <div className="text-xs flex gap-1 items-center text-slate-500 break-all">
+                          {field.id}
+                          {isMongoId(field.id) &&
+                            (field.verified ? (
+                              <p className="flex items-center font-bold text-md sm:text-lg gap-1 text-[#008888]">
+                                {" "}
+                                <CheckCircle size={18} />
+                                Verified
+                              </p>
+                            ) : field.isEmailSend ? (
+                              <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#f14419]">
+                                <Clock size={18} /> Pending
+                              </p>
+                            ) : (
+                              <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#03257e]">
+                                <PenLine size={18} /> Self Attested
+                              </p>
+                            ))}
                         </div>
                       </div>
 
@@ -409,32 +421,37 @@ export const EducationDetails = ({
                           )}
                         />
                         <div className="flex items-center gap-1">
-                        {isMongoId(field.id) ? (
-                          <Button
-                            disabled={field.verified || loading}
-                            type="button"
-                            onClick={() => updateHandler(index)}
-                            className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/80 active:scale-[0.99] transition"
-                          >
-                            <Replace size={18} /> {loading&&idx===index?"Updating...":"Update"}
-                          </Button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => removeEducation(index)}
-                            className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
-                          >
-                            <Trash2 size={18} /> Remove
-                          </button>
-                        )}
-                        {isMongoId(field.id)&&<Button
-                            disabled={field.verified || loading}
-                            type="button"
-                            onClick={() => deleteHandler(index)}
-                            className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
-                          >
-                            <Delete size={18} /> Delete
-                          </Button>}
+                          {isMongoId(field.id) ? (
+                            <Button
+                              disabled={field.verified || loading}
+                              type="button"
+                              onClick={() => updateHandler(index)}
+                              className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/80 active:scale-[0.99] transition"
+                            >
+                              <Replace size={18} />{" "}
+                              {loading && idx === index
+                                ? "Updating..."
+                                : "Update"}
+                            </Button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => removeEducation(index)}
+                              className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                            >
+                              <Trash2 size={18} /> Remove
+                            </button>
+                          )}
+                          {isMongoId(field.id) && (
+                            <Button
+                              disabled={field.verified || loading}
+                              type="button"
+                              onClick={() => deleteHandler(index)}
+                              className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                            >
+                              <Delete size={18} /> Delete
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -709,8 +726,9 @@ export const EducationDetails = ({
                                       {/* Visible content */}
                                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-2">
                                         {form.getValues(
-                                            `educations.${index}.docUri`
-                                          )?<div className="flex items-center gap-2">
+                                          `educations.${index}.docUri`
+                                        ) ? (
+                                          <div className="flex items-center gap-2">
                                             <span className="text-green-600">
                                               File Uploaded
                                             </span>
@@ -726,19 +744,22 @@ export const EducationDetails = ({
                                             >
                                               Clear
                                             </button>
-                                          </div>:<div className="flex flex-col gap-2">
-                                          <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
-                                            <Paperclip className="h-4 w-4 text-[#171515]" />
-                                            <span className="text-sm text-gray-800">
-                                              {selectedFileName ??
-                                                "Upload File"}
-                                            </span>
                                           </div>
-                                          <p className="text-xs text-[#f14419]">
-                                            Accepted:.jpg .jpeg .png .pdf — max
-                                            5MB
-                                          </p>
-                                        </div>}
+                                        ) : (
+                                          <div className="flex flex-col gap-2">
+                                            <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
+                                              <Paperclip className="h-4 w-4 text-[#171515]" />
+                                              <span className="text-sm text-gray-800">
+                                                {selectedFileName ??
+                                                  "Upload File"}
+                                              </span>
+                                            </div>
+                                            <p className="text-xs text-[#f14419]">
+                                              Accepted:.jpg .jpeg .png .pdf —
+                                              max 5MB
+                                            </p>
+                                          </div>
+                                        )}
 
                                         {/* <div className="flex items-center gap-2">
                                           {form.getValues(
@@ -844,11 +865,12 @@ export const EducationDetails = ({
                           </div>
                         </div>
                       )}
-                      {getValues(`educations.${index}.docUri`) && getValues(`educations.${index}.verified`) && (
-                        <div className="flex items-center p-4 text-green-600 gap-2">
-                          <CheckCircle size={18} /> <p>Document Saved</p>
-                        </div>
-                      )}
+                      {getValues(`educations.${index}.docUri`) &&
+                        getValues(`educations.${index}.verified`) && (
+                          <div className="flex items-center p-4 text-green-600 gap-2">
+                            <CheckCircle size={18} /> <p>Document Saved</p>
+                          </div>
+                        )}
                       {openDigiLocker && index === idx && (
                         <DigiLockerTest
                           setOpenDigiLocker={setOpenDigiLocker}
