@@ -384,11 +384,11 @@ export const EducationDetails = ({
                           {field.id} 
                           {isMongoId(field.id) && (field.verified?
                           <p className="flex items-center font-bold text-lg gap-1 text-[#008888]"> <CheckCircle size={18}/>Verified</p>
-                          :<p className="flex items-center text-lg font-bold gap-1 text-[#f14419]"><Clock size={18}/> Pending</p>)}
+                          :field.isEmailSend?<p className="flex items-center text-lg font-bold gap-1 text-[#f14419]"><Clock size={18}/> Pending</p>:<p className="flex items-center text-lg font-bold gap-1 text-[#03257e]"><Clock size={18}/> Self Attested</p>)}
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center justify-end gap-2">
                         <FormField
                           control={control}
                           name={`educations.${index}.selfAttested`}
@@ -408,9 +408,10 @@ export const EducationDetails = ({
                             </FormItem>
                           )}
                         />
+                        <div className="flex items-center gap-1">
                         {isMongoId(field.id) ? (
                           <Button
-                            disabled={field.verified}
+                            disabled={field.verified || loading}
                             type="button"
                             onClick={() => updateHandler(index)}
                             className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/80 active:scale-[0.99] transition"
@@ -434,6 +435,7 @@ export const EducationDetails = ({
                           >
                             <Delete size={18} /> Delete
                           </Button>}
+                        </div>
                       </div>
                     </div>
 

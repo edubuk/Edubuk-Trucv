@@ -285,13 +285,18 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                     </div>}
                                 <div key={field.rhfKey} className="border p-4 rounded bg-white">
                                     <div className="flex justify-between flex-wrap items-center mb-2">
-                                        <div className="text-md flex gap-1 items-center text-slate-500 break-all">
-                          Company {field.id} 
+                                       <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
+                        <div className="text-sm font-medium">
+                          Organisation
+                        </div>
+                        <div className="text-xs flex gap-1 items-center text-slate-500 break-all sm:truncate sm:max-w-[280px]">
+                          {field.id} 
                           {isMongoId(field.id) && (field.verified?
                           <p className="flex items-center font-bold text-lg gap-1 text-[#008888]"> <CheckCircle size={18}/>Verified</p>
-                          :<p className="flex items-center text-lg font-bold gap-1 text-[#f14419]"><Clock size={18}/> Pending</p>)}
+                          :field.isEmailSend?<p className="flex items-center text-lg font-bold gap-1 text-[#f14419]"><Clock size={18}/>Pending</p>:<p className="flex items-center text-lg font-bold gap-1 text-[#03257e]"><Clock size={18}/>Self Attested</p>)}
                         </div>
-                                        <div className="flex items-center justify-end gap-2">
+                      </div>
+                                        <div className="flex flex-wrap items-center justify-end gap-2">
                                             <FormField
                                                 control={control}
                                                 name={`experiences.${index}.selfAttested`}
@@ -307,6 +312,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                     </FormItem>
                                                 )}
                                             />
+                                            <div className="flex items-center gap-1">
                                             {isMongoId(field.id)? <Button
                                                     type="button"
                                                     disabled={field.verified || loading}
@@ -318,7 +324,7 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                 <button
                                                     type="button"
                                                     onClick={() => removeExperience(index)}
-                                                    className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                                                    className="mt-2 px-1 sm:py-1 sm:px-3 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
                                                 >
                                                     <Trash2 size={14} /> Remove
                                                 </button>}
@@ -326,10 +332,11 @@ export const ExperienceDetails = ({ step, setStep, uid,docId,setCvData,cvData}: 
                                                    disabled={field.verified || loading}
                                                    type="button"
                                                    onClick={() => deleteHandler(index)}
-                                                   className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                                                   className="mt-2 px-1 sm:py-1 sm:px-3 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
                                                  >
                                                    <Delete size={18} /> Delete
                                                  </Button>}
+                                                 </div>
                                         </div>
                                     </div>
                                     <div className="flex justify-start items-center gap-1">

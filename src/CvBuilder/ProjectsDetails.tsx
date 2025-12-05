@@ -257,7 +257,7 @@ export const ProjectDetails = ({
                   <div className="text-sm font-medium text-[#03257e]">
                     Project {p.id}
                   </div>
-                  <div className="flex justify-end items-center gap-2">
+                  <div className="flex flex-wrap justify-end items-center gap-2">
                     <FormField
                       control={control}
                       name={`projects.${index}.selfAttested`}
@@ -277,6 +277,7 @@ export const ProjectDetails = ({
                         </FormItem>
                       )}
                     />
+                    <div className="flex items-center gap-1">
                     {isMongoId(p.id) ? (
                       <button
                       disabled={loading}
@@ -430,6 +431,7 @@ export const ProjectDetails = ({
                         </FormItem>
                       )}
                     />
+                  </div>
                   </div>
                 </div>
               </>
