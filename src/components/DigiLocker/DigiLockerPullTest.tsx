@@ -448,7 +448,7 @@ export default function DigiLockerTest({
             <span className="text-slate-600">I provide my consent to share my educational documents with the <span className="font-semibold text-slate-800">{issuerName}</span> for the purpose of fetching <span className="font-semibold text-slate-800">{description}</span> into DigiLocker.</span>
           </label>
         </div> */}
-        {dlFormFields?.length===0&&<DynamicDigilockerForm 
+        {dlFormFields?.length>0&&<DynamicDigilockerForm 
         fields={dlFormFields} 
         index={index}
         setOpenDigiLocker={setOpenDigiLocker}
