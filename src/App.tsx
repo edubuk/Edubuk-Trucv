@@ -1,6 +1,8 @@
 import { Routes, Route} from "react-router-dom";
 import { lazy, Suspense, useEffect } from "react";
 import ThreeDotLoader from "./components/Loader/ThreeDotLoader";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 // Lazy-loaded pages
 const HomePage = lazy(() => import("./pages/HomePage"));

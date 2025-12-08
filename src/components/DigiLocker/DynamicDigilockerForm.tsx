@@ -1,6 +1,8 @@
 import { useForm, useFormContext } from "react-hook-form";
 import { useState } from "react";
 import api from "@/lib/api";
+import PdfViewerModal from "./PDFViewermodel";
+import toast from "react-hot-toast";
 // import qs from "qs";
 
 type FieldSpec = {
@@ -31,6 +33,8 @@ export default function DynamicDigilockerForm({
   orgid,
   setErrorMsg
 }: Props) {
+    const [open, setOpen] = useState(false);
+    const [pdfSource, setPdfSource] = useState<string | ArrayBuffer | null>(null);
   // Build defaultValues from fields (empty string)
   const defaultValues = fields.reduce<Record<string, any>>((acc, f) => {
     acc[f.paramname] = "";
@@ -83,9 +87,25 @@ export default function DynamicDigilockerForm({
   };
 
 
+    const fetchDoc = async()=>{
+    try {
+      const response = await api.get(`/api/dl/view-doc?docUri=${uri}`);
+      if(response.data.ok){
+        setOpen(true);
+        setPdfSource(response.data.data);
+      }
+    } catch (error:any) {
+      toast.error(error?.response?.data?.error?.error_description ?? error.response.data)
+    }
+  }
+
 
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="space-y-1">
+    <>
+    {open?
+  <PdfViewerModal open={open} onClose={()=>setOpen(false)} rawPdfString={pdfSource as ArrayBuffer} />
+
+    :<form onSubmit={(e) => e.preventDefault()} className="space-y-1">
         <div className="flex flex-wrap items-center gap-4">
       {fields.map((f) => {
         const options =
@@ -148,7 +168,7 @@ export default function DynamicDigilockerForm({
           </label>
         </div>
       <div className="flex items-center gap-2">
-        {uri?<a href={`https://trucv.org/api/dl/view-doc?docUri=${uri}`} target="_blank" rel="noopener noreferrer">View Document</a>:<button
+        {uri?<button type="button" onClick={fetchDoc} className="bg-[#006666] text-white p-2 rounded">View Document</button>:<button
         type="button"  
         onClick={() => onSubmitWrapper()}   
         disabled={isSubmitting || loading || !consent}
@@ -165,6 +185,7 @@ export default function DynamicDigilockerForm({
       </button>}
       
       </div>
-    </form>
+    </form>}
+    </>
   );
-}
+} 
