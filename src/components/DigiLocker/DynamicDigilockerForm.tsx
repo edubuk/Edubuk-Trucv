@@ -112,7 +112,6 @@ export default function DynamicDigilockerForm({
           f.valuelist && typeof f.valuelist === "string"
             ? f.valuelist.split(",").map((s) => s.trim())
             : null;
-
         return (
           <div key={f.paramname} className="flex flex-col gap-1">
             <label className="font-medium">
