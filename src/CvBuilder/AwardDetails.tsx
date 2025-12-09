@@ -5,13 +5,10 @@ import {
   Badge,
   Building2,
   Calendar,
-  CheckCircle,
-  Clock,
   Delete,
   ExternalLink,
   FileText,
   Paperclip,
-  PenLine,
   PlusCircle,
   Replace,
   Trash2,
@@ -39,6 +36,7 @@ import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
+import StatusBadge from "./StatusBadge";
 
 export const AwardDetails = ({
   step,
@@ -309,23 +307,8 @@ export const AwardDetails = ({
                       <div className="text-xs flex gap-1 items-center text-slate-500 break-all">
                         {a.id}
                         {isMongoId(a.id) &&
-                          (a.verified ? (
-                            <p className="flex items-center font-bold text-md sm:text-lg gap-1 text-[#008888]">
-                              {" "}
-                              <CheckCircle size={18} />
-                              Verified
-                            </p>
-                          ) : a.isEmailSend ? (
-                            <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#f14419]">
-                              <Clock size={18} />
-                              Pending
-                            </p>
-                          ) : (
-                            <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#03257e]">
-                              <PenLine size={18} />
-                              Self Attested
-                            </p>
-                          ))}
+                        <StatusBadge status={a.status} isEmailSend={a.isEmailSend}/>
+                        }
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -511,7 +494,7 @@ export const AwardDetails = ({
                       )}
                     />
                   </div>
-                  {!a.verified&&<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center mt-1">
+                  {!isMongoId(a.id)&&<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center mt-1">
                     {/* Upload / proof column */}
                     <FormField
                       control={control}

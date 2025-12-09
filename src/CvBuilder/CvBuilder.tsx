@@ -24,6 +24,7 @@ export interface ICvData{
       linkedin:string,
       github:string,
       summary:string,
+      imageUrl:string,
     },
     educations:[],
     experiences:[],

@@ -19,8 +19,8 @@ export default defineConfig({
     minify: "terser", // 👈 use Terser instead of default esbuild
     terserOptions: {
       compress: {
-        //drop_console: true,    // 👈 removes all console.* calls
-        //drop_debugger: true,   // 👈 removes all debugger statements
+        drop_console: true,    // 👈 removes all console.* calls
+        drop_debugger: true,   // 👈 removes all debugger statements
       },
     },
   },

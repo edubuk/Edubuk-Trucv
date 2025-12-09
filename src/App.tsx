@@ -5,7 +5,7 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 // Lazy-loaded pages
-const HomePage = lazy(() => import("./pages/HomePage"));
+//const HomePage = lazy(() => import("./pages/HomePage"));
 const CvOutputPage = lazy(() => import("./pages/CvOutputPage"));
 const Home = lazy(() => import("./pages/Home"));
 const DashBoard = lazy(() => import("./pages/DashBoard"));
@@ -42,8 +42,6 @@ useEffect(() => {
     });
   }, []);
 
-
-
   return (
     <div>
           <Suspense fallback={<div className="flex justify-center items-center text-3xl text-[#03257e] font-bold h-[80vh]" data-aos="zoom-in">Loading {""} <ThreeDotLoader w={2} h={2} yPos={'end'} /></div>}>
@@ -69,7 +67,7 @@ useEffect(() => {
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />
               <Route path="/admin" element={<Layout><AdminUsersPage/></Layout>} />
               <Route path="/pricing" element={<ProtectedRoute><SubscriptionPlans /></ProtectedRoute>} />
-              <Route path="/create-cv" element={<Layout><HomePage /></Layout>} />
+              <Route path="/create-cv" element={<Layout><CVBuilder /></Layout>} />
               <Route path="/dashboard" element={<Layout><DashBoard /></Layout>} />
               <Route path="/register" element={<Register />} />
             </Routes>

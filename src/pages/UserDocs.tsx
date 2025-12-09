@@ -1,13 +1,10 @@
 import React from "react";
-import { CheckCircle, Clock, ExternalLink, ShieldCheck, FileText,UserCircle} from "lucide-react";
+import { ExternalLink, ShieldCheck, FileText,UserCircle} from "lucide-react";
 
 import { useUserData } from "@/context/AuthContext";
-import { API_BASE_URL } from "@/main";
+import StatusBadge from "@/CvBuilder/StatusBadge";
 
-// Colors
-const COLOR_PRIMARY = "#03257e"; // deep blue
-const COLOR_TEAL = "#006666"; // teal
-const COLOR_ACCENT = "#f14419"; // orange-red
+const COLOR_PRIMARY = "#03257e";
 
 export interface IUserDoc{
   _id:string;
@@ -82,26 +79,7 @@ export type VerificationMethod = "DigiLocker" | "Email" | "Third Party" | null;
 
 
 // UI bits
-const StatusBadge: React.FC<{ status: VerificationStatus }> = ({ status }) => {
-  if (status === "verified") {
-    return (
-      <span
-        className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
-        style={{ backgroundColor: COLOR_TEAL + "1a", color: COLOR_TEAL }}
-      >
-        <CheckCircle className="h-3.5 w-3.5" /> Verified
-      </span>
-    );
-  }
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
-      style={{ backgroundColor: COLOR_ACCENT + "1a", color: COLOR_ACCENT }}
-    >
-      <Clock className="h-3.5 w-3.5" /> Pending
-    </span>
-  );
-};
+
 
 const MethodChip: React.FC<{ method: VerificationMethod }> = ({ method }) => {
   const label = method === "DigiLocker" ? "DigiLocker" : method === "Email" ? "Email" : method === "Third Party" ? "Third Party" : "Not set";
@@ -173,15 +151,15 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educ
                           <div className="text-sm text-gray-500">{cert.institutionName || "Issuer —"}</div>
                           <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.level}</div>
                         </div>
-                        <StatusBadge status={cert?.status||"pending"} />
+                        <StatusBadge status={cert?.status||"pending"} isEmailSend={cert.isEmailSend}/>
                       </div>
                       <div className="mt-3 flex items-center justify-between">
                         <MethodChip method={cert?.verifiedThrough!}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
-                      <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
-                        View details <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                      </a>
+                      {cert.docUri&&cert?.docUri.includes("https://")&&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                        View Document <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                      </a>}
                     </button>
                   ))}
                   {experienceDocs?.map((cert) => (
@@ -195,15 +173,15 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educ
                           <div className="text-sm text-gray-500">{cert.companyName || "Issuer —"}</div>
                           <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.jobRole}</div>
                         </div>
-                        <StatusBadge status={cert?.status||"pending"} />
+                        <StatusBadge status={cert?.status || "pending"} isEmailSend={cert.isEmailSend} />
                       </div>
                       <div className="mt-3 flex items-center justify-between">
                         <MethodChip method={cert?.verifiedThrough!}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
-                      <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
-                        View details <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                      </a>
+                     {cert.docUri&&cert.docUri.includes("https://") &&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                        View Document <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                      </a>}
                     </button>
                   ))}
                   {awardDocs?.map((cert) => (
@@ -217,15 +195,15 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educ
                           <div className="text-sm text-gray-500">{cert.organisation || "Issuer —"}</div>
                           <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.awardName}</div>
                         </div>
-                        <StatusBadge status={cert?.status||"pending"} />
+                        <StatusBadge status={cert?.status || "pending"} isEmailSend={cert.isEmailSend} />
                       </div>
                       <div className="mt-3 flex items-center justify-between">
                         <MethodChip method={cert?.verifiedThrough!}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
-                      <a href={`${API_BASE_URL}/api/dl/view-doc?uri=${cert.docUri}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
-                        View details <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                      </a>
+                      {cert.docUri&&cert.docUri.includes("https://")&&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                        View Document <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                      </a>}
                     </button>
                   ))}
                 </div>

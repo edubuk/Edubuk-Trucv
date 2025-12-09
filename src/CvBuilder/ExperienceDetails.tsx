@@ -5,13 +5,10 @@ import {
   BriefcaseBusiness,
   Building,
   Calendar,
-  CheckCircle,
-  Clock,
   Delete,
   ExternalLink,
   FileText,
   Paperclip,
-  PenLine,
   PlusCircle,
   Replace,
   Trash2,
@@ -37,6 +34,7 @@ import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
+import StatusBadge from "./StatusBadge";
 //import { useUserData } from "@/context/AuthContext";
 
 export const ExperienceDetails = ({
@@ -318,23 +316,8 @@ export const ExperienceDetails = ({
                       <div className="text-xs flex gap-1 items-center text-slate-500 break-all">
                         {field.id}
                         {isMongoId(field.id) &&
-                          (field.verified ? (
-                            <p className="flex items-center font-bold text-md sm:text-lg gap-1 text-[#008888]">
-                              {" "}
-                              <CheckCircle size={18} />
-                              Verified
-                            </p>
-                          ) : field.isEmailSend ? (
-                            <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#f14419]">
-                              <Clock size={18} />
-                              Pending
-                            </p>
-                          ) : (
-                            <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#03257e]">
-                              <PenLine size={18} />
-                              Self Attested
-                            </p>
-                          ))}
+                        <StatusBadge status={field.status} isEmailSend={field.isEmailSend}/>
+                          }
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -532,7 +515,7 @@ export const ExperienceDetails = ({
                       )}
                     />
                   </div>
-                  {!field.verified && (
+                  {!isMongoId(field.id) && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center">
                       {/* Upload / proof column */}
                       <FormField

@@ -26,9 +26,7 @@ import {
   BookOpen,
   Replace,
   CheckCircle,
-  Delete,
-  Clock,
-  PenLine,
+  Delete
 } from "lucide-react";
 import { StepCard } from "./StepCard";
 // import { uploadFile } from "@/uploadFile";
@@ -41,6 +39,7 @@ import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
 import { ICvData } from "./CvBuilder";
 import api from "@/lib/api";
+import StatusBadge from "./StatusBadge";
 
 const collegeOptions = [
   {
@@ -382,21 +381,8 @@ export const EducationDetails = ({
                         <div className="text-xs flex gap-1 items-center text-slate-500 break-all">
                           {field.id}
                           {isMongoId(field.id) &&
-                            (field.verified ? (
-                              <p className="flex items-center font-bold text-md sm:text-lg gap-1 text-[#008888]">
-                                {" "}
-                                <CheckCircle size={18} />
-                                Verified
-                              </p>
-                            ) : field.isEmailSend ? (
-                              <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#f14419]">
-                                <Clock size={18} /> Pending
-                              </p>
-                            ) : (
-                              <p className="flex items-center text-md sm:text-lg font-bold gap-1 text-[#03257e]">
-                                <PenLine size={18} /> Self Attested
-                              </p>
-                            ))}
+                          <StatusBadge status={field.status} isEmailSend={field.isEmailSend}/>
+                          }
                         </div>
                       </div>
 
@@ -679,13 +665,13 @@ export const EducationDetails = ({
                               </button>
                             </div>
                           </div>
-                          <div className="relative border-t border-gray-300 my-2">
+                          {!isMongoId(field.id)&&<div className="relative border-t border-gray-300 my-2">
                             <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2">
                               OR
                             </p>
-                          </div>
+                          </div>}
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center">
+                          {!isMongoId(field.id)&&<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center">
                             {/* Upload / proof column */}
                             <FormField
                               control={form.control}
@@ -862,7 +848,7 @@ export const EducationDetails = ({
                               )}
                             </Button> */}
                             </div>
-                          </div>
+                          </div>}
                         </div>
                       )}
                       {getValues(`educations.${index}.docUri`) &&

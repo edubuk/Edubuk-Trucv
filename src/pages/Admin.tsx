@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { CheckCircle, Clock, ShieldCheck, X, FileText, BadgeCheck, Loader2, Copy, Hash, ChevronDown, RefreshCwIcon, Crown, Edit, ExternalLink, User, XCircle,CircleCheckBig, FolderCheck } from "lucide-react";
+import { ShieldCheck, X, FileText, BadgeCheck, Loader2, Copy, Hash, ChevronDown, RefreshCwIcon, Crown, Edit, ExternalLink, User, XCircle,CircleCheckBig, FolderCheck} from "lucide-react";
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 import AccessDeniedPage from "./AccessDenied";
 import { useUserData } from "@/context/AuthContext";
 import UpdateSubscription from "@/components/Subscription/UpdateSubscription";
+import StatusBadge from "@/CvBuilder/StatusBadge";
 // Colors
 const COLOR_PRIMARY = "#03257e"; // deep blue
 const COLOR_TEAL = "#006666"; // teal
-const COLOR_ACCENT = "#f14419"; // orange-red
+
 
 // Types
-export type VerificationStatus = "verified" | "pending";
+export type VerificationStatus = "verified" | "pending" | "rejected";
 export type VerificationMethod = "DigiLocker" | "Email" | "Third Party" | null;
 
 type Certificate = {
@@ -74,27 +75,6 @@ interface ISubscription {
   paymentId: string;
 }
 
-// UI bits
-const StatusBadge: React.FC<{ status: VerificationStatus }> = ({ status }) => {
-  if (status === "verified") {
-    return (
-      <span
-        className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
-        style={{ backgroundColor: COLOR_TEAL + "1a", color: COLOR_TEAL }}
-      >
-        <CheckCircle className="h-3.5 w-3.5" /> Verified
-      </span>
-    );
-  }
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
-      style={{ backgroundColor: COLOR_ACCENT + "1a", color: COLOR_ACCENT }}
-    >
-      <Clock className="h-3.5 w-3.5" /> Pending
-    </span>
-  );
-};
 
 const MethodChip: React.FC<{ method: VerificationMethod }> = ({ method }) => {
   const label = method === "DigiLocker" ? "DigiLocker" : method === "Email" ? "Email" : method === "Third Party" ? "Third Party" : "Not set";
@@ -388,7 +368,7 @@ export default function AdminUserProfilesPage() {
                               <div className="text-sm text-gray-500">{cert.institutionName || "Issuer —"}</div>
                               <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.level}</div>
                             </div>
-                            <StatusBadge status={cert?.status || "pending"} />
+                            <StatusBadge status={cert?.status || "pending"} isEmailSend={cert.isEmailSend} />
                           </div>
                           <div className="mt-3 flex items-center justify-between">
                             <MethodChip method={cert?.verifiedThrough || null} />
@@ -411,7 +391,7 @@ export default function AdminUserProfilesPage() {
                               <div className="text-sm text-gray-500">{cert.companyName || "Issuer —"}</div>
                               <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.jobRole}</div>
                             </div>
-                            <StatusBadge status={cert?.status || "pending"} />
+                            <StatusBadge status={cert?.status || "pending"} isEmailSend={cert.isEmailSend} />
                           </div>
                           <div className="mt-3 flex items-center justify-between">
                             <MethodChip method={cert?.verifiedThrough || "email"} />
@@ -434,7 +414,7 @@ export default function AdminUserProfilesPage() {
                               <div className="text-sm text-gray-500">{cert.organisation || "Issuer —"}</div>
                               <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.level}</div>
                             </div>
-                            <StatusBadge status={cert?.status || "pending"} />
+                            <StatusBadge status={cert?.status || "pending"} isEmailSend={cert.isEmailSend} />
                           </div>
                           <div className="mt-3 flex items-center justify-between">
                             <MethodChip method={cert?.verifiedThrough || "email"} />
@@ -579,7 +559,7 @@ export default function AdminUserProfilesPage() {
                         <div className="flex items-center justify-between"><span className="text-gray-500">Issued On</span><span className="font-medium">{formatDate(activeCert?.createdAt)}</span></div>
                         {(activeCert?.issuerEmailId &&activeCert.status==="verified") && <div className="flex items-center justify-between"><span className="text-gray-500">Approved By</span><span className="font-medium">{activeCert?.issuerEmailId}</span></div>}
                         <div className="flex items-center justify-between"><span className="text-gray-500">Last Updated</span><span className="font-medium">{formatDate(activeCert?.updatedAt)}</span></div>
-                        <div className="flex items-center justify-between"><span className="text-gray-500">Status</span><span><StatusBadge status={activeCert?.status || "pending"} /></span></div>
+                        <div className="flex items-center justify-between"><span className="text-gray-500">Status</span><span>                            <StatusBadge status={activeCert?.status || "pending"} isEmailSend={activeCert.isEmailSend} /></span></div>
                         <div className="flex items-center justify-between"><span className="text-gray-500">Verification Method</span><span><MethodChip method={activeCert?.verifiedThrough ||null} /></span></div>
                         {(activeCert?.isEmailSend && activeCert.status!=="verified") && <div className="flex items-start justify-start gap-1"><span className="text-[#f14419]">Remark: </span><span>Email has been sent to issuer email id  <span className="font-medium text-[#008888]">{activeCert?.issuerEmailId}</span>. Once issuer approve or reject, the updated status will reflect here</span></div>}  
                         {activeCert.status==="verified" && <div className="flex items-center justify-center text-green-600 text-lg font-semibold gap-1"><FolderCheck className="h-6 w-6" /> Verified</div>}  
