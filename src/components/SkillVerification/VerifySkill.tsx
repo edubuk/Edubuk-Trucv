@@ -113,7 +113,8 @@ const SkillVerification = () => {
 
                 {/* Level Dropdown */}
                 <div className="col-span-5">
-                  <select
+                  {skill.level}
+                  {/* <select
                   disabled
                     defaultValue={skill.level}
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-[6px] text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006666] focus:border-[#006666] transition"
@@ -124,7 +125,7 @@ const SkillVerification = () => {
                         {level}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
                 </div>
               </div>
             ))}
