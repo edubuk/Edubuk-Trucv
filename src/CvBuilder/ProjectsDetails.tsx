@@ -161,6 +161,8 @@ export const ProjectDetails = ({
 
   const deleteHandler = async (index: number) => {
     try {
+      const confirm = window.confirm("Are you sure you want to delete this project?");
+      if (!confirm) return;
       setLoading(true);
       setIdx(index);
       const payload = getValues(`projects.${index}`);

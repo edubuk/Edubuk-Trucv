@@ -104,6 +104,7 @@ export default function AdminUserProfilesPage() {
   const [email, setEmail] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState<boolean>(false);
   const [cvIds, setCvIds] = useState([]);
+  const [currentUserId,setCurrentUserId] = useState<string>("");
   const [educationDocs, setEducationDocs] = useState({
     educations: [],
     experiences: [],
@@ -191,7 +192,9 @@ export default function AdminUserProfilesPage() {
 
   async function toggleUser(userId: string) {
     console.log({ userId })
-    await userSubscription(userId);
+    if(currentUserId!==userId){
+      await userSubscription(userId);
+    }
     //await userDocsHandler(userId);
     setExpandedUserId((prev) => (prev === userId ? null : userId));
     setActiveCert(null);
@@ -221,12 +224,16 @@ export default function AdminUserProfilesPage() {
   }
 
   const helperHandler = async (userId: string) => {
+    setLoading(true);
     await toggleUser(userId);
-    await userDocsHandler(userId);
+    if((educationDocs.educations.length===0 && educationDocs.experiences.length===0 && educationDocs.awards.length===0) || currentUserId!==userId){
+      await userDocsHandler(userId);
+    }
   }
 
   const userDocsHandler = async (userId: string) => {
     try {
+      setCurrentUserId(userId);
       const response = await fetch(`${API_BASE_URL}/admin/user-docs?userId=${userId}`, {
         method: "GET",
         credentials: "include",
@@ -243,6 +250,8 @@ export default function AdminUserProfilesPage() {
     }
     catch (err) {
       toast.error("something went wrong")
+    }finally{
+      setLoading(false);
     }
   }
 
@@ -291,6 +300,7 @@ export default function AdminUserProfilesPage() {
     userListHandler();
   }, [pageNum, refreshKey]);
 
+
   return (
     <>
       {user?.roles === "admin" ?
@@ -320,7 +330,7 @@ export default function AdminUserProfilesPage() {
           </header>
 
           {/* Users list */}
-          {!loading ? <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-4 overflow-y-auto mb-12">
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-4 overflow-y-auto mb-12">
             {usersList?.map((userData) => (
               <div key={userData._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 {/* Collapsible header (acts like profile row) */}
@@ -425,7 +435,7 @@ export default function AdminUserProfilesPage() {
                       </div>
                         </button>
                       ))}
-                    </div> : loading?<ThreeDotLoader w={12} h={12} yPos="center"/>:<p className="text-center text-[#f14419] py-2">No Certificate Found</p>}
+                    </div> : loading?<ThreeDotLoader w={2} h={2} yPos="center"/>:<p className="text-center text-[#f14419] py-2">No Certificate Found</p>}
                     { (expandedUserId === userData._id)&&viewUserData &&
                       <div
                         role="dialog"
@@ -532,7 +542,7 @@ export default function AdminUserProfilesPage() {
 
               </div>
             ))}
-          </main> : <ThreeDotLoader w={62} h={62} yPos={"center"} />}
+          </main>
           {/* MODAL — restored to previous detailed design */}
           {activeCert && activeUser && (
             <div className="fixed inset-0 z-50">
@@ -540,7 +550,7 @@ export default function AdminUserProfilesPage() {
               <div className="absolute inset-0 flex items-end sm:items-center justify-center p-2 sm:p-4">
                 <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-y">
                   {/* Modal Header */}
-                  <div className="flex items-center justify-between px-4 sm:px-6 py-3" style={{ backgroundColor: COLOR_PRIMARY, color: "white" }}>
+                  <div className="flex items-center justify-between px-4 sm:px-6 py-3 rounded-t-2xl" style={{ backgroundColor: COLOR_PRIMARY, color: "white" }}>
                     <div className="flex items-center gap-2">
                       <FileText className="h-5 w-5" />
                       <div className="font-semibold flex items-center gap-2">{activeCert?.level??activeCert?.jobRole} • {activeUser?.name} {activeCert?.status === "verified" && <CircleCheckBig size={20} className="text-green-600 font-semibold" />}</div>

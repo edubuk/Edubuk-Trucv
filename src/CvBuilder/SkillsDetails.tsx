@@ -176,6 +176,8 @@ export const SkillDetails = ({
 
   const deleteHandler = async (index: number) => {
         try {
+          const confirm = window.confirm("Are you sure you want to delete this document?");
+          if (!confirm) return;
           setLoading(true);
           setIdx(index);
           const payload = getValues(`skills.${index}`);

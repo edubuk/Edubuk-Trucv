@@ -13,6 +13,7 @@ import api from "@/lib/api";
 const DashBoard = () => {
     //const [isActiveButton , setActiveButton] = useState<boolean>(true);
     const [cvData, setCvData] = useState([]);
+    const [refreshKey,setRefreshKey] = useState<boolean>(false);
     const [userDocs,setUserDocs] = useState({
       educations:[],
       experiences:[],
@@ -25,7 +26,7 @@ const DashBoard = () => {
     //const [isNFT, setNFT] = useState<boolean>(false);
 
     // new: which component is selected to render
-    const [selected, setSelected] = useState<"cv" | "nft" | "docs">("cv");
+    const [selected, setSelected] = useState<"cv" | "nft" | "docs">("docs");
 
     //  const getAccount = async()=>{
     //   try
@@ -129,8 +130,8 @@ const DashBoard = () => {
        }
 
     useEffect(()=>{
-        userCvs();
-    },[])
+        getDocs();
+    },[refreshKey])
 
   return (
     <div className="flex flex-col justify-center items-center h-auto w-full">
@@ -167,7 +168,7 @@ const DashBoard = () => {
 
           {/* {selected === "nft" && <NFTGallery contractAddress={contractNFTAddress} abi={abiNFT} account={account!}/>} */}
 
-          {selected === "docs" && <UserDocs educationDocs={userDocs.educations} experienceDocs={userDocs.experiences} awardDocs = {userDocs.awards}/>}
+          {selected === "docs" && <UserDocs educationDocs={userDocs.educations} experienceDocs={userDocs.experiences} awardDocs = {userDocs.awards} setRefreshKey={setRefreshKey}/>}
         </div>
     </div>
   )

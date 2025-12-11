@@ -249,3 +249,13 @@ export const SkillSchema = z.object({
 
 export type SkillFormValues = z.infer<typeof SkillSchema>
 export type TypeSkill = z.infer<typeof SKillItemSchema>
+
+
+export const ResendEmailDoc = z.object({
+  id:z.string().min(1,"id is required"),
+  issuerEmailId:z.string().email(),
+  docUri:z.string().min(1,"doc uri is required"),  
+  docHash:z.string().min(1,"docHash is required")
+})
+
+export type TypeResendEmail = z.infer<typeof ResendEmailDoc>

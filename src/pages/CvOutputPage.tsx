@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { SiHyperskill } from "react-icons/si";
-import { FaCopy, FaExternalLinkAlt } from "react-icons/fa";
+import { FaBriefcase, FaCopy } from "react-icons/fa";
 import { GiAchievement } from "react-icons/gi";
 import { BiSolidBriefcase } from "react-icons/bi";
-import { GraduationCap, Mail, MapPinned, Phone } from "lucide-react";
+import { CheckCircle, CircleUser, GraduationCap, Link2, Mail, MapPinned, Phone } from "lucide-react";
 // import HyperText from "@/components/ui/AnimateHypertext";
 import ShowVerifications from "@/components/ShowVerifications";
 import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import { useState, useRef, useEffect } from "react";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 import api from "@/lib/api";
-import { useUserData } from "@/context/AuthContext";
+//import { useUserData } from "@/context/AuthContext";
 import { ICvData } from "@/CvBuilder/CvBuilder";
 import {
   TypeAward,
@@ -21,6 +21,9 @@ import {
   TypeProject,
   TypeSkill,
 } from "@/CvBuilder/cvSchema";
+import { MdSchool } from "react-icons/md";
+import StatusBadge from "@/CvBuilder/StatusBadge";
+const COLOR_TEAL = "#006666";
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
 
@@ -28,7 +31,6 @@ const formatDate = (dateString: string) => {
   if (date.getFullYear() === 1970) {
     return "Present";
   }
-
   const months = [
     "Jan",
     "Feb",
@@ -54,7 +56,7 @@ const CvOutputPage = () => {
   const { id } = useParams();
   const [copied, setCopied] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
-  const { user } = useUserData();
+  //const { user } = useUserData();
   const [cvData, setCvData] = useState<ICvData>({
     personal: {
       fullName: "",
@@ -65,6 +67,7 @@ const CvOutputPage = () => {
       github: "",
       summary: "",
       imageUrl: "",
+      profession:"",
     },
     educations: [],
     experiences: [],
@@ -189,39 +192,42 @@ const CvOutputPage = () => {
           {/* left sidebar */}
           <div className="w-72  h-auto  bg-[#006666] rounded-ss-2xl px-2 md:px-5 text-white py-2 space-y-20 md:space-y-10">
             {/* image */}
-            <div className="mt-5">
-              <img
-                src={user?.userImageUrl}
-                alt="image"
-                className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 mx-auto border-[#449298] object-cover"
-              />
-              {/* <ShowVerifications
-                isAttested={
-                  cvData.personalDetailsVerification.imageUrl.isSelfAttested
-                }
-                className="flex justify-center mt-2"
-                onlySelfAttest
-                textClass="text-white"
-                fillCheck
-                fillcheckClass="mt-1"
-              />
-            </div> */}
+          {cvData.personal.imageUrl?<div className="mt-5">
+            <img
+              src={cvData.personal.imageUrl}
+              alt="image"
+              className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 mx-auto border-[#449298] object-cover"
+            />
+            <ShowVerifications
+              isAttested={
+                true
+              }
+              className="flex justify-center mt-2"
+              onlySelfAttest
+              textClass="text-white"
+              fillCheck
+              fillcheckClass="mt-1"
+            />
+          </div>:<div className="mt-5">
+            <CircleUser size={24} 
+            className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 mx-auto border-[#449298] object-cover"
+            />
+          </div>}
 
-              {/* Education */}
-              <div>
-                <div className="flex items-center gap-3 px-1">
-                  <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                    <GraduationCap size={20} />
-                  </div>
-                  <h1 className="text-black-500 text-sm md:text-xl lg:text-2xl font-semibold tracking-tight uppercase">
-                    Education
-                  </h1>
+            {/* Education */}
+            <div>
+              <div className="flex items-center gap-3 px-1">
+                <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
+                  <GraduationCap size={20} />
                 </div>
+                <h1 className="text-black-500 text-sm md:text-xl lg:text-2xl font-semibold tracking-tight uppercase">
+                  Education
+                </h1>
+              </div>
 
-                {/* showcasing education higher to lower*/}
-                <div className="flex flex-col gap-10 md:gap-5 mt-3">
-                  {/* postgraduation */}
-                  {cvData.educations.length > 0 &&
+              {/* showcasing education higher to lower*/}
+              <div className="flex flex-col gap-10 md:gap-5 mt-3">
+                {cvData.educations.length > 0 &&
                     cvData.educations.map(
                       (education: TypeEducation, index: number) => {
                         return (
@@ -231,12 +237,9 @@ const CvOutputPage = () => {
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex items-center gap-3">
-                                <h1 className="font-semibold text-sm md:text-base text-white">
+                                <h1 className="flex items-center gap-1 font-semibold text-sm md:text-base text-white">
                                   {education.level}
-                                </h1>
-
-                                {/* document link */}
-                                {education.docUri && (
+                                  {education.docUri && (
                                   <a
                                     href={education.docUri}
                                     target="_blank"
@@ -244,17 +247,15 @@ const CvOutputPage = () => {
                                     aria-label={`Open document for ${education.level}`}
                                     className="inline-flex items-center justify-center ml-1 p-1 rounded-md text-[#FB980E] hover:bg-[#FB980E]/10 transition"
                                   >
-                                    <FaExternalLinkAlt className="h-4 w-4" />
+                                    <Link2 />
                                   </a>
                                 )}
+                                </h1>
                               </div>
-
-                              {/* verification badge (compact) */}
-                              {/* <div className="flex items-center">
-      <VerificationBadge item={education} small className="ml-2" />
-    </div> */}
                             </div>
-
+                            <div className="bg-white rounded-full w-fit">
+                            <StatusBadge status={education.status} isEmailSend={education.isEmailSend}/>
+                            </div>
                             {/* meta row: degree, gpa and duration */}
                             <div className="mt-2 flex flex-col gap-2">
                               <div className="text-sm flex flex-col justify-start text-white dark:text-gray-300">
@@ -279,8 +280,6 @@ const CvOutputPage = () => {
                       }
                     )}
                 </div>
-              </div>
-
               {/*  */}
             </div>
           </div>
@@ -296,12 +295,12 @@ const CvOutputPage = () => {
                   {cvData.personal.fullName}
                 </h1>
 
-                {/* <ShowVerifications
+                <ShowVerifications
                   isAttested={
-                    cvData.personalDetailsVerification.name.isSelfAttested
+                    true
                   }
                   onlySelfAttest
-                /> */}
+                />
               </div>
               {/* personal details */}
               <div className="bg-[#006666] rounded-md text-white px-5 py-1 flex md:max-w-3xl w-full gap-2">
@@ -319,16 +318,15 @@ const CvOutputPage = () => {
                       <h1 className="text-sm md:text-base tracking-wider font-normal">
                         {cvData.personal.email}
                       </h1>
-                      {/* <ShowVerifications
+                      <ShowVerifications
                         isAttested={
-                          cvData.personalDetailsVerification.email
-                            .isSelfAttested
+                          true
                         }
                         className="self-start"
                         onlySelfAttest
                         textClass="text-white"
                         badge
-                      /> */}
+                      />
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="self-start">
@@ -338,18 +336,17 @@ const CvOutputPage = () => {
                         />
                       </div>
                       <h1 className="text-sm md:text-base tracking-wider font-normal">
-                        {cvData?.personal?.city}
+                        {cvData.personal.city}
                       </h1>
-                      {/* <ShowVerifications
+                      <ShowVerifications
                         isAttested={
-                          cvData.personalDetailsVerification.location
-                            .isSelfAttested
+                          true
                         }
                         className="self-start mt-2"
                         onlySelfAttest
                         textClass="text-white"
                         badge
-                      /> */}
+                      />
                     </div>
                   </div>
                 </div>
@@ -367,137 +364,140 @@ const CvOutputPage = () => {
                       <h1 className="text-sm md:text-base tracking-wider font-normal">
                         {cvData.personal.phone}
                       </h1>
-                      {/* <ShowVerifications
-                        isAttested={
-                          cvData.personal.phone
-                        }
+                      <ShowVerifications
+                        isAttested={true}
                         // className="self-start mt-2"
                         onlySelfAttest
                         textClass="text-white"
                         badge
-                      /> */}
+                      />
                     </div>
                     <div className="flex items-center gap-3">
-                      {/* <div className="self-start">
-                        {cvData.personalDetails.profession === "student" ? (
-                          <MdSchool
+                      <div className="self-start">
+                        {cvData.personal.profession === "student" ? (
+                          <span className="flex item-center gap-1"><MdSchool
                             size={26}
                             className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                          />
+                          />Student </span> 
                         ) : (
-                          <FaBriefcase
+                          <span className="flex item-center gap-1"> <FaBriefcase
                             size={26}
                             className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                          />
+                          />Employee</span>
                         )}
-                      </div> */}
-                      {/* <h1 className="text-sm md:text-base tracking-wider font-normal">
-                        {cvData.personalDetails.profession}
+                      </div>
+                      <h1 className="text-sm md:text-base tracking-wider font-normal">
+                        {cvData.personal.profession}
                       </h1>
                       <ShowVerifications
                         isAttested={
-                          cvData.personalDetailsVerification.phoneNumber
-                            .isSelfAttested
+                          true
                         }
                         // className="self-start mt-2"
                         onlySelfAttest
                         textClass="text-white"
                         badge
-                      /> */}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            {/* profile summary */}
-            <div className="flex gap-5 items-center  overflow-hidden">
-              <p className="text-sm md:text-base font-semibold  max-w-md lg:max-w-2xl">
-                {cvData.personal.summary}
-              </p>
-              <ShowVerifications
-                // isAttested={
-                //   cvData.profileSummaryVerification.profile_summary
-                //     .isSelfAttested
-                // }
-                isAttested={true}
-                className="self-start mt-2"
-                onlySelfAttest
-                // textClass="text-white"
-              />
-            </div>
-
-            {/* skill section */}
-            {/* skills */}
-            <div className="mt-2">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                  <SiHyperskill size={20} />
-                </div>
-                <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                  Skills
-                </h1>
+              {/* profile summary */}
+              <div className="flex gap-5 items-center  overflow-hidden">
+                <p className="text-sm md:text-base font-semibold  max-w-md lg:max-w-2xl">
+                  {cvData.personal?.summary}
+                </p>
+                <ShowVerifications
+                  // isAttested={
+                  //   cvData.profileSummaryVerification.profile_summary
+                  //     .isSelfAttested
+                  // }
+                  isAttested={true}
+                  className="self-start mt-2"
+                  onlySelfAttest
+                  // textClass="text-white"
+                />
               </div>
 
-              {/* showcasing skills */}
-              <div className="">
-                <div className="flex flex-col  mt-2 gap-5 md:gap-3 ">
-                  {cvData.skills.length > 0 &&
-                    cvData.skills.map((skill: TypeSkill) => {
-                      // const isSelfAttested =
-                      //   cvData.skillsVerifications[skill.skillName]
-                      //     .isSelfAttested || false;
-                      // const isSelfAttested = true;
-                      // const mailStatus =
-                      //   cvData.skillsVerifications[skill.skillName]
-                      //     .mailStatus;
-                      return (
-                        <div>
-                          {/* <div
+              {/* skill section */}
+              {/* skills */}
+              <div className="mt-2">
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
+                    <SiHyperskill size={20} />
+                  </div>
+                  <h1 className="text-2xl font-semibold tracking-wider uppercase">
+                    Skills
+                  </h1>
+                </div>
+
+                {/* showcasing skills */}
+                <div className="">
+                  <div className="flex flex-col  mt-2 gap-5 md:gap-3 ">
+                    {cvData.skills.length > 0 &&
+                      cvData.skills.map((skill:TypeSkill) => {
+                        // const isSelfAttested =
+                        //   cvData.skillsVerifications[skill.skillName]
+                        //     .isSelfAttested || false;
+                        const isSelfAttested = true;
+                        const mailStatus = skill.endoresBy
+                        return (
+                          <div>
+                            {/* <div
                           key={index}
                           className="px-2 py-1  text-sm tracking-wide font-semibold rounded-sm bg-[#006666] text-white w-fit"
                         >
                           {skill}
                         </div> */}
-                          <ShowAnimatedVerifications
-                            firstButtonText={skill.skillName}
-                            // buttonClass="text-sm lg:text-base"
-                            isSelfAttested={true}
-                          />
-                        </div>
-                      );
-                    })}
+                        <div className="flex gap-1 items-center w-fit">
+                            <ShowAnimatedVerifications
+                              firstButtonText={skill.skillName}
+                              // buttonClass="text-sm lg:text-base"
+                              isSelfAttested={isSelfAttested}
+                              mailStatus={mailStatus}
+                              hash=""
+                            />
+                            {skill.endoresBy&&<span>Endorsed by 
+                              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
+                              style={{ backgroundColor: COLOR_TEAL + "1a", color: COLOR_TEAL }}
+                            >
+                            <CheckCircle className="h-3.5 w-3.5" /> {skill.endoresBy.slice(0,2)}...{skill.endoresBy.slice(-4)}
+                            </span>
+                              </span>}
+                              </div>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* experience */}
-            <div className="mt-5">
-              {/* title */}
-              {cvData.experiences.length > 0 && (
-                <div className="flex items-center gap-5">
-                  <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                    <BiSolidBriefcase size={20} />
+              {/* experience */}
+              <div className="mt-5">
+                {/* title */}
+                {cvData.experiences.length > 0 && (
+                  <div className="flex items-center gap-5">
+                    <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
+                      <BiSolidBriefcase size={20} />
+                    </div>
+                    <h1 className="text-2xl font-semibold tracking-wider uppercase">
+                      Work Experience
+                    </h1>
                   </div>
-                  <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                    Work Experience
-                  </h1>
-                </div>
-              )}
+                )}
 
-              {/* experience cards */}
-              <div className="relative">
-                <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
+                {/* experience cards */}
+                <div className="relative">
+                  <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
 
-                {cvData.experiences.map(
-                  (exp: TypeExperience, index: number) => {
-                    //const verificationKey = exp.company_name;
+                  {cvData.experiences.map((exp:TypeExperience, index) => {
+                    //const verificationKey = exp.c;
                     // const isSeflAtetsted =
                     //   cvData.experienceVerifications[verificationKey]
                     //     .isSelfAttested || false;
-                    //const isSeflAtetsted = true;
-                    const mailStatus =
-                      exp.isEmailSend && exp.verified ? true : false;
-                    const hash = exp.docUri;
+                    const isSeflAtetsted = true;
+                    const mailStatus = exp.status
+                    const hash = exp.docHash;
                     return (
                       <div
                         key={index}
@@ -514,26 +514,28 @@ const CvOutputPage = () => {
                               {exp.jobRole}
                             </h1>
                             <div className="flex flex-col">
-                              <p className="text-sm md:text-lg capitalize line-clamp-1">
+                              <p className="flex gap-1 items-center text-sm md:text-lg capitalize line-clamp-1">
                                 {exp.companyName}{" "}
-                                {hash && (
+                                {exp.docUri && (
                                   <a
-                                    href={`${
-                                      import.meta.env.VITE_AzureGATWAY
-                                    }/${hash}`}
+                                    href={exp.docUri}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-[#FB980E] font-semibold text-sm"
                                   >
-                                    🔗
+                                    <Link2 />
                                   </a>
                                 )}
                               </p>{" "}
+                              <div className="flex gap-1 w-fit">
                               <ShowVerifications
-                                isAttested={mailStatus}
+                                isAttested={isSeflAtetsted}
+                                mailStatus={mailStatus}
                                 hash={hash}
                                 className="ml-5 mt-1"
                               />
+                              <StatusBadge status={exp.status} isEmailSend={exp.isEmailSend}/>
+                              </div>
                             </div>
                           </div>
                           {/* duration */}
@@ -550,205 +552,170 @@ const CvOutputPage = () => {
                         </div>
                         {/* description of work */}
                         <div className="mt-3">
-                          <ul className="list-disc list-inside text-[#000000] mt-2 pl-6">
-                            {exp?.description !== "" &&
-                              exp?.description
-                                ?.split(".")
-                                .filter((point) => point.trim() !== "")
-                                .map((point, i) => (
-                                  <li key={i}>
-                                    {point.endsWith(".") ? point : `${point}.`}
-                                  </li>
-                                ))}
-                            <li>
-                              Skills: <strong>{exp.skills}</strong>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    );
-                  }
-                )}
-              </div>
-            </div>
-
-            {/* Achievements */}
-            {cvData.awards.length > 0 && (
-              <div className="my-10 space-y-5">
-                {/* title */}
-                <div className="flex items-center gap-5">
-                  <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                    <GiAchievement size={27} />
-                  </div>
-                  <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                    Achievements and Certifications
-                  </h1>
-                </div>
-                {/* award cards */}
-                <div className="flex flex-col gap-3  relative">
-                  <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
-                  {cvData.awards.map((award: TypeAward, index: number) => {
-                    //const verificationKey = award.name;
-                    //const isSelfAttetsted = true;
-                    const hash = award.docUri;
-                    const mailStatus =
-                      award.isEmailSend && award.verified ? true : false;
-                    return (
-                      <div key={index} className="flex flex-col ml-3">
-                        <div className="flex justify-between">
-                          {/* job role,company name  */}
-                          <div className="max-w-xl w-full relative">
-                            {/* bulletdot */}
-                            <div
-                              className={`absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 left-[-17px]`}
-                            ></div>
-                            <h1 className="text-md md:text-xl font-semibold tracking-tight line-clamp-1">
-                              {award.name}{" "}
-                              {hash && (
-                                <a
-                                  href={`${
-                                    import.meta.env.VITE_AzureGATWAY
-                                  }/${hash}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[#FB980E] font-semibold text-sm"
-                                >
-                                  🔗
-                                </a>
-                              )}
-                            </h1>
-                            <div className="flex flex-col">
-                              <p className="text-sm md:text-lg capitalize line-clamp-1 mb-1">
-                                {award.organisation}
-                              </p>
-                              <ShowVerifications
-                                isAttested={mailStatus}
-                                hash={hash}
-                                className="ml-5 mt-1"
-                              />
-                            </div>
-                          </div>
-                          {/* duration */}
-                          <div className="">
-                            <p className="text-[#006666] italic text-xs md:text-base">
-                              {award.duration.from}
-                            </p>
-                          </div>
-                        </div>
-                        {/* description of work */}
-                        <div className="mt-1">
-                          <ul className="list-disc list-inside text-[#000000] mt-2 pl-6">
-                            {award?.description !== "" &&
-                              award?.description
-                                ?.split(".")
-                                .filter((point) => point.trim() !== "")
-                                .map((point, i) => (
-                                  <li key={i}>
-                                    {point.endsWith(".") ? point : `${point}.`}
-                                  </li>
-                                ))}
-                          </ul>
+                          <p>{exp.description}</p>
                         </div>
                       </div>
                     );
                   })}
                 </div>
               </div>
-            )}
 
-            {/* Projects */}
-            {cvData.projects && (
-              // award container
-              <div className="px-3 mt-2">
-                <h1 className="text-xl font-semibold text-[#44949C] mb-3">
-                  Projects
-                </h1>
-                {/* project cards */}
-                <div className="flex flex-col gap-3  relative">
-                  <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
-                  {cvData.projects.map(
-                    (project: TypeProject, index: number) => {
-                      const isSelfAttested = project.selfAttested;
-                      return (
-                        <div key={index} className="flex flex-col ml-3">
-                          <div className="flex justify-between">
-                            {/* job role,company name  */}
-                            <div className="max-w-xl w-full flex flex-col md:flex-row md:gap-10 md:items-center relative">
-                              {/* bulletdot */}
-                              <div
-                                className={`absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 -left-[17px]`}
-                              ></div>
-                              <div className="flex flex-col">
-                                <h1 className="text-md md:text-xl font-semibold tracking-tight line-clamp-2">
-                                  {project.projectName}{" "}
-                                  {project.projectUrl && (
-                                    <a
-                                      href={project.projectUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-[#FB980E] font-semibold text-sm"
-                                    >
-                                      🔗
-                                    </a>
-                                  )}
-                                </h1>
-                                <ShowVerifications
-                                  isAttested={isSelfAttested}
-                                  className="ml-5 mt-1"
-                                />
+              {/* Achievements */}
+              {((cvData.awards.length>0 || cvData.projects.length>0) && (
+                <div className="my-10 space-y-5">
+                  {/* title */}
+                  <div className="flex items-center gap-5">
+                    <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
+                      <GiAchievement size={27} />
+                    </div>
+                    <h1 className="text-2xl font-semibold tracking-wider uppercase">
+                      Achievements and Certifications
+                    </h1>
+                  </div>
+
+                  {/* Awards */}
+                  {cvData.awards.length > 0 && (
+                      // award container
+                      <div className="px-3 mt-2">
+                        <h1 className="text-xl font-semibold text-[#44949C] mb-2">
+                          Awards
+                        </h1>
+                        {/* award cards */}
+                        <div className="flex flex-col gap-3  relative">
+                          <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
+                          {cvData.awards.map((award:TypeAward, index) => {
+                            //const verificationKey = award.award_name;
+                            const isSelfAttetsted = true;
+                            const hash = award.docUri;
+                            const mailStatus = award.status
+                            return (
+                              <div key={index} className="flex flex-col ml-3">
+                                <div className="flex justify-between">
+                                  {/* job role,company name  */}
+                                  <div className="max-w-xl w-full relative">
+                                    {/* bulletdot */}
+                                    <div
+                                      className={`absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 left-[-17px]`}
+                                    ></div>
+                                    <h1 className="text-md flex items-center gap-1 md:text-xl font-semibold tracking-tight line-clamp-1">
+                                      {award.name}{" "}
+                                      {award.docUri && (
+                                        <a
+                                          href={award.docUri}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-[#FB980E] font-semibold text-sm"
+                                        >
+                                          <Link2 />
+                                        </a>
+                                      )}
+                                    </h1>
+                                    <div className="flex flex-col">
+                                      <p className="text-sm md:text-lg capitalize line-clamp-1 mb-1">
+                                        {award.organisation}
+                                      </p>
+                                      <div className="flex gap-1 w-fit ">
+                                      <ShowVerifications
+                                        isAttested={isSelfAttetsted}
+                                        mailStatus={mailStatus}
+                                        hash={hash}
+                                        className="ml-5 mt-1"
+                                      />
+                                      <StatusBadge status={award.status} isEmailSend={award.isEmailSend}/>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {/* duration */}
+                                  <div className="">
+                                    <p className="text-[#006666] italic text-xs md:text-base">
+                                      {award.duration.from}
+                                    </p>
+                                  </div>
+                                </div>
+                                {/* description of work */}
+                                <div className="mt-1">
+                                  <p className="text-base">
+                                    {award.description}
+                                  </p>
+                                </div>
                               </div>
-                              {project.projectUrl && (
-                                <a
-                                  href={`${import.meta.env.VITE_AzureGATWAY}/${
-                                    project.projectUrl
-                                  }`}
-                                  target="_blank"
-                                  className="hover:underline text-blue-600 cursor-pointer text-sm font-medium text-nowrap mt-5 lg:mt-0"
-                                >
-                                  <FaExternalLinkAlt />
-                                </a>
-                              )}
-                            </div>
-                            {/* duration */}
-                            <div className="">
-                              <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
-                                {
-                                  <>
-                                    {project.duration.from} -{" "}
-                                    {project.duration.to}
-                                  </>
-                                }
-                              </p>
-                            </div>
-                          </div>
-                          {/* description of work */}
-                          <div className="mt-1">
-                            <p className="text-base">
-                              <ul className="list-disc list-inside text-[#000000] mt-2 pl-6">
-                                {project?.description !== "" &&
-                                  project?.description
-                                    ?.split(". ")
-                                    .filter((point) => point.trim() !== "")
-                                    .map((point, i) => (
-                                      <li key={i}>
-                                        {point.endsWith(".")
-                                          ? point
-                                          : `${point}.`}
-                                      </li>
-                                    ))}
-                                <li>
-                                  Skills: <strong>{project.skills}</strong>
-                                </li>
-                              </ul>
-                            </p>
-                          </div>
+                            );
+                          })}
                         </div>
-                      );
-                    }
-                  )}
+                      </div>
+                    )}
+
+                  {/* Projects */}
+                  {cvData.projects.length > 0 && (
+                      // award container
+                      <div className="px-3 mt-2">
+                        <h1 className="text-xl font-semibold text-[#44949C] mb-3">
+                          Projects
+                        </h1>
+                        {/* project cards */}
+                        <div className="flex flex-col gap-3  relative">
+                          <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
+                          {cvData.projects.map(
+                            (project:TypeProject, index) => {
+                              //const verificationKey = project.project_name;
+                              const isSelfAttested = true;
+                              return (
+                                <div key={index} className="flex flex-col ml-3">
+                                  <div className="flex justify-between">
+                                    {/* job role,company name  */}
+                                    <div className="max-w-xl w-full flex flex-col md:flex-row md:gap-10 md:items-center relative">
+                                      {/* bulletdot */}
+                                      <div
+                                        className={`absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 -left-[17px]`}
+                                      ></div>
+                                      <div className="flex flex-col">
+                                        <h1 className="flex gap-1 text-center items-center text-md md:text-xl font-semibold tracking-tight line-clamp-2">
+                                          {project.projectName}{" "}
+                                          {project.projectUrl && (
+                                            <a
+                                              href={project.projectUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-[#FB980E] font-semibold text-sm"
+                                            >
+                                              <Link2 />
+                                            </a>
+                                          )}
+                                        </h1>
+                                        <ShowVerifications
+                                          isAttested={isSelfAttested}
+                                          className="ml-5 mt-1"
+                                        />
+                                      </div>
+                                    </div>
+                                    {/* duration */}
+                                    <div className="">
+                                      <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
+                                        {
+                                          <>
+                                            {project.duration.from} -{" "}
+                                            {project.duration.to}
+                                          </>
+                                        }
+                                      </p>
+                                    </div>
+                                  </div>
+                                  {/* description of work */}
+                                  <div className="mt-1">
+                                    <p className="text-base">
+                                      {project.description}
+                                    </p>
+                                  </div>
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
+                      </div>
+                    )}
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         </div>
       </div>

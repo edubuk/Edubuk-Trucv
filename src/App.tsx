@@ -30,6 +30,7 @@ import Layout from "./Layout/Layout";
 import Register from "./pages/Register";
 import PasswordResetUI from "./pages/ForgotPassword";
 import CVBuilder from "./CvBuilder/CvBuilder";
+import CreateCv from "./pages/CreateCv";
 
 
 function App() {
@@ -67,7 +68,7 @@ useEffect(() => {
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />
               <Route path="/admin" element={<Layout><AdminUsersPage/></Layout>} />
               <Route path="/pricing" element={<ProtectedRoute><SubscriptionPlans /></ProtectedRoute>} />
-              <Route path="/create-cv" element={<Layout><CVBuilder /></Layout>} />
+              <Route path="/create-cv" element={<Layout><CreateCv /></Layout>} />
               <Route path="/dashboard" element={<Layout><DashBoard /></Layout>} />
               <Route path="/register" element={<Register />} />
             </Routes>

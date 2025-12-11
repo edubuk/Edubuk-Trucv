@@ -72,7 +72,7 @@ const CvById: React.FC<CvByIdProps> = ({ cvData }) => {
           <div className="px-4 pb-4 pt-2 border-t border-slate-100">
             <div className="flex items-center gap-2">
               <Link
-                to={`/new-cv/${doc?._id}`}
+                to={`/cv/${doc?._id}`}
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[#006666] py-2 text-sm font-medium text-white shadow-sm hover:bg-[#03257e] transition-colors duration-150"
               >
                 View CV

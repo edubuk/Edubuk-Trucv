@@ -223,6 +223,8 @@ export const EducationDetails = ({
 
   const updateHandler = async (index: number) => {
     try {
+      const isValid = await form.trigger(`educations.${index}`);
+      if (!isValid) return;
       const payload = getValues(`educations.${index}`);
       console.log("payload", payload);
       const data = await api.put(`/doc/update-eduDoc/${payload.id}`, {
@@ -242,6 +244,8 @@ export const EducationDetails = ({
 
   const deleteHandler = async (index: number) => {
     try {
+      const confirm = window.confirm("Are you sure you want to delete this educational document?");
+      if (!confirm) return;
       setIdx(index);
       setLoading(true);
       const payload = getValues(`educations.${index}`);

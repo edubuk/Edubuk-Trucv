@@ -180,6 +180,8 @@ export const ExperienceDetails = ({
 
   const updateHandler = async (index: number) => {
     try {
+      const isValid = await form.trigger(`experiences.${index}`);
+      if (!isValid) return;
       const payload = getValues(`experiences.${index}`);
       console.log("payload", payload);
       const data = await api.put(`/doc/update-expDoc/${payload.id}`, {
@@ -199,6 +201,8 @@ export const ExperienceDetails = ({
 
   const deleteHandler = async (index: number) => {
     try {
+      const confirm = window.confirm("Are you sure you want to delete this experience document?");
+      if (!confirm) return;
       setLoading(true);
       setIdx(index);
       const payload = getValues(`experiences.${index}`);

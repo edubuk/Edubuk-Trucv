@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { ExternalLink, ShieldCheck, FileText,UserCircle} from "lucide-react";
 
 import { useUserData } from "@/context/AuthContext";
 import StatusBadge from "@/CvBuilder/StatusBadge";
+import ResendEmail from "./ResendEmail";
 
 const COLOR_PRIMARY = "#03257e";
 
@@ -20,6 +21,7 @@ export interface IUserDoc{
 }
 
 export interface IEducationDoc {
+  _id:string;
   userId:string;
   eduDocId:string,
   level:string,
@@ -39,6 +41,7 @@ export interface IEducationDoc {
 }
 
 export interface IExperienceDoc{
+    _id:string;
     userId:string,
     expDocId:string,
     companyName:string,
@@ -57,9 +60,10 @@ export interface IExperienceDoc{
     updatedAt:string,
 }
 export interface IAwardDoc{
+    _id:string;
     userId:string,
     awardDocId:string,
-    awardName:string,
+    name:string,
     awardDescription:string,
     organisation:string,
     selfAttested:boolean,
@@ -94,9 +98,16 @@ const MethodChip: React.FC<{ method: VerificationMethod }> = ({ method }) => {
   );
 };
 
-export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educationDocs: IEducationDoc[],experienceDocs:IExperienceDoc[],awardDocs:IAwardDoc[]}) {
-    const {user} = useUserData();
-    console.log("edu data",educationDocs)
+export default function UserDocs({educationDocs,experienceDocs,awardDocs,setRefreshKey}: {educationDocs: IEducationDoc[],experienceDocs:IExperienceDoc[],awardDocs:IAwardDoc[],setRefreshKey:React.Dispatch<React.SetStateAction<boolean>>}) {
+  const [openModel,setOpenModel] = useState(false);
+  const [docId,setDocId] = useState<string>("");
+  const {user} = useUserData();
+  const [info,setInfo] = useState({
+    org:"",
+    roleOrLevel:"",
+    docType:"",
+  })
+  // console.log("edu data",educationDocs)
 
   // const verifiedCount = useMemo(() => educationDocs?.reduce((sum, u) => (sum + (u.status==="verified"?1:0)), 0), [educationDocs]);
   // const totalCerts = useMemo(() => educationDocs?.reduce((sum) => sum + 1, 0), [educationDocs]);
@@ -105,6 +116,16 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educ
     if (!iso) return "—";
     const d = new Date(iso);
     return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+  }
+
+  const modelHandler = (id:string,org:string,roleOrLevel:string,docType:string)=>{
+    setOpenModel(true);
+    setDocId(id);
+    setInfo({
+      org,
+      roleOrLevel,
+      docType
+    })
   }
 
 
@@ -141,7 +162,7 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educ
                 </h3>
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {educationDocs?.map((cert) => (
-                    <button
+                    <div
                       key={cert?.eduDocId}
                       className="group bg-white border border-gray-100 rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow"
                       aria-label={`Open ${cert.level}`}
@@ -157,10 +178,15 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educ
                         <MethodChip method={cert?.verifiedThrough!}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
-                      {cert.docUri&&cert?.docUri.includes("https://")&&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                      <div className="flex justify-between items-center mt-4">
+                      {!cert.verified&&<button 
+                      onClick={()=>modelHandler(cert._id,cert.boardNameOrDegree,cert.level,"education")}
+                      className="text-xs bg-[#008888] text-white shadow-sm px-2 py-1 rounded cursor-pointer ">Resend Document </button>}
+                      {cert.docUri&&cert?.docUri.includes("https://")&&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
                         View Document <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                       </a>}
-                    </button>
+                      </div>
+                    </div>
                   ))}
                   {experienceDocs?.map((cert) => (
                     <button
@@ -179,21 +205,27 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educ
                         <MethodChip method={cert?.verifiedThrough!}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
-                     {cert.docUri&&cert.docUri.includes("https://") &&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                     <div className="flex justify-between items-center mt-4">
+                      {!cert.verified&&<button 
+                      onClick={()=>modelHandler(cert._id,cert.jobRole,cert.companyName,"experience")}
+                      className="text-xs bg-[#008888] text-white shadow-sm px-2 py-1 rounded cursor-pointer ">
+                      Resend Document </button>}
+                      {cert.docUri&&cert?.docUri.includes("https://")&&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
                         View Document <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                       </a>}
+                      </div>
                     </button>
                   ))}
                   {awardDocs?.map((cert) => (
                     <button
                       key={cert?.awardDocId}
                       className="group bg-white border border-gray-100 rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow"
-                      aria-label={`Open ${cert.awardName}`}
+                      aria-label={`Open ${cert.name}`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="text-sm text-gray-500">{cert.organisation || "Issuer —"}</div>
-                          <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.awardName}</div>
+                          <div className="mt-0.5 text-base font-semibold text-gray-900">{cert.name}</div>
                         </div>
                         <StatusBadge status={cert?.status || "pending"} isEmailSend={cert.isEmailSend} />
                       </div>
@@ -201,14 +233,22 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs}: {educ
                         <MethodChip method={cert?.verifiedThrough!}/>
                         <div className="text-xs text-gray-500">{formatDate(cert?.createdAt)}</div>
                       </div>
-                      {cert.docUri&&cert.docUri.includes("https://")&&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                      <div className="flex justify-between items-center mt-4">
+                      {!cert.verified&&<button 
+                      onClick={()=>modelHandler(cert._id,cert.name,cert.organisation,"award")}
+                      className="text-xs bg-[#008888] text-white shadow-sm px-2 py-1 rounded cursor-pointer ">
+                      Resend Document 
+                      </button>}
+                      {cert.docUri&&cert?.docUri.includes("https://")&&<a href={cert.docUri} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
                         View Document <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                       </a>}
+                      </div>
                     </button>
                   ))}
                 </div>
               </div>
             </div>
+            <ResendEmail openModel={openModel} setOpenModel={setOpenModel} docId={docId} setDocId={setDocId} info={info} setRefreshKey={setRefreshKey}/>
           </div>
         }
       </main>

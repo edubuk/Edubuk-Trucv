@@ -168,6 +168,8 @@ export const AwardDetails = ({
 
   const updateHandler = async (index: number) => {
     try {
+      const isValid = await form.trigger(`awards.${index}`);
+      if (!isValid) return;
       setLoading(true);
       setIdx(index);
       const payload = getValues(`awards.${index}`);
@@ -212,6 +214,8 @@ export const AwardDetails = ({
 
   const deleteHandler = async (index: number) => {
     try {
+      const confirm = window.confirm("Are you sure you want to delete this document?");
+      if (!confirm) return;
       setLoading(true);
       setIdx(index);
       const payload = getValues(`awards.${index}`);
