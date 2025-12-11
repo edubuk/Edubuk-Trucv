@@ -327,7 +327,7 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Company Name"
+                              placeholder="Project Name"
                               className="w-full"
                               {...field}
                             />
