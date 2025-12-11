@@ -43,6 +43,7 @@ const Resume: React.FC = () => {
         github:"",
         summary:"",
         imageUrl:"",
+        profession:""
       },
       educations:[],
       experiences:[],
