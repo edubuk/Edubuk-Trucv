@@ -226,7 +226,8 @@ export const SkillDetails = ({
         >
           <p className="text-sm text-slate-500">
             Add skills manually. Each skill supports self-attestation and can be
-            included in your resume.
+            included in your resume.<br></br>
+            <span className="text-[#f14419] font-semibold">Note:</span> After listing the skills select internal checkbox to include the skill in verification list and click on Verify Below Listed Skills button to send verification request to the selected skill.
           </p>
 
           <div className="mt-4 space-y-4">

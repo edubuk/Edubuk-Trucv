@@ -4,6 +4,7 @@ import { ExternalLink, ShieldCheck, FileText,UserCircle} from "lucide-react";
 import { useUserData } from "@/context/AuthContext";
 import StatusBadge from "@/CvBuilder/StatusBadge";
 import ResendEmail from "./ResendEmail";
+import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 
 const COLOR_PRIMARY = "#03257e";
 
@@ -98,7 +99,9 @@ const MethodChip: React.FC<{ method: VerificationMethod }> = ({ method }) => {
   );
 };
 
-export default function UserDocs({educationDocs,experienceDocs,awardDocs,setRefreshKey}: {educationDocs: IEducationDoc[],experienceDocs:IExperienceDoc[],awardDocs:IAwardDoc[],setRefreshKey:React.Dispatch<React.SetStateAction<boolean>>}) {
+export default function UserDocs({educationDocs,experienceDocs,awardDocs,setRefreshKey,isFetching}: 
+  {educationDocs: IEducationDoc[],experienceDocs:IExperienceDoc[],awardDocs:IAwardDoc[],setRefreshKey:React.Dispatch<React.SetStateAction<boolean>>,isFetching:boolean}) 
+  {
   const [openModel,setOpenModel] = useState(false);
   const [docId,setDocId] = useState<string>("");
   const {user} = useUserData();
@@ -126,6 +129,13 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs,setRefr
       roleOrLevel,
       docType
     })
+  }
+
+  if(isFetching)
+  {
+    return(
+      <ThreeDotLoader w={4} h={4} yPos={"center"} />
+    )
   }
 
 

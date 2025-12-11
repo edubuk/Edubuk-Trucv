@@ -13,7 +13,9 @@ import api from "@/lib/api";
 const DashBoard = () => {
     //const [isActiveButton , setActiveButton] = useState<boolean>(true);
     const [cvData, setCvData] = useState([]);
-    const [refreshKey,setRefreshKey] = useState<boolean>(false);
+    const [docRefresh,setDocRefresh] = useState<boolean>(false);
+    const [cvRefresh,setCvRefresh] = useState<boolean>(false);
+    const [isFetching,setIsFetching] = useState<boolean>(false);
     const [userDocs,setUserDocs] = useState({
       educations:[],
       experiences:[],
@@ -96,6 +98,7 @@ const DashBoard = () => {
             //          "Content-Type":"application/json",
             //      }
             //  })
+            setIsFetching(true)
              const userDocs = await api.get("/doc/user-docs");
              const data = await userDocs.data;
              console.log("data",data);
@@ -110,6 +113,8 @@ const DashBoard = () => {
          } catch (error) {
              toast.error("something went wrong");
              console.log("error while fetching docs",error)
+         }finally{
+          setIsFetching(false)
          }
 
        }
@@ -117,6 +122,7 @@ const DashBoard = () => {
 
        const userCvs = async()=>{
         try {
+          setIsFetching(true);
           const res:any = await api.get("/cv/user-cvs");
           if(res.data.success)
           {
@@ -126,12 +132,18 @@ const DashBoard = () => {
         } catch (error) {
           toast.error("something went wrong");
              console.log("error while fetching docs",error)
+        }finally{
+          setIsFetching(false);
         }
        }
 
     useEffect(()=>{
         getDocs();
-    },[refreshKey])
+    },[docRefresh])
+
+    useEffect(()=>{
+        userCvs();
+    },[cvRefresh])
 
   return (
     <div className="flex flex-col justify-center items-center h-auto w-full">
@@ -164,11 +176,11 @@ const DashBoard = () => {
 
         <div className="flex justify-center items-center gap-2 my-4 w-full">
           {/* Render only the selected component */}
-          {selected === "cv" && <CvById cvData={cvData} />}
+          {selected === "cv" && <CvById cvData={cvData} setCvRefresh={setCvRefresh} isFetching={isFetching}/>}
 
           {/* {selected === "nft" && <NFTGallery contractAddress={contractNFTAddress} abi={abiNFT} account={account!}/>} */}
 
-          {selected === "docs" && <UserDocs educationDocs={userDocs.educations} experienceDocs={userDocs.experiences} awardDocs = {userDocs.awards} setRefreshKey={setRefreshKey}/>}
+          {selected === "docs" && <UserDocs educationDocs={userDocs.educations} experienceDocs={userDocs.experiences} awardDocs = {userDocs.awards} setRefreshKey={setDocRefresh} isFetching={isFetching}/>}
         </div>
     </div>
   )

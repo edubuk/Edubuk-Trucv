@@ -1,14 +1,45 @@
 
+import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 import { useUserData } from "@/context/AuthContext";
-import React from "react";
+import api from "@/lib/api";
+import { Loader2, Trash } from "lucide-react";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 interface CvByIdProps {
   cvData:any[]; // Expecting an array of strings as cvData
+  setCvRefresh:React.Dispatch<React.SetStateAction<boolean>>;
+  isFetching:boolean;
 }
 
-const CvById: React.FC<CvByIdProps> = ({ cvData }) => {
+const CvById: React.FC<CvByIdProps> = ({ cvData,setCvRefresh,isFetching   }) => {
   const {user} = useUserData();
+  const [loading,setLoading] = useState<boolean>(false);
+  const [idx,setIdx] = useState<number>(-1);
   console.log("cv fetched data",cvData)
+
+  const deleteCvHandler = async(id:string,idx:number)=>{
+    try {
+      const confirm = window.confirm("Are you sure you want to delete this CV?")
+      if(!confirm){return}
+      setIdx(idx);
+      setLoading(true)
+      const response = await api.delete(`/cv/delete-cv/${id}`)
+      const {data} = response;
+      if(data.success)
+      {
+        toast.success(data.message);
+        setCvRefresh(prev=>!prev)
+      }
+    } catch (error:any) {
+      toast.error(error.message||"something went wrong");
+    }finally{setLoading(false)}
+  }
+  if(isFetching){
+    return (
+      <ThreeDotLoader w={4} h={4} yPos={"center"}/>
+    )
+  }
   return (
   <div className="w-full max-w-6xl mx-auto px-4 py-6">
   {cvData?.length === 0 && (
@@ -37,6 +68,11 @@ const CvById: React.FC<CvByIdProps> = ({ cvData }) => {
                 <span className="h-1.5 w-1.5 rounded-full bg-[#03257e]" />
                 {doc.title}
               </span>
+              <div>
+              {loading&&i===idx?<Loader2 className="text-[#f14419] cursor-pointer animate-spin" />:<Trash 
+              className="text-[#f14419] cursor-pointer"
+              onClick={()=>deleteCvHandler(doc._id,i)} />}
+              </div>
             </div>
 
             {/* Name / title */}

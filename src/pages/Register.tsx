@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import loginImg from "../assets/login.avif"
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
-import { ArrowLeftSquare } from "lucide-react";
+import { ArrowLeftSquare, Loader2 } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import 'react-phone-input-2/lib/style.css';
 // interface UserLoginData {
@@ -263,7 +263,7 @@ export default function RegistrationPage(): JSX.Element {
                                             className="mt-8 w-[170px] lg:w-[110px] rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
                                             onClick={otpHandler}
                                             style={{ opacity: otpSent ? 0.7 : 1 }}
-                                        >{otpSent ? "wait.." : "Get OTP"}</button>
+                                        >{otpSent ? <Loader2 className="text-white animate-spin" /> : "Get OTP"}</button>
                                     </div>
                                 </label>
                             </div>

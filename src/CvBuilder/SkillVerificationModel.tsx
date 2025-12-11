@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { API_BASE_URL } from "@/main";
 import LoadingButton from "@/components/LoadingButton";
 
-const levels = ["Beginner", "Intermediate", "Advanced", "Expert"];
+//const levels = ["Beginner", "Intermediate", "Advanced", "Expert"];
 
 type SkillVerificationProps = {
   selectedSkill: any;
@@ -24,7 +24,7 @@ const SkillVerificationModel: React.FC<SkillVerificationProps> = ({
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [emailId, setEmailId] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-
+  console.log("selected skills are",selectedSkill)
   const emailHandler = async () => {
     try {
       setLoading(true);
@@ -131,7 +131,8 @@ const SkillVerificationModel: React.FC<SkillVerificationProps> = ({
 
                       {/* Level Dropdown */}
                       <div className="col-span-5">
-                        <select
+                        {skill.level}
+                        {/* <select
                           disabled
                           defaultValue={skill.level}
                           className="w-full rounded-lg border border-slate-200 bg-white px-3 py-[6px] text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006666] focus:border-[#006666] transition"
@@ -142,7 +143,7 @@ const SkillVerificationModel: React.FC<SkillVerificationProps> = ({
                               {level}
                             </option>
                           ))}
-                        </select>
+                        </select> */}
                       </div>
                     </div>
                   ))}

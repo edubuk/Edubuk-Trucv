@@ -24,12 +24,14 @@ import { TypeAward, TypeEducation, TypeExperience, TypeProject, TypeSkill } from
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 //import PdfDownloader from "@/components/PDFDownloader/PdfDownloader";
 
 const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch<React.SetStateAction<boolean>>}) => {
   // const [copied, setCopied] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
   const [title,setTitle] = useState("")
+  const [loading,setLoading] = useState(false)
   const navigate = useNavigate();
   // const formatDate = (dateString: string): string => {
   //   const date = new Date(dateString);
@@ -76,6 +78,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
         return
       }
     try {
+      setLoading(true);
       const res = await api.post("/cv/create-cv",{data:cvData,title:title})
       if(res.status === 200){
         toast.success("CV Created Successfully")
@@ -83,6 +86,8 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
       }
     } catch (error) {
       toast.error("Something went wrong")
+    }finally{
+      setLoading(false);
     }
   }
 
@@ -147,7 +152,12 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
           ✕
         </button>
         <div className="flex items-center gap-2">
-       <button onClick={createCv} className="bg-green-600 px-3 py-2 mb-2 text-white text-center rounded">Create CV</button>
+       {loading?<Loader2 className="animate-spin text-[#006666]" />:<button 
+       onClick={createCv} 
+       className="bg-green-600 px-3 py-2 mb-2 text-white text-center rounded"
+       >
+        Create CV</button>
+        }
        <input type="text" placeholder="Enter resume title"
        onChange={(e)=>setTitle(e.target.value)}
        className="w-full rounded px-3 py-2 mb-2 md:w-[200px]"
