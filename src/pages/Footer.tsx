@@ -15,7 +15,7 @@ const Footer = () => {
         <img src="/newLogo.png" alt="logo" className="md:w-[200px] md:h-[200px] w-[152px] h-[152px]"></img>
         <div className="flex flex-col justify-center gap-4 sm:pl-12 ml-6">
             <div className="font-semibold text-xl text-black uppercase">Contact Us:</div>
-            <div className="flex justify-start gap-2 items-center text-black"><MdEmail />Email: support@edubukeseal.org</div>
+            <div className="flex justify-start gap-2 items-center text-black"><MdEmail />Email: support@edubuk.com</div>
             <div className="flex justify-start gap-2 items-center text-black"><MdPhone />Phone: +91 9250411261</div>
         </div>
         <div className="flex flex-col sm:flex-row pl-6 gap-4">
