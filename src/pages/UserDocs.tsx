@@ -170,6 +170,9 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs,setRefr
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2 mt-2">
                   <FileText className="h-5 w-5" /> Uploaded Certificates
                 </h3>
+                {educationDocs?.length===0?<div>
+                  <p className="text-[#f14419] text-center mt-2 bg-gray-200 p-8 rounded">No education docs uploaded</p>
+                </div>:<p className="text-[#03257e]"><span className="text-[#f14419]">Note:</span> If any document is got rejected, you can resend correct document by clicking on Resend Document button</p>}
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {educationDocs?.map((cert) => (
                     <div

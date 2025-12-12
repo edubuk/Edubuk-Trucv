@@ -3,6 +3,7 @@ import { useState } from "react";
 import api from "@/lib/api";
 import PdfViewerModal from "./PDFViewermodel";
 import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 // import qs from "qs";
 
 type FieldSpec = {
@@ -167,13 +168,13 @@ export default function DynamicDigilockerForm({
           </label>
         </div>
       <div className="flex items-center gap-2">
-        {uri?<button type="button" onClick={fetchDoc} className="bg-[#006666] text-white p-2 rounded">View Document</button>:<button
-        type="button"  
+        {uri?loading?<Loader2 className="bg-[#006666] text-white p-2 rounded animate-spin"/>:<button type="button" onClick={fetchDoc} className="bg-[#006666] text-white p-2 rounded">View Document</button>:<button
+        type="button"      
         onClick={() => onSubmitWrapper()}   
         disabled={isSubmitting || loading || !consent}
         className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-60"
       >
-        {isSubmitting || loading ? "fetching..." : "Submit"}
+        {isSubmitting || loading ? "fetching..." : "Submit"} 
       </button>}
         {uri&&<button
         type="button"                 
@@ -182,7 +183,6 @@ export default function DynamicDigilockerForm({
       >
         Save
       </button>}
-      
       </div>
     </form>}
     </>

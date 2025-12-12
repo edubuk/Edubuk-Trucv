@@ -274,6 +274,7 @@ export default function DigiLockerTest({
 
   const fetchParams = async()=>{
     try {
+      setLoading(true);
       const res:any = await api.post(`api/dl/pullParams?orgid=${orgId}&doctype=${doctype}`)
       console.log("res",res)
       if (res.data.ok) {
@@ -283,7 +284,7 @@ export default function DigiLockerTest({
     } catch (error:any) {
       setErrorMsg(error?.response?.data?.error?.error_description);
       console.log("error",error);
-    }
+    }finally{setLoading(false)}
   }
 
   // Helpers for PKCE
@@ -333,8 +334,6 @@ export default function DigiLockerTest({
     // 6. Redirect user
     window.location.href = authUrl;
   }
-
-
 
 
   useEffect(() => {
@@ -410,44 +409,7 @@ export default function DigiLockerTest({
             <div className="font-medium text-slate-800">{profile.eaadhaar === "Y" ? "Yes" : "No"}</div>
           </div>
         </div>
-        {/* <label>Enter below your {description} related required data</label>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input
-            type="text"
-            placeholder="Enter Roll Number*"
-            value={rollno}
-            onChange={(e) => setRollno(e.target.value)}
-            className="rounded-lg w-full px-3 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#03257e]"
-          />
 
-          {doctype === "DGCER" && <input
-            type="text"
-            placeholder="Enter Registration Number*"
-            value={regno}
-            onChange={(e) => setRegno(e.target.value)}
-            className="rounded-lg w-full px-3 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#03257e]"
-          />}
-          <input
-            type="text"
-            placeholder="Enter Passing Year*"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            className="rounded-lg w-full px-3 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#03257e]"
-          />
-        </div>
-
-        <div className="mt-4">
-          <label htmlFor="digilocker-checkbox" className="flex items-start gap-3 text-sm text-slate-600">
-            <input
-              id="digilocker-checkbox"
-              type="checkbox"
-              onChange={() => setConsent(!consent)}
-              checked={consent}
-              className="mt-1 h-4 w-4 rounded border-slate-300 text-[#006666]"
-            />
-            <span className="text-slate-600">I provide my consent to share my educational documents with the <span className="font-semibold text-slate-800">{issuerName}</span> for the purpose of fetching <span className="font-semibold text-slate-800">{description}</span> into DigiLocker.</span>
-          </label>
-        </div> */}
         {dlFormFields?.length>0&&<DynamicDigilockerForm 
         fields={dlFormFields} 
         index={index}

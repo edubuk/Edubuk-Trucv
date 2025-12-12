@@ -142,7 +142,7 @@ export const ProjectItemSchema = z.object({
     to:z.string().min(1,"end date is required")
   }),
   skills:z.string().min(1,"skill is required").refine((s)=>s.includes(","),"Separate multiple skills using commas (e.g., React, Node.js)"),
-  description: z.string().optional(),
+  description: z.string().min(1, "Description is required"),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
 }).superRefine((data,ctx)=>{
   if(data.duration.from && data.duration.to)

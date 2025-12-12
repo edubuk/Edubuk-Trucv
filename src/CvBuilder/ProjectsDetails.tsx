@@ -138,6 +138,8 @@ export const ProjectDetails = ({
 
   const updateHandler = async (index: number) => {
     try {
+      const isValid = await form.trigger(`projects.${index}`);
+      if (!isValid) return;
       setLoading(true);
       setIdx(index);
       const payload = getValues(`projects.${index}`);
@@ -406,7 +408,7 @@ export const ProjectDetails = ({
                             </div>
                           </FormLabel>
                           <FormControl>
-                            <Textarea
+                            <Input
                               placeholder="Write your used skills in this project. e.g.(ReactJs,Java,NodeJs)"
                               className="w-full"
                               {...field}
