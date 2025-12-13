@@ -147,7 +147,7 @@ export const AwardDetails = ({
           },
           description: doc.description ?? "",
           selfAttested: doc.selfAttested ?? false,
-          issuerEmailId: doc.issuerEmailId ?? "",
+          issuerEmailId: doc.issuerEmailId ?? undefined,
           docUri:doc.docUri??"",
           isEmailSend: doc.isEmailSend ?? false,
           verified: doc.verified ?? false,
@@ -374,6 +374,7 @@ export const AwardDetails = ({
                     <div>
                       <label className="">Select your relevant field*</label>
                       <select
+                      disabled={a.verified}
                         value={a.level}
                         onChange={(e) =>
                           update(index, {
@@ -394,7 +395,7 @@ export const AwardDetails = ({
                     <FormField
                       control={form.control}
                       name={`awards.${index}.name`}
-                      render={({ field }) => (
+                      render={({ field}) => (
                         <FormItem className="w-full">
                           <FormLabel>
                             <div className="flex items-center gap-1">
@@ -404,6 +405,7 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                            disabled={a.verified}
                               placeholder={`${a.level} name`}
                               className="w-full"
                               {...field}
@@ -426,6 +428,7 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                            disabled={a.verified}
                               placeholder="Organisation"
                               className="w-full"
                               {...field}
@@ -438,7 +441,7 @@ export const AwardDetails = ({
                     <FormField
                       control={control}
                       name={`awards.${index}.duration.from`}
-                      render={({ field: innerField }) => (
+                      render={({ field}) => (
                         <FormItem className="w-full">
                           <FormLabel>
                             <div className="flex items-center gap-1">
@@ -449,7 +452,9 @@ export const AwardDetails = ({
                             </div>
                           </FormLabel>
                           <FormControl>
-                            <Input type="date" {...innerField} />
+                            <Input 
+                            disabled={a.verified}
+                            type="date" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -468,7 +473,9 @@ export const AwardDetails = ({
                               </div>
                             </FormLabel>
                             <FormControl>
-                              <Input type="date" {...innerField} />
+                              <Input 
+                              disabled={a.verified}
+                              type="date" {...innerField} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -488,6 +495,7 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Textarea
+                            disabled={a.verified}
                               placeholder="Description(write as paragraph format)"
                               className="w-full"
                               {...field}

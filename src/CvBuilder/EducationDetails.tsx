@@ -203,7 +203,7 @@ export const EducationDetails = ({
           },
           selfAttested: doc.selfAttested ?? false,
           docUri: doc.docUri ?? "",
-          issuerEmailId: doc.issuerEmailId ?? "",
+          issuerEmailId: doc.issuerEmailId ?? undefined,
           isEmailSend: doc.isEmailSend ?? false,
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
@@ -223,6 +223,7 @@ export const EducationDetails = ({
 
   const updateHandler = async (index: number) => {
     try {
+      console.log("errors", errors);
       const isValid = await form.trigger(`educations.${index}`);
       if (!isValid) return;
       const payload = getValues(`educations.${index}`);
@@ -455,6 +456,7 @@ export const EducationDetails = ({
                           Select your education level*
                         </label>
                         <select
+                        disabled={field.verified}
                           value={field.level}
                           onChange={(e) =>
                             update(index, {
@@ -496,6 +498,7 @@ export const EducationDetails = ({
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                disabled={field.verified}
                                   type="date"
                                   placeholder="YYYY"
                                   {...innerField}
@@ -518,6 +521,7 @@ export const EducationDetails = ({
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                disabled={field.verified}
                                   type="date"
                                   placeholder="YYYY"
                                   {...innerField}
@@ -553,6 +557,7 @@ export const EducationDetails = ({
                               <FormControl>
                                 {/* <Input placeholder="Board name" className="w-full" {...f} /> */}
                                 <DropDown
+                                isDisabled={field.verified}
                                   classOrgId={`educations.${index}.${
                                     field.level === "Secondary School" ||
                                     field.level === "Higher Secondary School"
@@ -590,6 +595,7 @@ export const EducationDetails = ({
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                disabled={field.verified}
                                   placeholder={
                                     field.level === "Secondary School" ||
                                     field.level === "Higher Secondary School"
@@ -621,6 +627,7 @@ export const EducationDetails = ({
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                disabled={field.verified}
                                   placeholder={
                                     field.level === "Secondary School" ||
                                     field.level === "Higher Secondary School"
@@ -829,6 +836,7 @@ export const EducationDetails = ({
 
                                     <div className="flex-1 flex-col gap-2 items-center">
                                       <Input
+                                      disabled={field.verified}
                                         id={`issuerEmail-${index}`}
                                         placeholder="Enter issuer's email address"
                                         className="w-full rounded-lg px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6334FA] focus:border-[#6334FA]"

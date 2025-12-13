@@ -66,7 +66,7 @@ const CvOutputPage = () => {
       linkedin: "",
       github: "",
       summary: "",
-      imageUrl: "",
+      imgUrl: "",
       profession:"",
     },
     educations: [],
@@ -192,9 +192,9 @@ const CvOutputPage = () => {
           {/* left sidebar */}
           <div className="w-72  h-auto  bg-[#006666] rounded-ss-2xl px-2 md:px-5 text-white py-2 space-y-20 md:space-y-10">
             {/* image */}
-          {cvData.personal.imageUrl?<div className="mt-5">
+          {cvData.personal.imgUrl?<div className="mt-5">
             <img
-              src={cvData.personal.imageUrl}
+              src={cvData.personal.imgUrl}
               alt="image"
               className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 mx-auto border-[#449298] object-cover"
             />

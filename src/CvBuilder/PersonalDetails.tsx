@@ -22,6 +22,7 @@ import { useUserData } from "@/context/AuthContext";
 import { Textarea } from "@/components/ui/textarea";
 import { ICvData } from "./CvBuilder";
 import api from "@/lib/api";
+import PhoneInput from "react-phone-input-2";
 
 
 export interface IStepCard {
@@ -88,6 +89,7 @@ useEffect(() => {
           linkedin: user.linkedInUrl ?? "",
           github: user.githubUrl ?? "",
           summary: user.profileSummary ?? "",
+          imgUrl:user.userImageUrl??"",
         },
       }
     })
@@ -294,7 +296,24 @@ useEffect(() => {
                                         </div>
                                     </FormLabel>
                                     <FormControl>
-                                        <Input type="text" placeholder="Enter phone number" {...field} />
+                                        <PhoneInput
+                                    country="in"
+                                    value={field.value}
+                                    onChange={(phone) => field.onChange(phone)}
+                                    placeholder="Phone Number"
+                                    // Outer wrapper styles (acts like your input's border + focus ring)
+                                    containerClass={`mt-2 w-full rounded-lg border px-0 focus-within:ring-2 ${false
+                                            ? 'border-red-200 focus-within:ring-red-300'
+                                            : 'border-slate-200 focus-within:ring-[#03257e]'
+                                        }`}
+                                    inputClass="!w-full !bg-transparent !text-[#006666] !placeholder-slate-400 !pl-10 !py-2 !focus:outline-none !border-0 !shadow-none"
+                                    buttonClass="!border-0 !shadow-none"
+                                    dropdownClass="!text-black"
+                                    inputProps={{
+                                        name: 'phone',
+                                        required: true,
+                                    }}
+                                />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

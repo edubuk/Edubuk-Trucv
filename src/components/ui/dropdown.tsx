@@ -14,6 +14,7 @@ export type DropDownProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
   index:number;
   onSearch?: (q: string) => void | Promise<void>;
   fetcher?: (q: string) => Promise<Option[]>;
+  isDisabled?: boolean;
 };
 
 const defaultFetcher = async (q: string): Promise<Option[]> => {
@@ -42,6 +43,7 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
       classOrgId,
       index,
       onChange,
+      isDisabled,
       ...props
     },
     ref
@@ -213,6 +215,7 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
         >
           {searchable ? (
             <input
+            disabled={isDisabled}
               ref={inputRef}
               className="flex-1 bg-transparent outline-none text-sm"
               placeholder={placeholder}

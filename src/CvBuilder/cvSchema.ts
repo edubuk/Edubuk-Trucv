@@ -76,7 +76,6 @@ export const EducationItemSchema = z.object({
 export const EducationSchema = z.object({
   educations: z
     .array(EducationItemSchema)
-    .min(1, { message: "At least one education record is required" }),
 });
 
 export type EducationFormValues = z.infer<typeof EducationSchema>;

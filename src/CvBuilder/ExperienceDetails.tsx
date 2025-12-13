@@ -162,7 +162,7 @@ export const ExperienceDetails = ({
           selfAttested: doc.selfAttested ?? false,
           isEmailSend: doc.isEmailSend ?? false,
           docUri: doc.docUri ?? "",
-          issuerEmailId: doc.issuerEmailId ?? "",
+          issuerEmailId: doc.issuerEmailId ?? undefined,
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
         }));
@@ -393,7 +393,7 @@ export const ExperienceDetails = ({
                     <FormField
                       control={control}
                       name={`experiences.${index}.companyName`}
-                      render={({ field }) => (
+                      render={({field:innerField}) => (
                         <FormItem className="w-full">
                           <FormLabel>
                             <div className="flex items-center gap-1">
@@ -403,9 +403,10 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                              disabled={field.verified}
                               placeholder="Company Name"
                               className="w-full"
-                              {...field}
+                              {...innerField}
                             />
                           </FormControl>
                           <FormMessage />
@@ -415,7 +416,7 @@ export const ExperienceDetails = ({
                     <FormField
                       control={control}
                       name={`experiences.${index}.jobRole`}
-                      render={({ field }) => (
+                      render={({ field: innerField }) => (
                         <FormItem className="w-full">
                           <FormLabel>
                             <div className="flex items-center gap-1">
@@ -425,9 +426,10 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                            disabled={field.verified}
                               placeholder="eg. Software Engineer"
                               className="w-full"
-                              {...field}
+                              {...innerField}
                             />
                           </FormControl>
                           <FormMessage />
@@ -446,7 +448,9 @@ export const ExperienceDetails = ({
                             </div>
                           </FormLabel>
                           <FormControl>
-                            <Input type="date" {...innerField} />
+                            <Input 
+                            disabled={field.verified}
+                            type="date" {...innerField} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -465,9 +469,10 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+
                               type="date"
                               {...innerField}
-                              disabled={isCurrentlyWorking}
+                              disabled={isCurrentlyWorking || field.verified}
                             />
                           </FormControl>
                           <FormMessage />
@@ -477,7 +482,7 @@ export const ExperienceDetails = ({
                     <FormField
                       control={control}
                       name={`experiences.${index}.skills`}
-                      render={({ field }) => (
+                      render={({field:innerField}) => (
                         <FormItem className="w-full">
                           <FormLabel>
                             <div className="flex items-center gap-1">
@@ -487,9 +492,10 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                            disabled={field.verified}
                               placeholder="Write your skills"
                               className="w-full"
-                              {...field}
+                              {...innerField}
                             />
                           </FormControl>
                           <FormMessage />
@@ -499,7 +505,7 @@ export const ExperienceDetails = ({
                     <FormField
                       control={control}
                       name={`experiences.${index}.description`}
-                      render={({ field }) => (
+                      render={({ field:innerField }) => (
                         <FormItem className="w-full">
                           <FormLabel>
                             <div className="flex items-center gap-1">
@@ -509,9 +515,10 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Textarea
+                            disabled={field.verified}
                               placeholder="Description(write as paragraph format)"
                               className="w-full"
-                              {...field}
+                              {...innerField}
                             />
                           </FormControl>
                           <FormMessage />
@@ -642,6 +649,7 @@ export const ExperienceDetails = ({
 
                               <div className="flex-1 flex-col gap-2 items-center">
                                 <Input
+                                disabled={field.verified}
                                   id={`issuerEmail-${index}`}
                                   placeholder="Enter issuer's email address"
                                   className="w-full rounded-lg px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6334FA] focus:border-[#6334FA]"

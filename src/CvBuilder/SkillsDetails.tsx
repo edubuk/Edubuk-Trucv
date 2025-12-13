@@ -308,7 +308,7 @@ export const SkillDetails = ({
                     {/* Bar row: name + level dropdown + self-attest + remove */}
                     <div className="flex flex-wrap items-center gap-3 border p-3 rounded bg-white">
                       {/* Skill name (editable inline if you want) */}
-                        {isMongoId(s.id) && s.endoresBy?<CheckCircle className="text-[#006666]"/>: <input
+                        {isMongoId(s.id)&& (s.endoresBy?<CheckCircle className="text-[#006666]"/>: <input
                             type="checkbox"
                             disabled={s.endoresBy?true:false}
                             className="border-[#008888] h-4 w-4"
@@ -323,7 +323,7 @@ export const SkillDetails = ({
                             }
                             onChange={() => handleSkillInclude(index)}
                             aria-label={`Include skills ${index + 1} in CV`}
-                          />}
+                          />)}
                       <div className="flex-1 text-sm font-medium text-slate-800">
                         <FormField
                           control={control}
