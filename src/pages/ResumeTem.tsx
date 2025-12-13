@@ -42,7 +42,7 @@ const Resume: React.FC = () => {
         linkedin:"",
         github:"",
         summary:"",
-        imageUrl:"",
+        imgUrl:"",
         profession:""
       },
       educations:[],
