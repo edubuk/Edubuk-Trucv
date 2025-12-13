@@ -274,6 +274,10 @@ export default function DigiLockerTest({
 
   const fetchParams = async()=>{
     try {
+      if (!orgId || !doctype) {
+        setErrorMsg("Please fill all the required filed in the form correctly first");
+        return;
+      }
       setLoading(true);
       const res:any = await api.post(`api/dl/pullParams?orgid=${orgId}&doctype=${doctype}`)
       console.log("res",res)
@@ -282,7 +286,7 @@ export default function DigiLockerTest({
         setDlFormFields(res.data.data);
       }
     } catch (error:any) {
-      setErrorMsg(error?.response?.data?.error?.error_description);
+      setErrorMsg(error?.response?.data?.error?.error_description??error?.message??error);
       console.log("error",error);
     }finally{setLoading(false)}
   }

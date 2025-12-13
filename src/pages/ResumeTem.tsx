@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 //import { PDFDownloadLink } from "@react-pdf/renderer";
 //import { CVDocument } from "@/components/PDFDownloader/ReactPDF";
-import { useReactToPrint } from "react-to-print";
+//import { useReactToPrint } from "react-to-print";
 // import { SiHyperskill } from "react-icons/si";
 // import { FaBriefcase } from "react-icons/fa";
 // import { GiAchievement } from "react-icons/gi";
@@ -52,40 +52,40 @@ const Resume: React.FC = () => {
       awards:[],
     })
 
-      const pageStyle = `
-    @media all {
-  .page-break {
-    display: none;
-  }
-}
+//       const pageStyle = `
+//     @media all {
+//   .page-break {
+//     display: none;
+//   }
+// }
 
-@media print {
-  html, body {
-    height: initial !important;
-    overflow: initial !important;
-    -webkit-print-color-adjust: exact;
-  }
-}
+// @media print {
+//   html, body {
+//     height: initial !important;
+//     overflow: initial !important;
+//     -webkit-print-color-adjust: exact;
+//   }
+// }
 
-@media print {
-  .page-break {
-    margin-top: 1rem;
-    display: block;
-    page-break-before: auto;
-  }
-}
+// @media print {
+//   .page-break {
+//     margin-top: 1rem;
+//     display: block;
+//     page-break-before: auto;
+//   }
+// }
 
-@page {
-  size: auto;
-  margin: 20mm;
-}
-  `;
+// @page {
+//   size: auto;
+//   margin: 20mm;
+// }
+//   `;
 
-  const handlePrint = useReactToPrint({
-    contentRef: pdfRef,
-    documentTitle: "My CV",
-    pageStyle, // inject the styles into print document
-  });
+  // const handlePrint = useReactToPrint({
+  //   contentRef: pdfRef,
+  //   documentTitle: "My CV",
+  //   pageStyle, // inject the styles into print document
+  // });
   
   const [loading,setLoading] = useState(false);
   //   const handlePrint = useReactToPrint({
@@ -161,9 +161,9 @@ const Resume: React.FC = () => {
       {user && (
         <div className="flex justify-end p-4 gap-2">
           <div>
-            <button onClick={handlePrint}
+            {/* <button onClick={handlePrint}
             className="rounded bg-green-600 px-3 py-2 text-white cursor-pointer"
-            >Print</button>
+            >Print</button> */}
           </div>
           <div
             className="flex items-center gap-2 border-2 border-[#03257e] px-2 py-1 rounded cursor-pointer text-[#03257e] hover:text-[#006666]"
@@ -197,7 +197,7 @@ const Resume: React.FC = () => {
         className="font-family min-h-screen flex justify-center px-4 py-3 overflow-hidden w-full shadow border-t"
       >
         <div
-          className="bg-white rounded-lg overflow-auto max-h-[90vh] no-scrollbar print-area shadow-lg w-full md:w-[800px]"
+          className="bg-white rounded-lg overflow-auto max-h-[90vh] no-scrollbar print-area shadow-lg w-full md:w-[950px]"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <div ref={pdfRef} id="cv-preview-wrapper" className="px-6 py-5 font-family">

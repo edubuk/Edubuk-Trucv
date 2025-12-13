@@ -25,6 +25,7 @@ import { MdSchool } from "react-icons/md";
 import StatusBadge from "@/CvBuilder/StatusBadge";
 const COLOR_TEAL = "#006666";
 const formatDate = (dateString: string) => {
+  if(!dateString){return ""}
   const date = new Date(dateString);
 
   // Check if year is 1970, return "Present"
@@ -49,8 +50,9 @@ const formatDate = (dateString: string) => {
   const month = months[date.getMonth()];
   const day = date.getDate().toString().padStart(2, "0");
   const year = date.getFullYear();
-
-  return `${month} ${day} ${year}`;
+  if(month==="undefined" || day==="NaN")
+  return "Present";
+  return `${day} ${month} ${year}`;
 };
 const CvOutputPage = () => {
   const { id } = useParams();
@@ -269,9 +271,9 @@ const CvOutputPage = () => {
 
                               {/* optional duration on the right for larger screens */}
                               <div className="text-sm text-white">
-                                {education.duration?.from || "—"}{" "}
-                                {education.duration?.to
-                                  ? `— ${education.duration.to}`
+                                {formatDate(education.duration?.from!)}{" "}
+                                  {education.duration?.to
+                                  ? `— ${formatDate(education.duration.to!)}`
                                   : ""}
                               </div>
                             </div>
@@ -422,14 +424,14 @@ const CvOutputPage = () => {
               {/* skill section */}
               {/* skills */}
               <div className="mt-2">
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                    <SiHyperskill size={20} />
-                  </div>
-                  <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                    Skills
-                  </h1>
+              {cvData.skills.length>0&&<div className="flex items-center gap-4">
+                <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
+                  <SiHyperskill size={20} />
                 </div>
+                <h1 className="text-2xl font-semibold tracking-wider uppercase">
+                  Skills
+                </h1>
+              </div>}
 
                 {/* showcasing skills */}
                 <div className="">
@@ -553,6 +555,7 @@ const CvOutputPage = () => {
                         {/* description of work */}
                         <div className="mt-3">
                           <p>{exp.description}</p>
+                          <p><strong>Skills:</strong> { exp.skills}</p>
                         </div>
                       </div>
                     );
@@ -628,7 +631,10 @@ const CvOutputPage = () => {
                                   {/* duration */}
                                   <div className="">
                                     <p className="text-[#006666] italic text-xs md:text-base">
-                                      {award.duration.from}
+                                      {formatDate(award.duration?.from!)}
+                                {award.duration?.to
+                                  ? `-${formatDate(award.duration.to!)}`
+                                  : ""}
                                     </p>
                                   </div>
                                 </div>
@@ -693,8 +699,8 @@ const CvOutputPage = () => {
                                       <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
                                         {
                                           <>
-                                            {project.duration.from} -{" "}
-                                            {project.duration.to}
+                                            {formatDate(project.duration.from)} -{" "}
+                                            {formatDate(project.duration.to)}
                                           </>
                                         }
                                       </p>
@@ -705,6 +711,7 @@ const CvOutputPage = () => {
                                     <p className="text-base">
                                       {project.description}
                                     </p>
+                                    <p><strong>Skills:</strong> {project.skills}</p>
                                   </div>
                                 </div>
                               );
