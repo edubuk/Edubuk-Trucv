@@ -1,136 +1,35 @@
-import { useParams } from "react-router-dom";
+import { useRef, useState} from "react";
+import {
+  FaGithub,
+} from "react-icons/fa";
+
+//import { useReactToPrint } from "react-to-print";
+import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 import { SiHyperskill } from "react-icons/si";
-import { FaBriefcase, FaCopy, FaGithub } from "react-icons/fa";
+import { FaBriefcase } from "react-icons/fa";
 import { GiAchievement } from "react-icons/gi";
 import { BiSolidBriefcase } from "react-icons/bi";
 import { CheckCircle, CircleUser, GraduationCap, Link2, Linkedin, Mail, MapPinned, Phone } from "lucide-react";
-// import HyperText from "@/components/ui/AnimateHypertext";
-import ShowVerifications from "@/components/ShowVerifications";
-import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
-//import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
-import { useState, useRef, useEffect } from "react";
-import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
+import { ICvData } from "./CvBuilder";
+import { TypeAward, TypeEducation, TypeExperience, TypeProject, TypeSkill } from "./cvSchema";
 import api from "@/lib/api";
-//import { useUserData } from "@/context/AuthContext";
-import { ICvData } from "@/CvBuilder/CvBuilder";
-import {
-  TypeAward,
-  TypeEducation,
-  TypeExperience,
-  TypeProject,
-  TypeSkill,
-} from "@/CvBuilder/cvSchema";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+import ShowVerifications from "@/components/ShowVerifications";
+import StatusBadge from "./StatusBadge";
+import { formatDate } from "@/pages/CvOutputPage";
 import { MdSchool } from "react-icons/md";
-import StatusBadge from "@/CvBuilder/StatusBadge";
+import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
+//import PdfDownloader from "@/components/PDFDownloader/PdfDownloader";
 const COLOR_TEAL = "#006666";
-export const formatDate = (dateString: string) => {
-  if(!dateString){return ""}
-  const date = new Date(dateString);
-
-  // Check if year is 1970, return "Present"
-  if (date.getFullYear() === 1970) {
-    return "Present";
-  }
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  const month = months[date.getMonth()];
-  const day = date.getDate().toString().padStart(2, "0");
-  const year = date.getFullYear();
-  if(month==="undefined" || day==="NaN")
-  return "Present";
-  return `${day} ${month} ${year}`;
-};
-const CvOutputPage = () => {
-  const { id } = useParams();
-  const [copied, setCopied] = useState(false);
+const NewCV = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch<React.SetStateAction<boolean>>}) => {
+  // const [copied, setCopied] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
-  //const { user } = useUserData();
-  const [cvData, setCvData] = useState<ICvData>({
-    personal: {
-      fullName: "",
-      email: "",
-      phone: "",
-      city: "",
-      linkedin: "",
-      github: "",
-      summary: "",
-      imgUrl: "",
-      profession:"",
-    },
-    educations: [],
-    experiences: [],
-    skills: [],
-    projects: [],
-    awards: [],
-  });
-
-  // const handlePrint = useReactToPrint({
-  //   contentRef: pdfRef,
-  //   documentTitle: "My CV",
-  //   pageStyle, // inject the styles into print document
-  // });
-
-  const [loading, setLoading] = useState(false);
-  //   const handlePrint = useReactToPrint({
-  //   contentRef: pdfRef,
-  //   documentTitle: "My CV"
-  // });
-  // const formatDate = (dateString: string): string => {
-  //   const date = new Date(dateString);
-  //   console.log("date", dateString);
-  //   const formatedDate = date.toLocaleDateString("en-GB", {
-  //     day: "numeric",
-  //     month: "short",
-  //     year: "numeric",
-  //   });
-  //   console.log("formated date", formatedDate);
-  //   if (formatedDate == "Invalid Date" || formatedDate == "1 Jan 1970") {
-  //     return "Present";
-  //   }
-  //   return formatedDate;
-  // };
-  const userCv = async () => {
-    try {
-      setLoading(true);
-      const res: any = await api.get(`/cv/user-cv/${id}`);
-      if (res.data.success) {
-        setCvData({
-          personal: res.data.data.personal,
-          educations: res.data.data.educations,
-          experiences: res.data.data.experiences,
-          skills: res.data.data.skills,
-          projects: res.data.data.projects,
-          awards: res.data.data.awards,
-        });
-      }
-      console.log("data", res.data);
-    } catch (error) {
-      toast.error("something went wrong");
-      console.log("error while fetching docs", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    userCv();
-  }, []);
-
-  if (loading) {
+  const [title,setTitle] = useState("")
+  const [loading,setLoading] = useState(false)
+  const navigate = useNavigate();
+  if (!cvData) {
     return (
       <div className="flex justify-center items-center h-[80vh]">
         <h1 className="text-4xl font-bold text-[#03257e]">
@@ -148,47 +47,110 @@ const CvOutputPage = () => {
     );
   }
 
-  const copyResumeLink = async (link: string) => {
-    await navigator.clipboard
-      .writeText(link)
-      .then(() => setCopied(true))
-      .catch((err) => {
-        toast.error("something went wrong", err.message);
-      });
-    //console.log("Link copied to clipboard");
-  };
+    const createCv = async()=>{
+      if(!title){
+        toast.error("Please enter a title")
+        return
+      }
+    try {
+      setLoading(true);
+      const res = await api.post("/cv/create-cv",{data:cvData,title:title})
+      console.log(res);
+      if(res.status === 200){
+        toast.success("CV Created Successfully")
+        navigate(`/cv/${res.data.id}`)
+      }
+    } catch (error) {
+      toast.error("Something went wrong")
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  // const downloadPdfHandler = async()=>{
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(`http://localhost:8000/cv/pdfmaker`,{
+  //       method:"POST",
+  //       headers:{
+  //         "Content-Type":"application/json",
+  //         "Authorization": `Bearer ${localStorage.getItem("googleIdToken")}`
+  //       },
+  //       body:JSON.stringify({url:`http://:5173/new-cv/${id}`,selector:"#cv-preview-wrapper",loginMailId:localStorage.getItem("email")})
+  //     })
+  //     if(!response.ok){
+  //       throw new Error("Failed to generate PDF");
+  //     }
+  //     const blob = await response.blob();
+  //     const url = URL.createObjectURL(blob);
+  //     const link = document.createElement("a");
+  //     link.href = url;
+  //     link.download = `${cvData.personalDetails.name}.pdf`;
+  //     link.click();
+  //     URL.revokeObjectURL(url);
+  //     toast.success("PDF downloaded successfully");
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Failed to download PDF");
+  //   }finally{
+  //     setLoading(false);
+  //   }
+  // }
+
+  // const copyResumeLink = async (link: string) => {
+  //   await navigator.clipboard
+  //     .writeText(link)
+  //     .then(() => setCopied(true))
+  //     .catch((err) => {
+  //       toast.error("something went wrong", err.message);
+  //     });
+  //   //console.log("Link copied to clipboard");
+  // };
 
   return (
-    <div className="px-1 mt-5 md:mt-0 md:px-10 mb-10 overflow-x auto ">
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 px-4 py-4">
-        <h1 className="text-xl md:text-2xl text-center font-bold text-[#006666]">
-          Verified Curriculum Vitae (CV) on the Blockchain
-        </h1>
-
-        {/* <Link
-          to={`/new-cv/${id}`}
-          className="px-4 py-2 border-2 border-[#f14419] text-[#f14419] font-semibold rounded-lg hover:bg-[#f14419] hover:text-white transition duration-200"
-        >
-          View Other Template
-        </Link> */}
-
-        <div
-          className="flex items-center gap-2 cursor-pointer text-[#03257e] hover:text-[#006666]"
-          onClick={() => copyResumeLink(`https://www.edubuktrucv.com/cv/${id}`)}
-        >
-          <FaCopy />
-          <span className="font-medium">
-            {copied ? "Copied" : "Copy CV Link"}
-          </span>
-        </div>
-      </div>
-      <div className="w-full text-center text-[#F1441C] text-lg mt-2 lg:hidden">
-        👉 Swipe left/right to view the full CV
-      </div>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      aria-modal="true"
+      role="dialog"
+      onClick={(prev)=>setPreviewCV(!prev)} // click outside to close
+    >
+      {/* modal dialog — stop propagation so clicks inside won't close */}
       <div
+        className="relative w-full max-w-[1100px] mx-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* close button */}
+        <button
+          onClick={(prev)=>setPreviewCV(!prev)}
+          className="absolute -top-3 -right-3 z-60 inline-flex items-center justify-center h-10 w-10 rounded-full bg-white shadow-md border border-gray-200 hover:scale-95 transition"
+          aria-label="Close preview"
+        >
+          ✕
+        </button>
+        <div className="flex items-center gap-2">
+       {loading?<Loader2 className="animate-spin text-[#006666]" />:<button 
+       onClick={createCv} 
+       className="bg-green-600 px-3 py-2 mb-2 text-white text-center rounded"
+       >
+        Create CV</button>
+        }
+       <input type="text" placeholder="Enter resume title"
+       onChange={(e)=>setTitle(e.target.value)}
+       className="w-full rounded px-3 py-2 mb-2 md:w-[200px]"
+       ></input>
+       </div>
+          {/* modal content — make scrollable and nicely padded */}
+        <div
+          ref={pdfRef}
+          className="bg-white rounded-lg overflow-x-scroll max-h-[90vh] print-area"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          <div
         ref={pdfRef}
         className=" mt-2 max-w-6xl mx-auto w-full border  border-l-0 shadow-lg   rounded-md overflow-x-scroll xl:overflow-x-clip"
       >
+        <p className="text-center text-[#f14419]">Scroll left-right to see full content</p>
+        <p className="text-center text-[#03257e]"><span className="font-bold text-[#f14419]">Note: </span>Please check the box <span className="bg-black/20 p-1 rounded ">Select to include this data in your resume</span> from the form to reflect here that data</p>
         {/* main */}
         <div className="flex gap-3 md:gap-7 w-[1100px]">
           {/* left sidebar */}
@@ -779,8 +741,10 @@ const CvOutputPage = () => {
           </div>
         </div>
       </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default CvOutputPage;
+export default NewCV;

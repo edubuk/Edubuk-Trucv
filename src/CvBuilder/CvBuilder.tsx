@@ -6,8 +6,8 @@ import { SkillDetails } from "./SkillsDetails";
 import { ProjectDetails } from "./ProjectsDetails";
 import { AwardDetails } from "./AwardDetails";
 import { v4 as uuidv4 } from "uuid";
-import Resume from "./ResumeTem";
 import { Button } from "@mui/material";
+import NewCV from "./NewCV";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
 //import { dummyCvData } from "./cvDummyData";
 
@@ -112,7 +112,7 @@ export default function CVBuilder() {
         <div className="grid grid-cols-1">
           <div className="col-span-7 p-2 sm:p-6 bg-slate-50 space-y-3">
             <button className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg" onClick={()=>setPreviewCV(true)}>Preview CV</button>
-            {previewCV&&<Resume cvData={cvData} setPreviewCV={setPreviewCV}/>}
+            {previewCV&&<NewCV cvData={cvData} setPreviewCV={setPreviewCV}/>}
             {/* <div className="flex gap-1">
               {dummyCvData.map((cvData,i)=>{
                 return(

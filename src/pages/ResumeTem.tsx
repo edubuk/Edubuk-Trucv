@@ -394,43 +394,7 @@ const Resume: React.FC = () => {
                 </h2>
                 {cvData.awards.map(
                   (award: TypeAward, i) =>
-                    (award.level === "Award" ||
-                      award.level === "Certificate") && (
-                      <div key={i} className="mt-2 space-y-4">
-                        <div>
-                          <div className="flex justify-between items-center">
-                            <h3 className="font-bold text-[#000000]">
-                              {award.name}
-                            </h3>
-                            <p className="text-[#000000] text-right">
-                              {award.duration.from} - {award.duration.to}
-                            </p>
-                          </div>
-                          <ul className="list-disc list-inside text-[#000000] mt-2 pl-6">
-                            {award.description
-                              .split(".")
-                              .filter((point) => point.trim() !== "")
-                              .map((point, i) => (
-                                <li key={i}>
-                                  {point.endsWith(".") ? point : `${point}.`}
-                                </li>
-                              ))}
-                          </ul>
-                        </div>
-                      </div>
-                    )
-                )}
-              </section>
-            )}
-            {/* Awards */}
-            {cvData?.awards?.length > 0 && (
-              <section className="mb-4">
-                <h2 className="text-xl font-semibold text-[#000000] border-b border-black pb-2">
-                  Courses
-                </h2>
-                {cvData.awards.map(
-                  (award: TypeAward, i) =>
-                    award.level === "Course" && (
+                 (
                       <div key={i} className="mt-2 space-y-4">
                         <div>
                           <div className="flex justify-between items-center">
