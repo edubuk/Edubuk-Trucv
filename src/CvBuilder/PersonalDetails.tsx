@@ -41,7 +41,7 @@ export const PersonalDetails = ({ step, setStep,setCvData }: IStepCard) => {
     const [imagePreview, setImagePreview] = useState<string>("");
     const [imageError, setImageError] = useState<string>("");
     const [isImageUploading, setIsImageUploading] = useState<boolean>(false);
-    const [loading,setLoading]=useState<boolean>(false);
+    const [submitting,setSubmitting]=useState<boolean>(false);
 
     const form = useForm<PersonalDetailsItem>({
         resolver: zodResolver(personalDetailsSchema),
@@ -159,7 +159,7 @@ useEffect(() => {
     const submitFormHandler = async(data: PersonalDetailsItem) => {
         console.log("personal data", data);
         try{
-            setLoading(true);
+            setSubmitting(true);
             const updateUser = await api.put(`/user/update-userInfo`,{
                 name:data.fullName,phoneNumber:data.phoneNumber,address:data.location,userImageUrl:data.imageUrl,linkedInUrl:data.linkedin,githubUrl:data.github,selfAttested:data.selfAttested,yearOfExp:data.yearOfExp,profession:profession,profileSummary:data.profileSummary
             })
@@ -169,12 +169,13 @@ useEffect(() => {
             {
                 toast.success(res.message);
                 setRefresh((prev)=>!prev);
+                window.location.reload();
             } 
         }
         catch(error:any){
             toast.error(error.message||error||"something went wrong");
         }finally{
-            setLoading(false);
+            setSubmitting(false);
         }
     };
 
@@ -447,7 +448,7 @@ useEffect(() => {
                         />
                     </div>
 
-                    {!loading?<Button
+                    {!submitting?<Button
                         type="submit"
                         className="mt-2 w-auto w-full bg-[#006666] hover:bg-[#008888] hover:opacity-90"
                     >

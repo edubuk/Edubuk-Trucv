@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { SiHyperskill } from "react-icons/si";
-import { FaBriefcase, FaCopy } from "react-icons/fa";
+import { FaBriefcase, FaCopy, FaGithub } from "react-icons/fa";
 import { GiAchievement } from "react-icons/gi";
 import { BiSolidBriefcase } from "react-icons/bi";
-import { CheckCircle, CircleUser, GraduationCap, Link2, Mail, MapPinned, Phone } from "lucide-react";
+import { CheckCircle, CircleUser, GraduationCap, Link2, Linkedin, Mail, MapPinned, Phone } from "lucide-react";
 // import HyperText from "@/components/ui/AnimateHypertext";
 import ShowVerifications from "@/components/ShowVerifications";
 import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
@@ -262,11 +262,16 @@ const CvOutputPage = () => {
                             <div className="mt-2 flex flex-col gap-2">
                               <div className="text-sm flex flex-col justify-start text-white dark:text-gray-300">
                                 <span className="font-medium text-white">
-                                  {education.boardNameOrDegree || "—"}
+                                  {education.institutionName } | {education.boardNameOrDegree}
                                 </span>
-                                <span className="font-normal ml-0 md:ml-2">
+                                {
+                                  Number(education.gpa)>10?
+                                  <span className="font-bold text-black">Percentage: {education.gpa}%</span>:
+                                  <span className="font-bold text-black">GPA: {education.gpa}</span>
+                                }
+                                {/* <span className="font-normal ml-0 md:ml-2">
                                   GPA: {education.gpa ?? "—"}
-                                </span>{" "}
+                                </span>{" "} */}
                               </div>
 
                               {/* optional duration on the right for larger screens */}
@@ -305,7 +310,7 @@ const CvOutputPage = () => {
                 />
               </div>
               {/* personal details */}
-              <div className="bg-[#006666] rounded-md text-white px-5 py-1 flex md:max-w-3xl w-full gap-2">
+              <div className="bg-[#006666] grid grid-cols-2 rounded-md text-white px-5 py-1 flex md:max-w-3xl w-full gap-3">
                 {/* email and location */}
                 <div className="w-full">
                   <div className="flex flex-col gap-2">
@@ -353,7 +358,7 @@ const CvOutputPage = () => {
                   </div>
                 </div>
                 {/* phoneNumber and profesion */}
-                <div className="w-full">
+                <div className="w-full ml-3">
                   <div className="flex flex-col gap-2">
                     {/* email */}
                     <div className="flex items-center gap-3">
@@ -401,6 +406,54 @@ const CvOutputPage = () => {
                         badge
                       />
                     </div>
+                  </div>
+                </div>
+                <div className="w-full">
+                  <div className="flex gap-2">
+                    {/* email */}
+                    {cvData.personal.github&&<div className="flex items-center gap-3">
+                      <div className="self-start">
+                        <FaGithub
+                          size={24}
+                          className="h-4 w-4 md:h-5 md:w-5 mt-1"
+                        />
+                      </div>
+                      <a 
+                      href={cvData.personal.github}
+                      target="_blank"
+                      className="text-sm md:text-base tracking-wider font-normal underline">
+                        Github
+                      </a>
+                      <ShowVerifications
+                        isAttested={true}
+                        // className="self-start mt-2"
+                        onlySelfAttest
+                        textClass="text-white"
+                        badge
+                      />
+                    </div>}
+                    {cvData.personal.linkedin&&<div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3">
+                      <div className="self-start">
+                        <Linkedin
+                          size={24}
+                          className="h-4 w-4 md:h-5 md:w-5 mt-1"
+                        />
+                      </div>
+                      <a href={cvData.personal.linkedin} 
+                      target="_blank"
+                      className="text-sm md:text-base tracking-wider font-normal underline">
+                        LinkedIn
+                      </a>
+                      <ShowVerifications
+                        isAttested={true}
+                        // className="self-start mt-2"
+                        onlySelfAttest
+                        textClass="text-white"
+                        badge
+                      />
+                    </div>
+                    </div>}
                   </div>
                 </div>
               </div>
@@ -631,7 +684,7 @@ const CvOutputPage = () => {
                                   {/* duration */}
                                   <div className="">
                                     <p className="text-[#006666] italic text-xs md:text-base">
-                                      {formatDate(award.duration?.from!)}
+                                      {formatDate(award.duration?.from!)}{" "}
                                 {award.duration?.to
                                   ? `-${formatDate(award.duration.to!)}`
                                   : ""}

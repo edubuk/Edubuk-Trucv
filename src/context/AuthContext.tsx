@@ -29,6 +29,7 @@ interface IUSER {
 interface UserContextType {
   user: IUSER | null;
   loading: boolean;
+  setLoading:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -87,7 +88,7 @@ export const UserContextProvider = ({
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading }}>
+    <UserContext.Provider value={{ user, loading,setLoading }}>
       {children}
     </UserContext.Provider>
   );

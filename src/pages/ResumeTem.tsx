@@ -232,7 +232,7 @@ const Resume: React.FC = () => {
                 </div>
 
                 {/* LinkedIn */}
-                <div className="flex items-center space-x-2 px-2 leading-[1.25] align-middle">
+                {cvData?.personal?.linkedin && <div className="flex items-center space-x-2 px-2 leading-[1.25] align-middle">
                   <span className="inline-flex items-center align-middle">
                     <FaLinkedin className="text-sm text-[#000000]" />
                   </span>
@@ -244,10 +244,10 @@ const Resume: React.FC = () => {
                   >
                     LinkedIn
                   </a>
-                </div>
+                </div>}
 
                 {/* GitHub */}
-                <div className="flex items-center space-x-2 px-2 leading-[1.25] align-middle">
+                {cvData?.personal?.github && <div className="flex items-center space-x-2 px-2 leading-[1.25] align-middle">
                   <span className="inline-flex items-center align-middle">
                     <FaGithub className="text-sm text-[#000000]" />
                   </span>
@@ -259,7 +259,7 @@ const Resume: React.FC = () => {
                   >
                     GitHub
                   </a>
-                </div>
+                </div>}
               </div>
             </header>
 
@@ -288,7 +288,7 @@ const Resume: React.FC = () => {
                           {edu.duration?.from} - {edu.duration?.to}
                         </p>
                         <p className="text-[#000000] font-semibold font-serif">
-                          GPA: {edu.gpa}/10
+                          {Number(edu.gpa)>10?`Percentage: ${edu.gpa}%`:`GPA: ${edu.gpa}/10`}
                         </p>
                       </div>
                     </div>
