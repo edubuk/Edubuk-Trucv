@@ -133,19 +133,19 @@ const SkillVerification = () => {
 
           {/* Footer Action */}
           <div className="mt-7 border-t border-slate-100 pt-4 flex flex-wrap justify-end gap-3">
-            <button
+            {/* <button
               type="button"
               // onClick={handleReject}
               className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 active:scale-[0.99] transition"
             >
               Decline All
-            </button>
+            </button> */}
             <button
               type="button"
               onClick={handleApprove}
               className="rounded-lg bg-[#006666] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#005050] active:scale-[0.99] transition"
             >
-              Confirm Verification
+              Endorse Above Skills
             </button>
           </div>
         </div>

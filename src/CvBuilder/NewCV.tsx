@@ -149,8 +149,8 @@ const NewCV = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch
         ref={pdfRef}
         className=" mt-2 max-w-6xl mx-auto w-full border  border-l-0 shadow-lg   rounded-md overflow-x-scroll xl:overflow-x-clip"
       >
-        <p className="text-center text-[#f14419]">Scroll left-right to see full content</p>
-        <p className="text-center text-[#03257e]"><span className="font-bold text-[#f14419]">Note: </span>Please check the box <span className="bg-black/20 p-1 rounded ">Select to include this data in your resume</span> from the form to reflect here that data</p>
+        <p className="text-center text-[#f14419] mb-2">Scroll left-right to see full content</p>
+        <p className="text-center text-[#03257e] mb-2"><span className="font-bold text-[#f14419]">Note: </span>Please check the box <span className="bg-black/20 p-1 rounded ">Select to include this data in your resume</span> from the form to reflect here that data</p>
         {/* main */}
         <div className="flex gap-3 md:gap-7 w-[1100px]">
           {/* left sidebar */}
@@ -421,7 +421,7 @@ const NewCV = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch
               </div>
               {/* profile summary */}
               <div className="flex gap-5 items-center  overflow-hidden">
-                <p className="text-sm md:text-base font-semibold  max-w-md lg:max-w-2xl">
+                <p className="text-sm md:text-base font-semibold ">
                   {cvData.personal?.summary}
                 </p>
                 <ShowVerifications
@@ -430,7 +430,7 @@ const NewCV = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatch
                   //     .isSelfAttested
                   // }
                   isAttested={true}
-                  className="self-start mt-2"
+                  className="self-start mt-2 w-[450px]"
                   onlySelfAttest
                   // textClass="text-white"
                 />

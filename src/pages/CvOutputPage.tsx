@@ -458,8 +458,8 @@ const CvOutputPage = () => {
                 </div>
               </div>
               {/* profile summary */}
-              <div className="flex gap-5 items-center  overflow-hidden">
-                <p className="text-sm md:text-base font-semibold  max-w-md lg:max-w-2xl">
+              <div className="flex gap-2 items-center  overflow-hidden">
+                <p className="text-sm md:text-base font-semibold">
                   {cvData.personal?.summary}
                 </p>
                 <ShowVerifications
@@ -468,7 +468,7 @@ const CvOutputPage = () => {
                   //     .isSelfAttested
                   // }
                   isAttested={true}
-                  className="self-start mt-2"
+                  className="self-start mt-2 w-[440px]"
                   onlySelfAttest
                   // textClass="text-white"
                 />

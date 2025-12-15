@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { ArrowLeftSquare, Loader2 } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import 'react-phone-input-2/lib/style.css';
+import api from "@/lib/api";
 // interface UserLoginData {
 //     name: string;
 //     email: string;
@@ -98,28 +99,22 @@ export default function RegistrationPage(): JSX.Element {
             if (!form.email) {
                 toast.error("please enter you email id first");
             }
-            const res = await fetch(`${API_BASE_URL}/user/generateOtp`, {
-                method: "POST",
-                body: JSON.stringify({ email: form.email }),
-                headers: {
-                    "Content-Type": "application/json"
-                }
+            const res = await api.post(`/user/generateOtp`, {
+                email: form.email
             })
-            const data = await res.json()
-            console.log(data)
-            if (!data.success) {
-                toast.error(data.message);
-            }
-
+            const {data} = res.data
+            //console.log(data);
             if (data.status === "Succeeded") {
                 toast.success(`${data.message} to entered email id`)
-
             }
 
             //setForm((prev)=>({...prev, otp:data.otp}))
-        } catch (error) {
-            toast.error("Something went wrong. Try again.")
-            console.log(error)
+        } catch (error:any) {
+            if(error?.response.data.error.code === 11000){
+                toast.error("otp already has been sent, Please wait for 5 minutes to resend it")
+            }else{
+                toast.error("Something went wrong. Try again.")
+            }
         }
         finally {
             setOtpSent(false)

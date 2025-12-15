@@ -8,12 +8,13 @@ const CreateCv = () => {
   if (!user || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p className="text-center text-2xl text-[#03257e]">Please hold on for a few seconds...</p>
+        <p className="text-center text-xl text-[#03257e] mb-10">Please hold on for a few seconds...</p>
       </div>
     );
   }
 
-  return user?.subscriptionPlan=== "pro"?<CVBuilder />:<Navigate to="/pricing" replace />;
+  // return user?.subscriptionPlan=== "pro"?<CVBuilder />:<Navigate to="/pricing" replace />;
+     return user?<CVBuilder />:<Navigate to="/login" replace />;
 };
 
 export default CreateCv;
