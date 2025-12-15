@@ -102,8 +102,8 @@ export default function RegistrationPage(): JSX.Element {
             const res = await api.post(`/user/generateOtp`, {
                 email: form.email
             })
-            const {data} = res.data
-            //console.log(data);
+            const {data} = res
+            //console.log("otp res",data);
             if (data.status === "Succeeded") {
                 toast.success(`${data.message} to entered email id`)
             }
@@ -255,7 +255,7 @@ export default function RegistrationPage(): JSX.Element {
                                         <button
                                         type="button"
                                             disabled={otpSent}
-                                            className="mt-8 w-[170px] lg:w-[110px] rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
+                                            className="mt-8 w-[170px] lg:w-[110px] flex items-center justify-center rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
                                             onClick={otpHandler}
                                             style={{ opacity: otpSent ? 0.7 : 1 }}
                                         >{otpSent ? <Loader2 className="text-white animate-spin" /> : "Get OTP"}</button>
