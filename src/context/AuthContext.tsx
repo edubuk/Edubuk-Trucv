@@ -1,11 +1,5 @@
 import api from "@/lib/api";
 import React, { createContext, useContext, useEffect, useState } from "react";
-
-// interface ISubscriptionData {
-//   userEmail: string;
-//   subscriptionPlan: "free" | "basic" | "pro";
-// }
-
 interface IUSER {
   name: string;
   email: string;
@@ -40,11 +34,11 @@ export const UserContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [user, setUser] = useState<IUSER | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchDetails = async () => {
     try {
-      setLoading(true);
+      //setLoading(true);
       const [data1, data2] = await Promise.allSettled([
         api.get("/user/profile"),
         api.get("/user/subscription"),

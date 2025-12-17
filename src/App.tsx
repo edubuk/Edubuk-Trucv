@@ -66,10 +66,10 @@ useEffect(() => {
               <Route path="cv-builder" element={<Layout><CVBuilder /></Layout>}> </Route>
               <Route path="/password-reset" element={<PasswordResetUI />} />
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />
-              <Route path="/admin" element={<Layout><AdminUsersPage/></Layout>} />
+              <Route path="/admin" element={<Layout><ProtectedRoute><AdminUsersPage/></ProtectedRoute></Layout>} />
               <Route path="/pricing" element={<ProtectedRoute><SubscriptionPlans /></ProtectedRoute>} />
-              <Route path="/create-cv" element={<Layout><CreateCv /></Layout>} />
-              <Route path="/dashboard" element={<Layout><DashBoard /></Layout>} />
+              <Route path="/create-cv" element={<Layout><ProtectedRoute><CreateCv /></ProtectedRoute></Layout>} />
+              <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />
               <Route path="/register" element={<Register />} />
             </Routes>
           </Suspense>

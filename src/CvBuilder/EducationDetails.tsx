@@ -20,13 +20,13 @@ import {
   Calendar,
   Building,
   School,
-  Percent,
   Paperclip,
   ExternalLink,
   BookOpen,
   Replace,
   CheckCircle,
-  Delete
+  Delete,
+  SquarePercent
 } from "lucide-react";
 import { StepCard } from "./StepCard";
 // import { uploadFile } from "@/uploadFile";
@@ -40,6 +40,7 @@ import { isMongoId } from "@/lib/utils";
 import { ICvData } from "./CvBuilder";
 import api from "@/lib/api";
 import StatusBadge from "./StatusBadge";
+
 
 const collegeOptions = [
   {
@@ -618,7 +619,7 @@ export const EducationDetails = ({
                             <FormItem className="w-full sm:col-span-2">
                               <FormLabel>
                                 <div className="flex items-center gap-1">
-                                  <Percent className="text-[#006666] size-4" />
+                                  <SquarePercent className="text-[#006666] size-4" />
                                   {field.level === "Secondary School" ||
                                   field.level === "Higher Secondary School"
                                     ? "Percentage*"
@@ -676,8 +677,8 @@ export const EducationDetails = ({
                               </button>
                             </div>
                           </div>
-                          {!isMongoId(field.id)&&<div className="relative border-t border-gray-300 my-2">
-                            <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2">
+                          {!isMongoId(field.id)&&<div className="relative border-t border-gray-300 my-2 mt-2">
+                            <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2 font-bold">
                               OR
                             </p>
                           </div>}
