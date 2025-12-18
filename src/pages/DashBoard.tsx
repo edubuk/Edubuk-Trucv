@@ -147,7 +147,7 @@ const DashBoard = () => {
 
   return (
     <div className="flex flex-col justify-center items-center h-auto w-full">
-        <div className="flex justify-center items-start gap-2 py-3 w-full bg-[#03257e]">
+        <div className="flex justify-center items-start gap-2 py-5 w-full bg-[#03257e]">
           <div className="relative rounded-lg p-[1px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
         <Button
           className={`text-center border border-slate-300 bg-white text-[#006666] hover:bg-slate-100 ${selected === "docs" ? "text-[#03257e] font-semibold" : "text-[#006666] border"}`}

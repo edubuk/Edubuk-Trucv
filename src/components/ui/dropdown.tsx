@@ -317,7 +317,7 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleAddCustomValue(query)}
               >
-                No result found. Add "{query}"
+                No result found. <span className="font-bold text-[#f14419]">Add </span> "{query}"
               </li>
             ) : (
               filtered.map((opt, idx) => {

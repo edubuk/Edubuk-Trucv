@@ -154,6 +154,7 @@ export default function CVBuilder() {
                 >
                   Next Step
                 </Button>
+                <button className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg" onClick={()=>setPreviewCV(true)}>Preview CV</button>
               </div>
             </div>
           </div>

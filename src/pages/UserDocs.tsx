@@ -144,7 +144,7 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs,setRefr
     <div className="min-h-screen w-full" style={{ background: "#f7f8fb" }}>
 
       {/* Users list */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-4">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-4">
         {user&&
           <div key={user?._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             {/* Collapsible header (acts like profile row) */}

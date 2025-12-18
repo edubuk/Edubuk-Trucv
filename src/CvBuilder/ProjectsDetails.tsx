@@ -40,6 +40,7 @@ export const ProjectDetails = ({
 }: IStepCard) => {
   const [refresh, setRefresh] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isProjectOpen,setOpenProject] = useState<boolean>(false);
   const [idx, setIdx] = useState<number>();
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(ProjectSchema),
@@ -66,6 +67,7 @@ export const ProjectDetails = ({
 
   function addProject(e: React.MouseEvent) {
     e.preventDefault();
+    setOpenProject(true);
     append({
       id: uid("prj"),
       projectName: "",
@@ -77,7 +79,10 @@ export const ProjectDetails = ({
     });
   }
 
-  const removeProject = (index: number) => remove(index);
+  const removeProject = (index: number) => {
+    remove(index);
+    setOpenProject(false);
+  }
 
   function handleSelfAttest(index: number) {
     setValue(`projects.${index}.selfAttested`, true, {
@@ -98,6 +103,7 @@ export const ProjectDetails = ({
       if (result.success) {
         toast.success(result.message);
         setRefresh((prev) => !prev);
+        setOpenProject(false);
       } else {
         toast.error(result.message);
       }
@@ -450,14 +456,15 @@ export const ProjectDetails = ({
                 onClick={addProject}
                 className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
               >
-                <PlusCircle size={16} /> Add Project
+                <PlusCircle size={16} /> {fields.length>0?"Add More Project":"Add Project"}
               </button>
             </div>
             <Button
+            disabled={!isProjectOpen}
               type="submit"
               className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
             >
-              Save
+              {fields.length>0?"Save New Project":"Save Project"}
             </Button>
           </div>
         </StepCard>

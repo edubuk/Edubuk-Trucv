@@ -31,6 +31,7 @@ export const SkillDetails = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModel,setOpenModel] = useState<boolean>(false);
   const [refresh,setRefresh] = useState<boolean>(false);
+  const [isNewSkill,setOpenNewSkill] = useState<boolean>(false);
   const [idx,setIdx]= useState<number>();
   const [selectedSkill,setSelectedSkill] = useState<any>({
     skills:[]
@@ -64,6 +65,7 @@ export const SkillDetails = ({
 
   const handleAddSkill = (e: React.MouseEvent) => {
     e.preventDefault();
+    setOpenNewSkill(true);
     const trimmed = newSkillName.trim();
     if (!trimmed) return;
 
@@ -82,6 +84,7 @@ export const SkillDetails = ({
 
   const removeSkill = (index: number) => {
     remove(index);
+    setOpenNewSkill(false);
   };
 
   const handleSelfAttest = (index: number) => {
@@ -105,6 +108,7 @@ export const SkillDetails = ({
       }
       toast.success(response.message);
       setRefresh((prev) => !prev);
+      setOpenNewSkill(false);
     } catch (error: any) {
       console.log("error", error);
       toast.error(error.response.data.message || error || "Something went wrong");
@@ -421,8 +425,11 @@ export const SkillDetails = ({
                 <LoadingButton className="w-full bg-[#006666] hover:bg-[#008888] active:scale-[0.99] transition" />
               ) : (
                 <>
-                <Button className="w-full bg-[#006666] hover:bg-[#008888] active:scale-[0.99] transition">
-                  Save
+                <Button 
+                  type="submit"
+                  disabled={!isNewSkill}
+                  className="w-full bg-[#006666] hover:bg-[#008888] active:scale-[0.99] transition">
+                  {fields.length > 0?"Save New Skills":"Save Skills"}
                 </Button>
                 </>
               ))}

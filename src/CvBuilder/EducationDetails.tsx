@@ -122,7 +122,7 @@ export const EducationDetails = ({
   // local UI state for proof dialog/upload (example)
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-
+  
   const submitFormHandler = async (index: number) => {
     console.log("error", errors);
     const isValid = await form.trigger(`educations.${index}`);
@@ -652,13 +652,17 @@ export const EducationDetails = ({
                           getValues(`educations.${index}.verified`))
                       ) && (
                         <div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          {
+                          getValues(`educations.${index}.${(field.level==="Secondary School" || field.level==="Higher Secondary School")?"boardNameOrDegree":"institutionName"}`)&& 
+                          !getValues(`educations.${index}.orgId`) ? 
+                          <p className="text-sm text-[#f14419] text-center mb-2">DigiLocker not available for this college/Board</p>:
+                          (<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                               <label className="text-sm font-medium text-gray-700">
                                 Get your document from{" "}
                                 <span className="text-[#6334FA] font-semibold">
-                                  DigiLocker
-                                </span>{" "}
+                                  DigiLocker</span>
+                                {" "}
                                 (Recommended)
                               </label>
                               <button
@@ -676,7 +680,8 @@ export const EducationDetails = ({
                                 />
                               </button>
                             </div>
-                          </div>
+                          </div>)
+                          }
                           {!isMongoId(field.id)&&<div className="relative border-t border-gray-300 my-2 mt-2">
                             <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2 font-bold">
                               OR
