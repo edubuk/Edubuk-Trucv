@@ -12,7 +12,7 @@ const VideoSection = () => {
         {/* <div className="hidden sm:block w-32 h-[350px] bg-gray-300 rounded-md shadow-md"></div> */}
 
         {/* Video with Fixed Height and 16:9 Aspect Ratio */}
-        {/* <div className="relative w-full max-w-[800px] aspect-video rounded-xl overflow-hidden border-4 border-gray-300 shadow-lg">
+        <div className="relative w-full max-w-[800px] aspect-video rounded-xl overflow-hidden border-4 border-gray-300 shadow-lg">
           <iframe
             className="absolute top-0 left-0 w-full h-full"
             src="https://www.youtube.com/embed/vVYQXffnI-8?autoplay=1&mute=1"
@@ -21,7 +21,7 @@ const VideoSection = () => {
             referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
           ></iframe>
-        </div> */}
+        </div>
 
         {/* Right Rectangular Box (Hidden on mobile) */}
         {/* <div className="hidden sm:block w-32 h-[350px] bg-gray-300 rounded-md shadow-md"></div> */}

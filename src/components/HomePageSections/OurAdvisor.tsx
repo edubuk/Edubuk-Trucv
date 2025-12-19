@@ -10,14 +10,14 @@ const OurAdvisor = () => {
 
   const AdvisorsArray = [
   {
-    name: "Dr. Somashekhar",
+    name: "Somashekhar",
     position: "Global Tech Leader",
-    intro: "MBA-MIT Sloan Fellow, INSEAD-EIR, Professor of Innovation & Entreprenurship; VC-Singapore Innovate; AI Venture Guide; Singapore Government IMDA" ,
+    intro: "MBA-MIT Sloan Fellow, INSEAD-EIR, Adjunct Professor of Innovation & Entreprenurship; VC-Singapore Innovate; AI Venture Guide; Singapore Government IMDA" ,
     image: advisor1,
     linkdeinProfile: "https://www.linkedin.com/in/neralakere-somashekhar-soma-9151611/",
   },
   {
-    name: "Ish Anand",
+    name: "Dr. Ish Anand",
     position: "Serial Entrepreneur, Advisor in Startups, Global Citizen",
     intro: `30 years + of experience in Corporates, the Startup Ecosystem and as an Enterpreneur across 5 continents`,
     image: advisor2,
