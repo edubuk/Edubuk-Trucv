@@ -210,7 +210,7 @@ export const AwardItemSchema = z.object({
   }
   if(data.duration.from && data.duration.to)
   {
-    if(data.duration.from < data.duration.to)
+    if(data.duration.from > data.duration.to)
     {
       ctx.addIssue({message:"Start date should be less than end date",path:["duration","from"],code: z.ZodIssueCode.custom})
     }
