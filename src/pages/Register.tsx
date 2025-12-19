@@ -133,7 +133,7 @@ export default function RegistrationPage(): JSX.Element {
     // };
 
     return (
-        <div className="min-h-screen lg:h-screen flex items-center justify-center bg-white">
+        <div className="h-auto flex items-center justify-center bg-white">
             <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center md:px-2">
                 {/* Left - illustration / marketing */}
                 <div className="hidden md:flex flex-col gap-6 p-8 rounded-2xl">
