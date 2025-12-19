@@ -204,6 +204,7 @@ export const EducationDetails = ({
           },
           selfAttested: doc.selfAttested ?? false,
           docUri: doc.docUri ?? "",
+          orgId: doc.orgId ?? "",
           issuerEmailId: doc.issuerEmailId ?? undefined,
           isEmailSend: doc.isEmailSend ?? false,
           verified: doc.verified ?? false,
@@ -654,8 +655,8 @@ export const EducationDetails = ({
                         <div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
                           {
                           getValues(`educations.${index}.${(field.level==="Secondary School" || field.level==="Higher Secondary School")?"boardNameOrDegree":"institutionName"}`)&& 
-                          !getValues(`educations.${index}.orgId`) ? 
-                          <p className="text-sm text-[#f14419] text-center mb-2">DigiLocker not available for this college/Board</p>:
+                          (!getValues(`educations.${index}.orgId`)&&!field.orgId )? 
+                          <p className="text-sm text-[#f14419] text-center mb-2">DigiLocker not available for this college/Board {field.orgId}</p>:
                           (<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                               <label className="text-sm font-medium text-gray-700">

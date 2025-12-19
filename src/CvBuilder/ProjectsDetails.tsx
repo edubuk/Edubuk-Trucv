@@ -40,7 +40,7 @@ export const ProjectDetails = ({
 }: IStepCard) => {
   const [refresh, setRefresh] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isProjectOpen,setOpenProject] = useState<boolean>(false);
+  const [count,setCount] = useState<number>(0);
   const [idx, setIdx] = useState<number>();
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(ProjectSchema),
@@ -67,7 +67,7 @@ export const ProjectDetails = ({
 
   function addProject(e: React.MouseEvent) {
     e.preventDefault();
-    setOpenProject(true);
+    setCount((prev)=>prev+1);
     append({
       id: uid("prj"),
       projectName: "",
@@ -81,7 +81,7 @@ export const ProjectDetails = ({
 
   const removeProject = (index: number) => {
     remove(index);
-    setOpenProject(false);
+    setCount((prev)=>prev-1);
   }
 
   function handleSelfAttest(index: number) {
@@ -103,7 +103,7 @@ export const ProjectDetails = ({
       if (result.success) {
         toast.success(result.message);
         setRefresh((prev) => !prev);
-        setOpenProject(false);
+        setCount(0);
       } else {
         toast.error(result.message);
       }
@@ -460,7 +460,7 @@ export const ProjectDetails = ({
               </button>
             </div>
             <Button
-            disabled={!isProjectOpen}
+            disabled={count===0}
               type="submit"
               className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
             >
