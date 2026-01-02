@@ -42,7 +42,7 @@ const Home:React.FC = () => {
      <div className="relative w-full flex flex-col">
      <div className="relative flex justify-end items-center w-full h-[20px] mt-2 p-6">
           {user&&<div className="flex flex-col justify-center items-center">
-            {user?.subscriptionPlan === "pro" && <Crown size={20} className="absolute -top-1 text-[#008888] bg-white" />}
+            {user?.subscriptionPlan === "pro" && <Crown size={20} className="absolute -top-1 text-[#f14419] bg-white" />}
               <p
                 className="px-3 py-1 font-bold text-2xl text-[#03257e] rounded-full cursor-pointer border-2 border-[#03257e]"
                 onClick={() => setOpenProfile(!openProfile)}

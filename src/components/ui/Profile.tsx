@@ -33,9 +33,12 @@ export default function ProfilePopup({ openProfile, setOpenProfile, user }: { op
         </div>}
         <div className="flex items-center gap-2 mt-3">
           {user?.subscriptionPlan === "pro" ? (
-            <div className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full">
-              <Crown size={16} className="text-yellow-500" />
-              <p className="text-sm font-medium">Pro Member</p>
+            <div>
+              <div className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full">
+                <Crown size={16} className="text-yellow-500" />
+                <p className="text-sm font-medium">Pro Member</p>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Expires on: <span className="font-medium text-green-700">{user?.subscriptionExpiry ? new Date(user.subscriptionExpiry).toLocaleDateString() : 'Unknown'}</span></p>
             </div>
           ) : (
             <Link

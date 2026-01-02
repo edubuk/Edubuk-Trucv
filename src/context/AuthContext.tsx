@@ -17,7 +17,7 @@ interface IUSER {
   profileSummary: string;
   _id?: string; // optional because it may be missing in some flows
   subscriptionPlan?: "free" | "basic" | "pro"; // optional union syntax fixed
-  endDate?: string;
+  subscriptionExpiry?: string;
 }
 
 interface UserContextType {
@@ -64,7 +64,7 @@ export const UserContextProvider = ({
             ? {
                 ...prev,
                 subscriptionPlan: subscription.subscription.subscriptionPlan,
-                endDate: subscription.subscription.endDate,
+                subscriptionExpiry: subscription.subscription.endDate,
               }
             : prev
         );

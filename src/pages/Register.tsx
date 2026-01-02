@@ -103,7 +103,7 @@ export default function RegistrationPage(): JSX.Element {
                 email: form.email
             })
             const {data} = res
-            //console.log("otp res",data);
+            console.log("otp res",data);
             if (data.status === "Succeeded") {
                 toast.success(`${data.message} to entered email id`)
             }
@@ -159,7 +159,13 @@ export default function RegistrationPage(): JSX.Element {
                             <h3 className="text-2xl text-center font-semibold text-[#03257e]">Welcome to <span className="bg-gradient-to-r from-[#03257e] via-[#f14419] to-[#006666] text-transparent bg-clip-text">Edubuk</span></h3>
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-[#03257e]">Create an account</h2>
+                            <h2 className="text-2xl font-bold text-[#03257e]">
+  Create your Edubuk account
+</h2>
+<p className="text-sm text-slate-500 mt-1">
+  Get started by verifying your email and completing your profile.
+</p>
+
                             {/* <p className="text-sm text-slate-500 mt-1">Sign up quickly or continue with Google</p> */}
                         </div>
                         <div className="text-slate-400">Already have an account? <Link to="/login" className="font-lg text-[#03257e] font-bold hover:underline">Log in</Link></div>
@@ -193,7 +199,9 @@ export default function RegistrationPage(): JSX.Element {
                             <div className="w-full border-t border-slate-100" />
                         </div>
                         <div className="relative flex justify-center text-xs">
-                            <span className="bg-white px-3 text-slate-400">sign up with email</span>
+                            <span className="bg-white px-3 text-slate-400">
+                                Or sign up using your email
+                            </span>
                         </div>
                     </div>
 
@@ -207,7 +215,7 @@ export default function RegistrationPage(): JSX.Element {
                                         value={form.fullName}
                                         onChange={handleChange}
                                         className={`mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-200 focus:ring-red-300' : 'border-slate-200 focus:ring-[#03257e]'}`}
-                                        placeholder="Alice Johnson"
+                                        placeholder="Enter your full name"
                                         aria-invalid={errors.fullName ? 'true' : 'false'}
                                     />
                                     {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>}
@@ -219,7 +227,7 @@ export default function RegistrationPage(): JSX.Element {
                                         value={form.address}
                                         onChange={handleChange}
                                         className={`mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 ${errors.address ? 'border-red-200 focus:ring-red-300' : 'border-slate-200 focus:ring-[#03257e]'}`}
-                                        placeholder="Jankipuram,Lucknow,India"
+                                        placeholder="Enter your current address"
                                         aria-invalid={errors.address ? 'true' : 'false'}
                                     />
                                     {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
@@ -242,7 +250,7 @@ export default function RegistrationPage(): JSX.Element {
                                 <label className="block">
                                     <div className="flex justify-between items-center gap-2">
                                         <div>
-                                            <span className="text-sm font-medium text-slate-700">Verify Email through OTP*</span>
+                                            <span className="text-sm font-medium text-slate-700">Email Verification (OTP)*</span>
                                             <input
                                                 type="text"
                                                 placeholder="Enter OTP"
@@ -258,7 +266,7 @@ export default function RegistrationPage(): JSX.Element {
                                             className="mt-8 w-[170px] lg:w-[110px] flex items-center justify-center rounded-lg border px-2 py-3 placeholder-slate-400 text-white focus:outline-none focus:ring-2 bg-[#006666]"
                                             onClick={otpHandler}
                                             style={{ opacity: otpSent ? 0.7 : 1 }}
-                                        >{otpSent ? <Loader2 className="text-white animate-spin" /> : "Get OTP"}</button>
+                                        >{otpSent ? <Loader2 className="text-white animate-spin" /> : "Send OTP"}</button>
                                     </div>
                                 </label>
                             </div>
@@ -271,7 +279,7 @@ export default function RegistrationPage(): JSX.Element {
                                         value={form.password}
                                         onChange={handleChange}
                                         className={`mt-2 block w-full rounded-lg border px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 ${errors.password ? 'border-red-200 focus:ring-red-300' : 'border-slate-200 focus:ring-[#03257e]'}`}
-                                        placeholder="At least 8 characters"
+                                        placeholder="Minimum 8 characters"
                                         aria-invalid={errors.password ? 'true' : 'false'}
                                     />
                                     {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
@@ -324,7 +332,7 @@ export default function RegistrationPage(): JSX.Element {
                             <label className="flex items-start gap-3 mt-1">
                                 <input name="agree" type="checkbox" checked={form.agree} onChange={handleChange} className="mt-1" />
                                 <div className="text-sm text-slate-600">
-                                    I agree to the <Link to="/terms-and-conditions" className="text-[#03257e] font-medium">Terms</Link> and <Link to="/privacy-policy" className="text-[#03257e] font-medium">Privacy Policy</Link>.
+                                    I agree to the <Link to="/terms-and-conditions" className="text-[#03257e] font-medium">Terms & Conditions</Link> and <Link to="/privacy-policy" className="text-[#03257e] font-medium">Privacy Policy</Link>.
                                 </div>
                             </label>
                             {errors.agree && <p className="text-xs text-red-500">{errors.agree}</p>}
@@ -337,7 +345,7 @@ export default function RegistrationPage(): JSX.Element {
                                 className="mt-2 w-full py-3 rounded-lg font-semibold text-white shadow hover:shadow-md focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{ backgroundColor: loading ? '#8aa0d6' : '#03257e' }}
                             >
-                                {loading ? 'Creating account...' : 'Create account'}
+                                {loading ? 'Creating account...' : 'Create my account'}
                             </button>
 
                             <div className="mt-2 flex items-center justify-center gap-3 text-xs text-slate-500">

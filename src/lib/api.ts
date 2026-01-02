@@ -77,7 +77,10 @@ api.interceptors.response.use(
     const isAuthError = status === 401;
     console.log("error response",error.response)
     if(error.response?.status===429){
-      toast.error(error.data.messsage || error.response.data)
+      toast.error(error.response.data.message || "Too many requests. Please try again later.")
+    }
+    if(error.response?.status===400){
+      toast.error(error.response.data.message || "Bad request. Please check your input.")
     }
     const isRefreshEndpoint =
       originalRequest?.url?.includes("/user/refresh-token") ?? false;
