@@ -1,0 +1,75 @@
+# robots.txt for edubuktrucv.com
+# Updated: 2025-12-30
+
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /password-reset
+Disallow: /invalid-token
+Disallow: /cv/
+Disallow: /new-cv/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /*.json$
+Disallow: /*?*utm_source=
+Disallow: /*?*session_id=
+Disallow: /download/
+Disallow: /preview/
+Disallow: /config/
+Disallow: /.env
+Disallow: /backup/
+Disallow: /temp/
+Disallow: /cache/
+
+# Allow static assets
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /fonts/
+Allow: /assets/
+Allow: /static/
+
+# Crawl delays for aggressive bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+# Block problematic bots
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+# Googlebot specific rules
+User-agent: Googlebot
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /cv/
+Disallow: /new-cv/
+
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /assets/
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /dashboard
+Disallow: /admin
+
+# Sitemap
+Sitemap: https://www.edubuktrucv.com/sitemap.xml
