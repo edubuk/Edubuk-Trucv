@@ -65,19 +65,19 @@ const DashBoard = () => {
   const fetchNFTsHandler = async() => {
     setSelected("nft");
     setSidebarOpen(false);
-    try {
-      setIsFetching(true);
-      const res = await api.get("/wallet/assets");
-      console.log("asset res",res);
-      if (res.data.success) {
-        console.log(res.data.data);
-        // setAssetIds(res.data.data);
-      }
-    } catch (error) {
-      toast.error("Failed to fetch assets");
-    } finally {
-      setIsFetching(false);
-    }
+    // try {
+    //   setIsFetching(true);
+    //   const res = await api.get("/wallet/assets");
+    //   console.log("asset res",res);
+    //   if (res.data.success) {
+    //     console.log(res.data.data);
+    //     // setAssetIds(res.data.data);
+    //   }
+    // } catch (error) {
+    //   toast.error("Failed to fetch assets");
+    // } finally {
+    //   setIsFetching(false);
+    // }
   };
 
   useEffect(() => {
