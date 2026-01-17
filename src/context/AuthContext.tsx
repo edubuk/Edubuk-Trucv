@@ -18,6 +18,7 @@ interface IUSER {
   _id?: string; // optional because it may be missing in some flows
   subscriptionPlan?: "free" | "basic" | "pro"; // optional union syntax fixed
   subscriptionExpiry?: string;
+  isHackathonUser?:boolean;
 }
 
 interface UserContextType {
@@ -39,15 +40,17 @@ export const UserContextProvider = ({
   const fetchDetails = async () => {
     try {
       //setLoading(true);
-      const [data1, data2] = await Promise.allSettled([
+      const [data1, data2, data3] = await Promise.allSettled([
         api.get("/user/profile"),
         api.get("/user/subscription"),
+        api.get("/hackathon/is-email-present")
       ]);
 
       const userData = data1.status === "fulfilled" ? data1.value.data : null;
 
       const subscription = data2.status === "fulfilled" ? data2.value.data : null;
-
+      
+      const isHackathonUser = data3.status === "fulfilled" ? data3.value.data : null;
       console.log("User:", userData);
       console.log("Subscription:", subscription);
 
@@ -65,6 +68,7 @@ export const UserContextProvider = ({
                 ...prev,
                 subscriptionPlan: subscription.subscription.subscriptionPlan,
                 subscriptionExpiry: subscription.subscription.endDate,
+                isHackathonUser: isHackathonUser.match
               }
             : prev
         );

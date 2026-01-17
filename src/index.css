@@ -38,3 +38,52 @@
   }
 }
 
+
+/* Snowflake animation */
+.snowflake {
+  top: -20px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  animation-name: snowfall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  color: #bfdbfe; /* soft icy blue */
+}
+
+@keyframes snowfall {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(120px) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* Frost shimmer effect on text */
+.frost-text {
+  background: linear-gradient(
+    120deg,
+    #f14419,
+    #60a5fa,
+    #03257e
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: frostShimmer 4s ease-in-out infinite;
+}
+
+@keyframes frostShimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+

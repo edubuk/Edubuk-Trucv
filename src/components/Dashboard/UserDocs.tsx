@@ -3,7 +3,7 @@ import { ExternalLink, ShieldCheck, FileText,UserCircle} from "lucide-react";
 
 import { useUserData } from "@/context/AuthContext";
 import StatusBadge from "@/CvBuilder/StatusBadge";
-import ResendEmail from "./ResendEmail";
+import ResendEmail from "../../pages/ResendEmail";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 
 const COLOR_PRIMARY = "#03257e";
