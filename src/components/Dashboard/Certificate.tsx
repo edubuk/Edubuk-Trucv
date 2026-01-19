@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import AddCertToLinkedIn from "./AddCertToLinkedIn";
 import toast from "react-hot-toast";
 import ThreeDotLoader from "../Loader/ThreeDotLoader";
+import { useUserData } from "@/context/AuthContext";
 
 interface CertificateProps {
   cvData: any[];
@@ -15,6 +16,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
   const [certificationData, setCertificationData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const {user} = useUserData();
 
   const fetchCertificationData = async () => {
     try {
@@ -204,12 +206,12 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
             <div className="mt-6 space-y-4">
               <div className="flex w-full flex-col items-center gap-3">
                 <AddCertToLinkedIn
-                  certName="SNOW FROST Hackathon Participation Certificate"
-                  organizationId={92792}
+                  certName="SNOW FROST HACKATHON Participation Certificate"
+                  organizationId={108080906}
                   issueYear={2026}
                   issueMonth={1}
                   certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certification?.certUrl}`}
-                  certId={certificationData?.certification?.id}
+                  certId={Number(user?.uuid) || 108080906}
                 />
               </div>
             </div>
