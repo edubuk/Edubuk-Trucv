@@ -31,6 +31,7 @@ import Register from "./pages/Register";
 import PasswordResetUI from "./pages/ForgotPassword";
 import CVBuilder from "./CvBuilder/CvBuilder";
 import CreateCv from "./pages/CreateCv";
+import CertificateTimerPage from "./components/Certification/CertificateTimerPage";
 
 
 function App() {
@@ -71,6 +72,7 @@ useEffect(() => {
               <Route path="/create-cv" element={<Layout><ProtectedRoute><CreateCv /></ProtectedRoute></Layout>} />
               <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />
               <Route path="/register" element={<Register />} />
+              <Route path="/certificate-timer" element={<Layout><ProtectedRoute><CertificateTimerPage /></ProtectedRoute></Layout>} />
             </Routes>
           </Suspense>
     </div>

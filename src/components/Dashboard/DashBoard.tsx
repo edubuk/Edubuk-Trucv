@@ -203,7 +203,9 @@ const DashBoard = () => {
         )}
 
         {selected === "nft" && (
-          <Certificate />
+          <Certificate 
+          cvData={cvData}
+          />
         )}
       </main>
     </div>
