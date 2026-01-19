@@ -18,18 +18,12 @@ const steps = [
   { id: 1, label: "Verification", icon: CheckCircle, endpoint: "/api/verify" },
   {
     id: 2,
-    label: "Certificate Generation",
+    label: "Certificate Generation & Upload",
     icon: FileText,
     endpoint: "/api/generate-certificate",
   },
   {
     id: 3,
-    label: "Certificate Upload",
-    icon: Upload,
-    endpoint: "/api/upload-certificate",
-  },
-  {
-    id: 4,
     label: "Blockchain Registration",
     icon: Shield,
     endpoint: "/api/register-blockchain",

@@ -50,7 +50,7 @@ export const UserContextProvider = ({
 
       const subscription = data2.status === "fulfilled" ? data2.value.data : null;
       
-      const isHackathonUser = data3.status === "fulfilled" ? data3.value.data : null;
+      const isMatch = data3.status === "fulfilled" ? data3.value.data : null;
       console.log("User:", userData);
       console.log("Subscription:", subscription);
 
@@ -68,7 +68,7 @@ export const UserContextProvider = ({
                 ...prev,
                 subscriptionPlan: subscription.subscription.subscriptionPlan,
                 subscriptionExpiry: subscription.subscription.endDate,
-                isHackathonUser: isHackathonUser.match
+                isHackathonUser: isMatch.match
               }
             : prev
         );
