@@ -3,7 +3,6 @@ import { Link, useLocation} from "react-router-dom";
 import {
   CheckCircle,
   FileText,
-  Upload,
   Shield,
   AlertCircle,
   RefreshCw,
@@ -533,12 +532,12 @@ export default function CertificateStepper() {
                   View Certificate
                 </a>
                 <AddCertToLinkedIn
-                  certName={`${allStepData?.topic} Module Completion Certificate`}
+                  certName="SNOW FROST HACKATHON Participation Certificate"
                   organizationId={108080906}
                   issueYear={2026}
                   issueMonth={1}
                   certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${allStepData?.uri}`}
-                  certId={allStepData?.qrId}
+                  certId={Number(user?.uuid)|| 108080906}
                 />
                 <Link to="/dashboard" className="bg-[#016765] text-white cursor-pointer hover:bg-[#016765]/80 py-3 px-6 rounded-xl">
                   Go to Dashboard
