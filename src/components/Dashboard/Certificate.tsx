@@ -82,14 +82,17 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
               animationDuration: `${6 + Math.random() * 4}s`,
             }}
           >
-            ❄
+          🧩
           </span>
         ))}
       </div>
 
       {/* Header text */}
       <h1 className="relative z-10 text-3xl font-bold text-gray-900 text-center frost-text font-['Inter'] text-3xl font-extrabold">
-        SNOW FROST HACKATHON Certification
+        INSIDE THE MIND OF HACKER HACKATHON
+      </h1>
+      <h1 className="relative z-10 text-2xl font-bold text-[#03257e] text-center font-['Inter'] text-2xl font-extrabold">
+        Series - 1 Certification
       </h1>
       <Alert
         variant="destructive"
@@ -160,7 +163,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
               {/* Left */}
               <div>
                 <span className="block text-base font-semibold capitalize text-gray-900">
-                  Spark Hackathon
+                  INSIDE THE MIND OF HACKER
                 </span>
                 <p className="mt-1 text-sm text-gray-500">
                   Taken on 17 Jan 2026
@@ -207,11 +210,11 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
               <div className="flex w-full flex-col items-center gap-3">
                 <AddCertToLinkedIn
                   certName="SNOW FROST HACKATHON Participation Certificate"
-                  organizationId={108080906}
+                  organizationId={110972920}
                   issueYear={2026}
                   issueMonth={1}
                   certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certification?.certUrl}`}
-                  certId={Number(user?.uuid) || 108080906}
+                  certId={Number(user?.uuid) || 110972920}
                 />
               </div>
             </div>

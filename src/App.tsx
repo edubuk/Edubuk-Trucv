@@ -25,13 +25,13 @@ import AppPrivacyPolicy from "./pages/AppPrivacy";
 import SubscriptionPlans from "./components/Subscription/Subscription";
 import GoogleLoginModal from "./pages/Login";
 import ProtectedRoute from "./protectRoute";
-import AdminUsersPage from "./pages/Admin";
 import Layout from "./Layout/Layout";
 import Register from "./pages/Register";
 import PasswordResetUI from "./pages/ForgotPassword";
 import CVBuilder from "./CvBuilder/CvBuilder";
 import CreateCv from "./pages/CreateCv";
 import CertificateTimerPage from "./components/Certification/CertificateTimerPage";
+import AdminDashBoard from "./components/Admin/AdminDashboard";
 
 
 function App() {
@@ -67,7 +67,7 @@ useEffect(() => {
               <Route path="cv-builder" element={<Layout><CVBuilder /></Layout>}> </Route>
               <Route path="/password-reset" element={<PasswordResetUI />} />
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />
-              <Route path="/admin" element={<Layout><ProtectedRoute><AdminUsersPage/></ProtectedRoute></Layout>} />
+              <Route path="/admin" element={<Layout><ProtectedRoute><AdminDashBoard/></ProtectedRoute></Layout>} />
               <Route path="/pricing" element={<ProtectedRoute><SubscriptionPlans /></ProtectedRoute>} />
               <Route path="/create-cv" element={<Layout><ProtectedRoute><CreateCv /></ProtectedRoute></Layout>} />
               <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />

@@ -3,7 +3,7 @@ import { ShieldCheck, X, FileText, Copy, ChevronDown, RefreshCwIcon, Crown, Edit
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
-import AccessDeniedPage from "../pages/AccessDenied";
+import AccessDeniedPage from "../../pages/AccessDenied";
 import { useUserData } from "@/context/AuthContext";
 import UpdateSubscription from "@/components/Subscription/UpdateSubscription";
 import StatusBadge from "@/CvBuilder/StatusBadge";
@@ -106,6 +106,7 @@ export default function AdminUserProfilesPage() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [email, setEmail] = useState<string>("");
   const [cvIds, setCvIds] = useState([]);
+  const [isFetching,setIsFetching] = useState(true);
   const [currentUserId,setCurrentUserId] = useState<string>("");
   const [educationDocs, setEducationDocs] = useState({
     educations: [],
@@ -117,6 +118,7 @@ export default function AdminUserProfilesPage() {
 
   const userListHandler = async () => {
     try {
+      setIsFetching(true);
       setLoading(true);
       const users = await fetch(`${API_BASE_URL}/admin/users-list?page=${pageNum}&email=${email ? email : ""}`, { credentials: "include" })
       const usersList = await users.json();
@@ -134,6 +136,7 @@ export default function AdminUserProfilesPage() {
       toast.error(error.message);
     } finally {
       setLoading(false);
+      setIsFetching(false);
     }
   }
 
@@ -268,6 +271,10 @@ export default function AdminUserProfilesPage() {
     userListHandler();
   }, [pageNum, refreshKey]);
 
+  if(isFetching)
+  {
+    return <ThreeDotLoader w={4} h={4} yPos="center" />;
+  }
 
   return (
     <>
