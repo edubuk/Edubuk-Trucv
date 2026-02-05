@@ -19,6 +19,8 @@ interface IUSER {
   subscriptionPlan?: "free" | "basic" | "pro"; // optional union syntax fixed
   subscriptionExpiry?: string;
   isHackathonUser?:boolean;
+  tag?:string;
+  rank?:string;
 }
 
 interface UserContextType {
@@ -68,7 +70,9 @@ export const UserContextProvider = ({
                 ...prev,
                 subscriptionPlan: subscription.subscription.subscriptionPlan,
                 subscriptionExpiry: subscription.subscription.endDate,
-                isHackathonUser: isMatch.match
+                isHackathonUser: isMatch.match,
+                tag: isMatch.tag,
+                rank: isMatch.rank
               }
             : prev
         );

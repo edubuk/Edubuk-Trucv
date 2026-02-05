@@ -108,6 +108,8 @@ export default function CertificateStepper() {
         },
         body: JSON.stringify({
           name: user?.name,
+          tag:user?.tag,
+          rank:user?.rank
         }),
       });
 
