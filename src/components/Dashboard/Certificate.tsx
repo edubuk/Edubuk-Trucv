@@ -166,7 +166,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
                   INSIDE THE MIND OF HACKER
                 </span>
                 <p className="mt-1 text-sm text-gray-500">
-                  Taken on 17 Jan 2026
+                  Taken on 25 Jan 2026
                 </p>
               </div>
 
@@ -209,7 +209,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
             <div className="mt-6 space-y-4">
               <div className="flex w-full flex-col items-center gap-3">
                 <AddCertToLinkedIn
-                  certName="SNOW FROST HACKATHON Participation Certificate"
+                  certName="INSIDE THE MIND OF HACKER HACKATHON Certificate"
                   organizationId={110972920}
                   issueYear={2026}
                   issueMonth={1}

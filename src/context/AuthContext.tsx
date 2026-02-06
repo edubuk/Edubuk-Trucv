@@ -21,6 +21,7 @@ interface IUSER {
   isHackathonUser?:boolean;
   tag?:string;
   rank?:string;
+  collegeName?:string;
 }
 
 interface UserContextType {
@@ -72,7 +73,8 @@ export const UserContextProvider = ({
                 subscriptionExpiry: subscription.subscription.endDate,
                 isHackathonUser: isMatch.match,
                 tag: isMatch.tag,
-                rank: isMatch.rank
+                rank: isMatch.rank,
+                collegeName: isMatch.collegeName
               }
             : prev
         );

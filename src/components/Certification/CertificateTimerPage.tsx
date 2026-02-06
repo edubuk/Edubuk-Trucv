@@ -107,9 +107,10 @@ export default function CertificateStepper() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          template_type: user?.tag,
           name: user?.name,
-          tag:user?.tag,
-          rank:user?.rank
+          college_name: user?.collegeName,
+          rank: user?.rank
         }),
       });
 
@@ -223,8 +224,9 @@ export default function CertificateStepper() {
         name: allStepDataRef.current.name,
         uri: allStepDataRef.current.uri,
         filehash: allStepDataRef.current.fileHash,
-        issuerName:"Spark Tech AI Hub",
-        certificateType:"Participation Certificate"
+        issuerName:"TechYoGeek Nirvana",
+        certificateType:user?.tag+" Certificate" || "Participation Certificate",
+        hackathonName: "INSIDE THE MIND OF HACKER"
       };
 
       const txData = await fetch(`${API_BASE_URL}/certification/register-on-chain`, {
@@ -534,12 +536,12 @@ export default function CertificateStepper() {
                   View Certificate
                 </a>
                 <AddCertToLinkedIn
-                  certName="SNOW FROST HACKATHON Participation Certificate"
-                  organizationId={108080906}
+                  certName="INSIDE THE MIND OF HACKER HACKATHON Certificate"
+                  organizationId={110972920}
                   issueYear={2026}
                   issueMonth={1}
                   certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${allStepData?.uri}`}
-                  certId={Number(user?.uuid)|| 108080906}
+                  certId={Number(user?.uuid)|| 110972920}
                 />
                 <Link to="/dashboard" className="bg-[#016765] text-white cursor-pointer hover:bg-[#016765]/80 py-3 px-6 rounded-xl">
                   Go to Dashboard

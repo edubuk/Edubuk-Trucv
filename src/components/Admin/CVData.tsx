@@ -2,6 +2,7 @@ import api from "@/lib/api";
 import { useEffect, useState } from "react";
 import ThreeDotLoader from "../Loader/ThreeDotLoader";
 import { ArrowUpRight} from "lucide-react";
+import axios from "axios";
 
 
 const CVData = ()=>{
@@ -40,11 +41,11 @@ const CVData = ()=>{
             if(cvType === "Lisk-CV"){
             setSelectedCV(cvType);
             setFetching(true);
-            // const response = await api.get(`/admin/all-user-cvs?page=${currPage}`);
-            // console.log(response.data);
-            // setCvIds(response.data.data);
-            // setTotalPages(response.data.totalPage);
-            // setTotalCV(response.data.totalCVs);
+            const response = await axios.get(`https://www.edubuktrucvlisk.org/cv/all_user_cvs?page=${currPage}`);
+            console.log(response.data);
+            setCvIds(response.data.cvIds);
+            setTotalPages(response.data.totalPages);
+            setTotalCV(response.data.totalCvs);
             }
             if(cvType === "Educhain-CV"){
             setSelectedCV(cvType);
