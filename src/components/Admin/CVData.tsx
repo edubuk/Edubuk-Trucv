@@ -47,10 +47,19 @@ const CVData = ()=>{
             setTotalPages(response.data.totalPages);
             setTotalCV(response.data.totalCvs);
             }
-            if(cvType === "Educhain-CV"){
+            if(cvType === "Algorand-CV"){
             setSelectedCV(cvType);
             setFetching(true);
-            // const response = await api.get(`/admin/all-user-cvs?page=${currPage}`);
+            const response = await api.get(`https://algorand-trucv-backend.edubuktrucv.com/admin/all-user-cvs?page=${currPage}`);
+            console.log(response.data);
+            setCvIds(response.data.data);
+            setTotalPages(response.data.totalPage);
+            setTotalCV(response.data.totalCVs);
+            }
+            if(cvType === "Educhain-CV"){
+            // setSelectedCV(cvType);
+            // setFetching(true);
+            // const response = await api.get(`https://algorand-trucv-backend.edubuktrucv.com/admin/all-user-cvs?page=${currPage}`);
             // console.log(response.data);
             // setCvIds(response.data.data);
             // setTotalPages(response.data.totalPage);
@@ -97,7 +106,7 @@ const CVData = ()=>{
                     <div className="flex flex-wrap items-center justify-center gap-2">
                         {cvIds?.map((cvId:any) => (
                             <a key={cvId._id} 
-                            href={selectedCV==="TruCV" ? `/cv/${cvId._id}` : selectedCV==="Lisk-CV" ? `https://tru-cv-lisk.vercel.app/cv/${cvId._id}` : selectedCV==="Algorand-CV" ? `https://www.edubuktrucvalgorand.org/cv/${cvId._id}` :`/cv/${cvId._id}`} 
+                            href={selectedCV==="TruCV" ? `/cv/${cvId._id}` : selectedCV==="Lisk-CV" ? `https://tru-cv-lisk.vercel.app/cv/${cvId._id}` : selectedCV==="Algorand-CV" ? `https://algorand.edubuktrucv.com/cv/${cvId._id}` :`/cv/${cvId._id}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="w-full flex mb-2 p-2 bg-[#006666] text-white rounded-lg hover:bg-[#005555] transition-colors">
