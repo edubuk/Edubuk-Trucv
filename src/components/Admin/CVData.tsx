@@ -27,16 +27,11 @@ const CVData = ()=>{
             if(cvType === "Educhain-CV"){
             setSelectedCV(cvType);
             setFetching(true);
-            return (
-                <div>
-                    <p className="items-center text-[#f14419] font-bold text-lg">Under Development...</p>
-                </div>
-            )
-            // const response = await api.get(`/admin/all-user-cvs?page=${currPage}`);
-            // console.log(response.data);
-            // setCvIds(response.data.data);
-            // setTotalPages(response.data.totalPage);
-            // setTotalCV(response.data.totalCVs);
+            const response = await axios.get(`https://educhaintrucv-backend.edubuktrucv.com/admin/all-user-cvs?page=${currPage}`);
+            console.log(response.data);
+            setCvIds(response.data.data);
+            setTotalPages(response.data.totalPage);
+            setTotalCV(response.data.totalCVs);
             }
             if(cvType === "Lisk-CV"){
             setSelectedCV(cvType);
@@ -55,15 +50,6 @@ const CVData = ()=>{
             setCvIds(response.data.data);
             setTotalPages(response.data.totalPage);
             setTotalCV(response.data.totalCVs);
-            }
-            if(cvType === "Educhain-CV"){
-            // setSelectedCV(cvType);
-            // setFetching(true);
-            // const response = await api.get(`https://algorand-trucv-backend.edubuktrucv.com/admin/all-user-cvs?page=${currPage}`);
-            // console.log(response.data);
-            // setCvIds(response.data.data);
-            // setTotalPages(response.data.totalPage);
-            // setTotalCV(response.data.totalCVs);
             }
         } catch (error) {
             console.error('Error fetching CV IDs:', error);
