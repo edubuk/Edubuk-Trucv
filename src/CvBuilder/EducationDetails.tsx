@@ -39,7 +39,8 @@ import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
 import { ICvData } from "./CvBuilder";
 import api from "@/lib/api";
-import StatusBadge from "./StatusBadge";
+import StatusBadge from "./StatusBadge"; 
+import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 
 
 const collegeOptions = [
@@ -84,12 +85,15 @@ export const EducationDetails = ({
   setCvData: React.Dispatch<React.SetStateAction<any>>;
   cvData: ICvData;
 }) => {
-  const [refresh, setRefresh] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(true);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   //const { user } = useUserData();
   const [idx, setIdx] = useState<number>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
   const [openDigiLocker, setOpenDigiLocker] = useState<boolean>(false);
+  const [parsedEducationData, setParsedEducationData] = useState<[]>();
+  const cvDataFromStorage = localStorage.getItem("educations");
+
   const form = useForm<EducationFormValues>({
     resolver: zodResolver(EducationSchema),
     defaultValues: {
@@ -132,23 +136,23 @@ export const EducationDetails = ({
     const payload = getValues(`educations.${index}`);
     try {
       setIdx(index);
-      setLoading(true);
+      setLoadingState("Submitting");
       const result = await api.post(`/doc/save-eduDoc`, {
         data: payload,
       });
       const res = await result.data;
       if (!res.success) {
         toast.error(res.message);
-        setLoading(false);
         return;
       }
       toast.success(res.message);
-      setLoading(false);
       setRefresh((prev) => !prev);
+      updateLocalStorageData(payload.level);
+      
     } catch (error: any) {
       toast.error(error.message ?? error ?? "Something went wrong");
     } finally {
-      setLoading(false);
+      setLoadingState(null);
     }
   };
 
@@ -216,11 +220,17 @@ export const EducationDetails = ({
       }
     } catch (error) {
       toast.error("something went wrong");
+    }finally{
+      setRefresh(false);
     }
   };
 
   useEffect(() => {
     fetchEducationsDocs();
+    const cvDataFromStorageParsed = cvDataFromStorage ? JSON.parse(cvDataFromStorage) : null;
+    if(cvDataFromStorageParsed){
+      setParsedEducationData(cvDataFromStorageParsed);
+    }
   }, [step === 2, refresh]);
 
   const updateHandler = async (index: number) => {
@@ -230,6 +240,7 @@ export const EducationDetails = ({
       if (!isValid) return;
       const payload = getValues(`educations.${index}`);
       console.log("payload", payload);
+      setLoadingState("Updating");
       const data = await api.put(`/doc/update-eduDoc/${payload.id}`, {
         data: payload,
       });
@@ -242,6 +253,8 @@ export const EducationDetails = ({
       setRefresh((prev) => !prev);
     } catch (error) {
       toast.error("something went wrong");
+    } finally {
+      setLoadingState(null);
     }
   };
 
@@ -250,7 +263,7 @@ export const EducationDetails = ({
       const confirm = window.confirm("Are you sure you want to delete this educational document?");
       if (!confirm) return;
       setIdx(index);
-      setLoading(true);
+      setLoadingState("Deleting")
       const payload = getValues(`educations.${index}`);
       const res = await api.delete(`/doc/delete-eduDoc/${payload.id}`);
       if (!res.data.success) {
@@ -259,10 +272,10 @@ export const EducationDetails = ({
       }
       toast.success(res.data.message);
       setRefresh((prev) => !prev);
-      setLoading(false);
-    } catch (error: any) {
+    } catch (error: any)  {
       toast.error(error.message ?? error ?? "something went wrong");
-      setLoading(false);
+    } finally {
+      setLoadingState(null);
     }
   };
 
@@ -311,7 +324,6 @@ export const EducationDetails = ({
 
   function handleToggleInclude(index: number) {
     const payload = buildEducationPayload(index);
-
     setCvData((prev: any) => {
       const exists = prev.educations.some((e: any) => e.id === payload.id);
       if (exists) {
@@ -326,6 +338,41 @@ export const EducationDetails = ({
       }
     });
   }
+
+
+  const fillParsedEducationDetails = ()=>{
+   if(parsedEducationData)
+   {
+    parsedEducationData.map((doc:any)=>
+      append({
+      id: uid("edu"),
+      eduDocId: docId(),
+      level: doc.level==="Grade 10"?"Secondary School":doc.level==="Grade 12"?"Higher Secondary School":doc.level==="Undergraduate"?"Graduation":"PostGraduation",
+      boardNameOrDegree: doc.boardNameOrDegree==="CBSE"?"Central Board of Secondary Education(CBSE)":"",
+      institutionName: doc.institutionName ?? "",
+      gpa: doc.gpa.split("/")[0] ?? "",
+      orgId:doc.boardNameOrDegree==="CBSE"?"000027":"",
+      duration: { from: "", to: "" },
+      selfAttested: false,
+      isEmailSend: false,
+      verified: false,
+      status: "pending",
+    }))
+   }
+  }
+
+  const updateLocalStorageData = (level:string)=>{
+    if(parsedEducationData){
+      const cvData = cvDataFromStorage ? JSON.parse(cvDataFromStorage):null;
+      const filterLevel = level==="Secondary School"?"Grade 10":level==="Higher Secondary School"?"Grade 12":level==="Graduation"?"Undergraduate":"Postgraduate"
+      const updatedData = cvData?.filter((doc:any)=>
+        doc.level!==filterLevel
+      )
+      localStorage.setItem("educations",JSON.stringify(updatedData))
+    }
+  }
+
+
 
   return (
     <>
@@ -343,11 +390,15 @@ export const EducationDetails = ({
               Add education entries. Choose school or college. Each entry can be
               self-attested and have proof uploaded.
             </p>
-            <div className="mt-4 space-y-4">
+            {refresh?<ThreeDotLoader w={3} h={3} yPos="center"/>:<div className="mt-4 space-y-4">
               {fields.map((field, index) => {
                 // Use field values if you need quick read-only access:
                 //const levelPath = `educations.${index}.level` as const;
                 return (
+                  <>
+                    {!isMongoId(field.id) &&<div className="flex items-center justify-center border-dashed border-[#03257e] border-b">
+                      <span className="relative top-4 bg-white p-1 text-md text-center text-[#03257e]">Save New Document</span>
+                    </div>}
                   <div
                     key={field.rhfKey}
                     className="border p-4 md:p-6 rounded-xl bg-white shadow-sm"
@@ -416,13 +467,13 @@ export const EducationDetails = ({
                         <div className="flex items-center gap-1">
                           {isMongoId(field.id) ? (
                             <Button
-                              disabled={field.verified || loading}
+                              disabled={field.verified || loadingState==="Updating"}
                               type="button"
                               onClick={() => updateHandler(index)}
                               className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/80 active:scale-[0.99] transition"
                             >
                               <Replace size={18} />{" "}
-                              {loading && idx === index
+                              {loadingState === "Updating" && idx === index
                                 ? "Updating..."
                                 : "Update"}
                             </Button>
@@ -437,12 +488,13 @@ export const EducationDetails = ({
                           )}
                           {isMongoId(field.id) && (
                             <Button
-                              disabled={field.verified || loading}
+                              disabled={field.verified || loadingState==="Deleting"}
                               type="button"
                               onClick={() => deleteHandler(index)}
                               className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
                             >
-                              <Delete size={18} /> Delete
+                              <Delete size={18} />
+                              {loadingState === "Deleting" ? "Deleting..." : "Delete"}
                             </Button>
                           )}
                         </div>
@@ -854,18 +906,6 @@ export const EducationDetails = ({
                                   </>
                                 )}
                               />
-
-                              {/* <Button
-                              type="button"
-                              onClick={() => emailHandler(index)}
-                              className="whitespace-nowrap"
-                            >
-                              {loading ? (
-                                <LoadingButton />
-                              ) : (
-                                "Send Email To Issuer"
-                              )}
-                            </Button> */}
                             </div>
                           </div>}
                         </div>
@@ -885,7 +925,7 @@ export const EducationDetails = ({
                         />
                       )}
                     </div>
-                    {loading
+                    {loadingState==="Submitting"
                       ? index === idx && (
                           <LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]" />
                         )
@@ -899,6 +939,7 @@ export const EducationDetails = ({
                           </Button>
                         )}
                   </div>
+                  </>
                 );
               })}
 
@@ -917,8 +958,15 @@ export const EducationDetails = ({
                 >
                   <PlusCircle size={16} /> Add College
                 </button>
+                {parsedEducationData&&parsedEducationData.length>0&&<button
+                  type="button"
+                  onClick={fillParsedEducationDetails}
+                  className="flex items-center gap-2 px-3 py-1 bg-[#03257e] rounded border shadow-lg border-[#03257e] text-white"
+                >
+                  <PlusCircle size={16} /> Fill from Parsed Data
+                </button>}
               </div>
-            </div>
+            </div>}
           </StepCard>
         </form>
       </Form>

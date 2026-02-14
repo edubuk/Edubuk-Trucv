@@ -35,6 +35,7 @@ import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
 import StatusBadge from "./StatusBadge";
+import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 //import { useUserData } from "@/context/AuthContext";
 
 export const ExperienceDetails = ({
@@ -46,7 +47,11 @@ export const ExperienceDetails = ({
   cvData,
 }: IStepCard) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(true);
+  const [parsedExperienceData, setParsedExperienceData] = useState<[]>();
+
+  const cvDataFromStorage = localStorage.getItem("experiences");
+
   // const {user} = useUserData();
   const form = useForm<ExperienceFormValues>({
     resolver: zodResolver(ExperienceSchema),
@@ -74,8 +79,8 @@ export const ExperienceDetails = ({
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isCurrentlyWorking, setIsCurrentlyWorking] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [idx, setIdx] = useState<number>();
+  const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -122,23 +127,24 @@ export const ExperienceDetails = ({
     const payload = getValues(`experiences.${index}`);
     try {
       setIdx(index);
-      setLoading(true);
+      setLoadingState("Submitting");
       const result = await api.post(`/doc/save-expDoc`, {
         data: payload,
       });
       const res = await result.data;
       if (!res.success) {
         toast.error(res.message);
-        setLoading(false);
+        setLoadingState(null);
         return;
       }
       toast.success(res.message);
-      setLoading(false);
+      setLoadingState(null);
       setRefresh((prev) => !prev);
+      updateLocalStorageData(payload.jobRole);
     } catch (error: any) {
       toast.error(error.message ?? error ?? "Something went wrong");
     } finally {
-      setLoading(false);
+      setLoadingState(null);
     }
   };
 
@@ -171,17 +177,23 @@ export const ExperienceDetails = ({
       }
     } catch (error) {
       toast.error("something went wrong");
+    }finally{
+      setRefresh(false);
     }
   };
 
   useEffect(() => {
     fetchExpDocs();
+    if(cvDataFromStorage){
+      setParsedExperienceData(JSON.parse(cvDataFromStorage));
+    }
   }, [step === 3, refresh]);
 
   const updateHandler = async (index: number) => {
     try {
       const isValid = await form.trigger(`experiences.${index}`);
       if (!isValid) return;
+      setLoadingState("Updating");
       const payload = getValues(`experiences.${index}`);
       console.log("payload", payload);
       const data = await api.put(`/doc/update-expDoc/${payload.id}`, {
@@ -190,12 +202,15 @@ export const ExperienceDetails = ({
       const res = await data.data;
       if (!res.success) {
         toast.error(res.message);
+        setLoadingState(null);
         return;
       }
       toast.success(res.message);
+      setLoadingState(null);
       setRefresh((prev) => !prev);
     } catch (error) {
       toast.error("something went wrong");
+      setLoadingState(null);
     }
   };
 
@@ -203,21 +218,22 @@ export const ExperienceDetails = ({
     try {
       const confirm = window.confirm("Are you sure you want to delete this experience document?");
       if (!confirm) return;
-      setLoading(true);
+      setLoadingState("Deleting");
       setIdx(index);
       const payload = getValues(`experiences.${index}`);
       const res = await api.delete(`/doc/delete-expDoc/${payload.id}`);
       console.log("res", res);
       if (!res.data.success) {
         toast.error(res.data.message);
+        setLoadingState(null);
         return;
       }
       toast.success(res.data.message);
+      setLoadingState(null);
       setRefresh((prev) => !prev);
-      setLoading(false);
     } catch (error: any) {
       toast.error(error.message ?? error ?? "something went wrong");
-      setLoading(false);
+      setLoadingState(null);
     }
   };
 
@@ -273,6 +289,37 @@ export const ExperienceDetails = ({
     });
   }
 
+  const fillParsedExperienceDetails = (e: React.MouseEvent)=>{
+    e.preventDefault();
+   if(parsedExperienceData)
+   {
+    parsedExperienceData.map((doc:any)=>
+      append({
+      id: uid("exp"),
+      expDocId: docId(),
+      companyName:doc.companyName,
+      jobRole:doc.jobRole,
+      duration: { from: "", to: "" },
+      skills:doc.skills || "",
+      description:doc.description || "",
+      selfAttested: false,
+      isEmailSend: false,
+      verified: false,
+      status: "pending",
+    }))
+   }
+  }
+
+  const updateLocalStorageData = (jobRole:string)=>{
+    if(parsedExperienceData){
+      const cvData = cvDataFromStorage ? JSON.parse(cvDataFromStorage):null;
+      const updatedData = cvData?.filter((doc:any)=>
+        doc.jobRole!==jobRole
+      )
+      localStorage.setItem("experiences",JSON.stringify(updatedData))
+    }
+  }
+
   return (
     <Form {...form}>
       <form>
@@ -287,9 +334,13 @@ export const ExperienceDetails = ({
             Add professional experiences. Each entry supports proof upload and
             self-attestation.
           </p>
+          {refresh?<ThreeDotLoader w={3} h={3} yPos="center"/>:
           <div className="mt-4 space-y-4">
             {fields.map((field, index) => (
               <>
+              {!isMongoId(field.id) &&<div className="flex items-center justify-center border-dashed border-[#03257e] border-b">
+                <span className="relative top-4 bg-white p-1 text-md text-center text-[#03257e]">Save New Document</span>
+              </div>}
                 {isMongoId(field.id) && (
                   <div className="flex justify-start items-center gap-2">
                     <input
@@ -348,12 +399,12 @@ export const ExperienceDetails = ({
                         {isMongoId(field.id) ? (
                           <Button
                             type="button"
-                            disabled={field.verified || loading}
+                            disabled={field.verified}
                             onClick={() => updateHandler(index)}
                             className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
                           >
                             <Replace size={18} />{" "}
-                            {loading && idx === index
+                            {loadingState === "Updating" && idx === index
                               ? "Updating..."
                               : "Update"}
                           </Button>
@@ -368,12 +419,15 @@ export const ExperienceDetails = ({
                         )}
                         {isMongoId(field.id) && (
                           <Button
-                            disabled={field.verified || loading}
+                            disabled={field.verified}
                             type="button"
                             onClick={() => deleteHandler(index)}
                             className="mt-2 px-1 sm:py-1 sm:px-3 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
                           >
-                            <Delete size={18} /> Delete
+                            <Delete size={18} /> 
+                            {loadingState === "Deleting" && idx === index
+                              ? "Deleting..."
+                              : "Delete"}
                           </Button>
                         )}
                       </div>
@@ -671,7 +725,7 @@ export const ExperienceDetails = ({
                       </div>
                     </div>
                   )}
-                  {loading
+                  {loadingState==="Submitting"
                     ? index === idx && (
                         <LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]" />
                       )
@@ -688,15 +742,22 @@ export const ExperienceDetails = ({
               </>
             ))}
 
-            <div>
+            <div className="flex justify-start items-center gap-2">
               <button
                 onClick={addExperience}
                 className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
               >
                 <PlusCircle size={16} /> Add Experience
               </button>
+             {parsedExperienceData &&parsedExperienceData.length>0&&<button
+                onClick={fillParsedExperienceDetails}
+                className="flex items-center shadow-lg border-[#03257e] text-white bg-[#03257e] gap-2 px-3 py-1 rounded border"
+              >
+                <PlusCircle size={16} /> Fill from Parsed Data
+              </button>}              
             </div>
           </div>
+          }
         </StepCard>
       </form>
     </Form>
