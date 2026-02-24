@@ -8,7 +8,7 @@ import { AwardDetails } from "./AwardDetails";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@mui/material";
 import NewCV from "./NewCV";
-import { UploadIcon } from "lucide-react";
+import { UploadCloud, UploadIcon } from "lucide-react";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
@@ -145,11 +145,12 @@ export default function CVBuilder() {
               <button onClick={clearParsedCV} className="bg-red-500 text-white px-2 py-1 rounded">Clear Parsed CV</button>
               </div>
               :<button
-                className="bg-[#03257e] text-white px-2 py-1 rounded"
+              type="button"
+                className="flex items-center gap-1 bg-[#03257e] text-white px-2 py-1 rounded"
                 onClick={() => setShowParsedModel(true)}
                 disabled={isParsing}
               >
-                Import Your CV
+                <UploadCloud size={18}/> Import Your CV
               </button>}
               {showParsedModel && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70">

@@ -107,10 +107,8 @@ export default function CertificateStepper() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          template_type: user?.tag,
+          template_type:"participation",
           name: user?.name,
-          college_name: user?.collegeName,
-          rank: user?.rank
         }),
       });
 
@@ -224,9 +222,9 @@ export default function CertificateStepper() {
         name: allStepDataRef.current.name,
         uri: allStepDataRef.current.uri,
         filehash: allStepDataRef.current.fileHash,
-        issuerName:"TechYoGeek Nirvana",
-        certificateType:user?.tag+" Certificate" || "Participation Certificate",
-        hackathonName: "INSIDE THE MIND OF HACKER"
+        issuerName:"TechEra",
+        certificateType:"Participation",
+        hackathonName: "CV To CAREER: A TruTalk by Edubuk x TechEra"
       };
 
       const txData = await fetch(`${API_BASE_URL}/certification/register-on-chain`, {
@@ -536,12 +534,12 @@ export default function CertificateStepper() {
                   View Certificate
                 </a>
                 <AddCertToLinkedIn
-                  certName="INSIDE THE MIND OF HACKER HACKATHON Certificate"
-                  organizationId={110972920}
+                  certName="CV To CAREER: A TruTalk by Edubuk x TechEra"
+                  organizationId={108289846}
                   issueYear={2026}
-                  issueMonth={1}
+                  issueMonth={2}
                   certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${allStepData?.uri}`}
-                  certId={Number(user?.uuid)|| 110972920}
+                  certId={Number(user?.uuid)|| 108289846}
                 />
                 <Link to="/dashboard" className="bg-[#016765] text-white cursor-pointer hover:bg-[#016765]/80 py-3 px-6 rounded-xl">
                   Go to Dashboard

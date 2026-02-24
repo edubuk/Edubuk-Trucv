@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DigilockerImg from "../assets/digilocker.svg";
 import {
@@ -93,6 +93,7 @@ export const EducationDetails = ({
   const [openDigiLocker, setOpenDigiLocker] = useState<boolean>(false);
   const [parsedEducationData, setParsedEducationData] = useState<[]>();
   const cvDataFromStorage = localStorage.getItem("educations");
+  const [customLevel,setCustomLevel] = useState<string>();
 
   const form = useForm<EducationFormValues>({
     resolver: zodResolver(EducationSchema),
@@ -163,6 +164,7 @@ export const EducationDetails = ({
       | "Graduation"
       | "PostGraduation"
       | "Other"
+      | any
   ) => {
     append({
       id: uid("edu"),
@@ -372,7 +374,15 @@ export const EducationDetails = ({
     }
   }
 
-
+  const addCustomLevel = (index:number,field:any)=>{
+    if(customLevel)
+    {
+     update(index, {
+    ...field,
+    level: customLevel,
+  });
+    }
+  }
 
   return (
     <>
@@ -510,31 +520,49 @@ export const EducationDetails = ({
                           Select your education level*
                         </label>
                         <select
-                        disabled={field.verified}
-                          value={field.level}
-                          onChange={(e) =>
-                            update(index, {
-                              ...field,
-                              level: e.target.value as
-                                | "Secondary School"
-                                | "Higher Secondary School"
-                                | "Graduation"
-                                | "PostGraduation"
-                                | "Other",
-                            })
-                          }
-                          className="border text-[#03257e] bg-gray-100 h-9 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#006666]"
-                        >
-                          <option value="Secondary School">
-                            Secondary School
-                          </option>
-                          <option value="Higher Secondary School">
-                            Higher Secondary School
-                          </option>
-                          <option value="Graduation">Graduation</option>
-                          <option value="PostGraduation">PostGraduation</option>
-                          <option value="Other">Other</option>
+  disabled={field.verified}
+  value={field.level}
+  onChange={(e) =>
+    update(index, {
+      ...field,
+      level: e.target.value,
+    })
+  }
+  className="border text-[#03257e] bg-gray-100 h-9 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#006666]"
+>
+  <option value="">Select level</option>
+  <option value="Secondary School">Secondary School</option>
+  <option value="Higher Secondary School">Higher Secondary School</option>
+  <option value="Graduation">Graduation</option>
+  <option value="PostGraduation">PostGraduation</option>
+
+  {customLevel && (
+    <option value={customLevel}>
+      {customLevel}
+    </option>
+  )}
+
+  <option value="Other">Other</option>
                         </select>
+                        {
+                          field.level==="Other"&&
+                          <div className="flex gap-2 mt-1">
+                          <input
+                            type="text"
+                            value={customLevel}
+                            onChange={(e: any) => setCustomLevel(e.target.value)}
+                            placeholder="Enter your level"
+                            className="border text-[#03257e] bg-gray-100 h-9 rounded w-full px-2 focus:outline-none focus:ring-1 focus:ring-[#006666]"
+                          />
+                          <button
+                            type="button"
+                            className="flex gap-1 items-center bg-[#03257e] text-white px-2 py-1 rounded-lg hover:bg-[#005555]"
+                            onClick={()=>addCustomLevel(index,field)}
+                          >
+                            <PlusCircle size={18}/>Add
+                          </button>
+                        </div>
+                        }
                       </div>
 
                       {/* Duration: startDate & endDate */}
@@ -552,8 +580,7 @@ export const EducationDetails = ({
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                disabled={field.verified}
-                                  type="date"
+                                type="date"
                                   placeholder="YYYY"
                                   {...innerField}
                                 />
@@ -676,7 +703,7 @@ export const EducationDetails = ({
                                   {field.level === "Secondary School" ||
                                   field.level === "Higher Secondary School"
                                     ? "Percentage*"
-                                    : "GPA*"}
+                                    : "GPA(Grade Point Average)*"}
                                 </div>
                               </FormLabel>
                               <FormControl>
@@ -686,7 +713,7 @@ export const EducationDetails = ({
                                     field.level === "Secondary School" ||
                                     field.level === "Higher Secondary School"
                                       ? "Percentage*"
-                                      : "GPA*"
+                                      : "GPA(Grade Point Average)*"
                                   }
                                   className="w-full"
                                   {...f}
@@ -956,7 +983,7 @@ export const EducationDetails = ({
                   onClick={() => addEducation("Graduation")}
                   className="flex items-center gap-2 px-3 py-1 rounded border shadow-lg border-[#03257e] text-[#03257e]"
                 >
-                  <PlusCircle size={16} /> Add College
+                  <PlusCircle size={16} /> Add Univrsity/College
                 </button>
                 {parsedEducationData&&parsedEducationData.length>0&&<button
                   type="button"
