@@ -201,7 +201,7 @@ export const PersonalDetails = ({ step, setStep, setCvData }: IStepCard) => {
   const addCustomProfession = () => {
     if(!customProfession?.trim())
         return toast.error("No custom profession is provided")
-    setProfession(customProfession?.trim().toLowerCase() as any);
+    setProfession(customProfession?.trim() as any);
   };
 
   return (
@@ -261,8 +261,13 @@ export const PersonalDetails = ({ step, setStep, setCvData }: IStepCard) => {
                 <option value="entrepreneur">Entrepreneur</option>
                 <option value="freelance">Freelance</option>
                 {customProfession && (
-                  <option value={customProfession.toLowerCase()}>
+                  <option value={customProfession?.trim()}>
                     {customProfession}
+                  </option>
+                )}
+                {user?.profession && (
+                  <option value={user.profession}>
+                    {user.profession}
                   </option>
                 )}
                 <option value="other">Add Other Profession</option>
