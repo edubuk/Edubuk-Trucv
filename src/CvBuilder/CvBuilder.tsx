@@ -109,13 +109,19 @@ export default function CVBuilder() {
   };
 
   const clearParsedCV = () => {
+    try {
     localStorage.removeItem("cvData");
     localStorage.removeItem("educations");
     localStorage.removeItem("experiences");
     localStorage.removeItem("projects");
     localStorage.removeItem("awards");
     localStorage.removeItem("skills");
+    window.location.reload();
+    } catch (error) {
+      console.log("error",error)
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-0 sm:p-6">
@@ -150,7 +156,7 @@ export default function CVBuilder() {
                 onClick={() => setShowParsedModel(true)}
                 disabled={isParsing}
               >
-                <UploadCloud size={18}/> Import Your CV
+                <UploadCloud size={18}/> Import Existing CV
               </button>}
               {showParsedModel && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70">

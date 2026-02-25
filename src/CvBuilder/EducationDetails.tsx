@@ -983,7 +983,7 @@ export const EducationDetails = ({
                   onClick={() => addEducation("Graduation")}
                   className="flex items-center gap-2 px-3 py-1 rounded border shadow-lg border-[#03257e] text-[#03257e]"
                 >
-                  <PlusCircle size={16} /> Add Univrsity/College
+                  <PlusCircle size={16} /> Add University/College
                 </button>
                 {parsedEducationData&&parsedEducationData.length>0&&<button
                   type="button"
