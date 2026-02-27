@@ -89,11 +89,11 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
 
       {/* Header text */}
       <h1 className="relative z-10 text-3xl font-bold text-gray-900 text-center frost-text font-['Inter'] text-3xl font-extrabold">
-        INSIDE THE MIND OF HACKER HACKATHON
+       CV To CAREER: A TruTalk by Edubuk x TechEra
       </h1>
-      <h1 className="relative z-10 text-2xl font-bold text-[#03257e] text-center font-['Inter'] text-2xl font-extrabold">
+      {/* <h1 className="relative z-10 text-2xl font-bold text-[#03257e] text-center font-['Inter'] text-2xl font-extrabold">
         Series - 1 Certification
-      </h1>
+      </h1> */}
       <Alert
         variant="destructive"
         className="rounded-2xl border-l-4 border-red-600 shadow-md max-w-xl mx-auto my-5 "
@@ -163,10 +163,10 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
               {/* Left */}
               <div>
                 <span className="block text-base font-semibold capitalize text-gray-900">
-                  INSIDE THE MIND OF HACKER
+                  CV To CAREER
                 </span>
                 <p className="mt-1 text-sm text-gray-500">
-                  Taken on 25 Jan 2026
+                  Taken on 8 Feb 2026
                 </p>
               </div>
 
@@ -209,12 +209,12 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
             <div className="mt-6 space-y-4">
               <div className="flex w-full flex-col items-center gap-3">
                 <AddCertToLinkedIn
-                  certName="INSIDE THE MIND OF HACKER HACKATHON Certificate"
-                  organizationId={110972920}
+                  certName="CV To CAREER: A TruTalk by Edubuk x TechEra"
+                  organizationId={108289846}
                   issueYear={2026}
-                  issueMonth={1}
+                  issueMonth={2}
                   certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certification?.certUrl}`}
-                  certId={Number(user?.uuid) || 110972920}
+                  certId={Number(user?.uuid) || 108289846}
                 />
               </div>
             </div>

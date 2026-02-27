@@ -35,7 +35,7 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
   (
     {
       className,
-      placeholder = "Search with full board or college name",
+      placeholder = "Search with full board or university/college name",
       searchable = true,
       onSearch,
       fetcher = defaultFetcher,
@@ -317,7 +317,7 @@ const DropDown = React.forwardRef<HTMLSelectElement, DropDownProps>(
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleAddCustomValue(query)}
               >
-                No result found. <span className="font-bold text-[#f14419]">Add </span> "{query}"
+                No result found. <span className="font-bold text-white bg-[#03257e] px-2 py-1 rounded mr-1">Add </span><span className="font-bold text-red-500">{query}</span>
               </li>
             ) : (
               filtered.map((opt, idx) => {
