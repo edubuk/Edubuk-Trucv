@@ -1,4 +1,4 @@
-import {instLogos,govLogos,blcLogos,accLogos,mediaLogos,foreignLogos,finLogos } from "../../utils";
+import {instLogos,blcLogos,accLogos,mediaLogos,foreignLogos,finLogos } from "../../utils";
 
 
 const ImageSlider = () => {
@@ -8,27 +8,7 @@ const ImageSlider = () => {
     Awards & Recognitions
   </p>
 
-  <div className="flex justify-start items-center p-2 border-b-2 border-gray-300">
-    <p className="absolute left-0 bg-gray-100 hidden border-b-4 w-[160px] border-[#03257e] sm:flex sm:ml-0 rounded py-2 px-4 text-[#03257e] text-center font-bold text-[10px] sm:text-[15px] md:text-[20px] uppercase leading-none animate-slide-in-right shadow-gray-800 z-20">
-            Education institutes
-          </p>
-      <div className="overflow-hidden sm:py-4">
-        <div
-          key={1} 
-          className="flex animate-slide whitespace-nowrap"
-        >
-          {instLogos.concat(instLogos).map((logo, index) => (
-            <img
-              key={index}
-              src={logo}
-              alt={`logo-${index}`}
-              className="h-9 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"
-            />
-            ))}
-        </div>
-      </div>
-  </div>
-  <div className="flex justify-start items-center p-2 border-b-2 border-gray-300">
+  {/* <div className="flex justify-start items-center p-2 border-b-2 border-gray-300">
       <div className="overflow-hidden sm:py-4">
         <div
           key={2} 
@@ -47,7 +27,7 @@ const ImageSlider = () => {
       <p className="absolute right-0 bg-gray-100 hidden border-b-4 border-[#03257e] sm:flex rounded w-[200px] p-2 text-[#03257e] text-center font-bold text-[10px] sm:text-[15px] md:text-[20px] uppercase leading-none animate-slide-in-right shadow-gray-800 z-20">
             Governments & Regulators
           </p>
-  </div>
+  </div> */}
   <div className="flex justify-start items-center p-2 border-b-2 border-gray-300">
     <p className="absolute left-0 bg-gray-100 hidden border-b-4 p-2 border-[#03257e] sm:flex rounded w-[250px] text-[#03257e] text-center font-bold text-[10px] sm:text-[15px] md:text-[20px] uppercase leading-none animate-slide-in-right shadow-gray-800 z-20">
             Grants & awards by blockchains
@@ -55,14 +35,14 @@ const ImageSlider = () => {
       <div className="overflow-hidden sm:py-4">
         <div
           key={3} 
-          className="flex animate-slide whitespace-nowrap"
+          className="flex animate-slide whitespace-nowrap w-max"
         >
           {blcLogos.concat(blcLogos).map((logo, index) => (
             <img
               key={index}
               src={logo}
               alt={`logo-${index}`}           
-              className="h-9 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"
+              className="h-6 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"
                />
             ))}
         </div>
@@ -72,14 +52,14 @@ const ImageSlider = () => {
       <div className="overflow-hidden sm:py-4">
         <div
           key={4} 
-          className="flex animate-slideOpposite whitespace-nowrap"
+          className="flex animate-slideOpposite whitespace-nowrap w-max"
         >
           {accLogos.concat(accLogos).map((logo, index) => (
             <img
               key={index}
               src={logo}
               alt={`logo-${index}`}
-              className="h-9 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"
+              className="h-6 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"
             />
           ))}
         </div>
@@ -95,14 +75,14 @@ const ImageSlider = () => {
       <div className="overflow-hidden sm:py-4">
         <div
           key={5} 
-          className="flex animate-slide whitespace-nowrap"
+          className="flex animate-slide whitespace-nowrap w-max"
         >
           {mediaLogos.concat(mediaLogos).map((logo, index) => (
             <img
               key={index}
               src={logo}
               alt={`logo-${index}`}
-               className="h-9 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"  
+               className="h-6 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"  
                          />
             ))}
         </div>
@@ -112,14 +92,14 @@ const ImageSlider = () => {
       <div className="overflow-hidden sm:py-4">
         <div
           key={6} 
-          className="flex animate-slideOpposite whitespace-nowrap"
+          className="flex animate-slideOpposite whitespace-nowrap w-max"
         >
           {foreignLogos.concat(foreignLogos).map((logo, index) => (
             <img
               key={index}
               src={logo}
               alt={`logo-${index}`}
-              className="h-9 sm:h-12 w-auto sm:w-auto mx-4 sm:mx-8"
+              className="h-6 sm:h-12 w-auto sm:w-auto mx-4 sm:mx-8"
             />
           ))}
         </div>
@@ -135,7 +115,7 @@ const ImageSlider = () => {
       <div className="overflow-hidden sm:py-4">
         <div
           key={7} 
-          className="flex animate-slide whitespace-nowrap"
+          className="flex animate-slide whitespace-nowrap w-max"
         >
           {finLogos.concat(finLogos).map((logo, index) => (
             <img
@@ -143,6 +123,26 @@ const ImageSlider = () => {
               src={logo}
               alt={`logo-${index}`}
               className="h-9 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"
+            />
+            ))}
+        </div>
+      </div>
+  </div>
+    <div className="flex justify-start items-center p-2 border-b-2 border-gray-300">
+    <p className="absolute right-0 bg-gray-100 hidden border-b-4 w-[160px] border-[#03257e] sm:flex sm:ml-0 rounded py-2 px-4 text-[#03257e] text-center font-bold text-[10px] sm:text-[15px] md:text-[20px] uppercase leading-none animate-slide-in-right shadow-gray-800 z-20">
+            Education institutes
+          </p>
+      <div className="overflow-hidden sm:py-4">
+        <div
+          key={1} 
+          className="flex animate-slide whitespace-nowrap w-max"
+        >
+          {instLogos.concat(instLogos).map((logo, index) => (
+            <img
+              key={index}
+              src={logo}
+              alt={`logo-${index}`}
+              className="h-6 sm:h-6 w-auto sm:w-auto mx-4 sm:mx-8"
             />
             ))}
         </div>
