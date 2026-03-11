@@ -7,10 +7,10 @@ import { ProjectDetails } from "./ProjectsDetails";
 import { AwardDetails } from "./AwardDetails";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@mui/material";
-import NewCV from "./NewCV";
-import { UploadCloud, UploadIcon } from "lucide-react";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
+import HeaderButtons from "@/components/cvBuilder/HeaderButtonns";
+import NewCV from "./NewCV";
 import CVCreatorPage from "./CvParser";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
 //import { dummyCvData } from "./cvDummyData";
@@ -46,6 +46,7 @@ export default function CVBuilder() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState<boolean>(false);
   const [showParsedModel, setShowParsedModel] = useState<boolean>(false);
+  console.log("preview cv is", previewCV);
   const [cvData, setCvData] = useState<any>({
     personal: {
       fullName: "",
@@ -111,115 +112,36 @@ export default function CVBuilder() {
 
   const clearParsedCV = () => {
     try {
-    localStorage.removeItem("cvData");
-    localStorage.removeItem("educations");
-    localStorage.removeItem("experiences");
-    localStorage.removeItem("projects");
-    localStorage.removeItem("awards");
-    localStorage.removeItem("skills");
-    window.location.reload();
+      localStorage.removeItem("cvData");
+      localStorage.removeItem("educations");
+      localStorage.removeItem("experiences");
+      localStorage.removeItem("projects");
+      localStorage.removeItem("awards");
+      localStorage.removeItem("skills");
+      window.location.reload();
     } catch (error) {
-      console.log("error",error)
+      console.log("error", error);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50 p-0 sm:p-6">
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="grid grid-cols-1">
           <div className="col-span-7 p-2 sm:p-6 bg-slate-50 space-y-3">
-            <div className="flex justify-between items-center">
-              <button
-                className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg"
-                onClick={() => setPreviewCV(true)}
-              >
-                Preview CV
-              </button>
-              {previewCV && (
-                <NewCV cvData={cvData} setPreviewCV={setPreviewCV} />
-              )}
-              {/* <div className="flex gap-1">
-              {dummyCvData.map((cvData,i)=>{
-                return(
-                  <button key={i} onClick={()=>{setCvData(cvData);setPreviewCV(true)}} className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg">{cvData.personal.fullName}</button>
-                )
-              })}
-            </div> */}
-              {localStorage.getItem("cvData")?
-              <div className="flex gap-1">
-              <p className="border-dashed border-2 border-gray-300 px-2 py-1 rounded">CV Parsed</p>
-              <button onClick={clearParsedCV} className="bg-red-500 text-white px-2 py-1 rounded">Clear Parsed CV</button>
-              </div>
-              :<button
-              type="button"
-                className="flex items-center gap-1 bg-[#03257e] text-white px-2 py-1 rounded"
-                onClick={() => setShowParsedModel(true)}
-                disabled={isParsing}
-              >
-                <UploadCloud size={18}/> Import Existing CV
-              </button>}
-              {showParsedModel && (
-                <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70">
-                  {/* Modal Card */}
-                  <div className="bg-white w-[90%] max-w-md rounded-xl shadow-2xl p-6 relative">
-                    {/* Close Button (optional) */}
-                    <button
-                      className="absolute top-3 right-3 text-gray-500 hover:text-black"
-                      onClick={() => setShowParsedModel(false)}
-                    >
-                      ✕
-                    </button>
-
-                    {/* Title */}
-                    <h2 className="text-lg font-semibold text-gray-800 text-center mb-4">
-                      Upload your CV to make it auto-fill in each below section
-                    </h2>
-
-                    {/* Hidden File Input */}
-                    <input
-                      className="hidden"
-                      type="file"
-                      id="cv-upload"
-                      accept=".pdf,.doc,.docx"
-                      onChange={(e) => setCvFile(e.target.files?.[0] || null)}
-                    />
-
-                    {/* Actions */}
-                    <div className="flex flex-col items-center gap-4">
-                      {/* Upload Button */}
-                      {!cvFile && (
-                        <label
-                          htmlFor="cv-upload"
-                          className="flex items-center gap-2 bg-[#006666] text-white px-4 py-2 rounded-lg cursor-pointer hover:opacity-90 transition"
-                        >
-                          <UploadIcon />
-                          Upload CV
-                        </label>
-                      )}
-
-                      {/* Selected File */}
-                      {cvFile && (
-                        <div className="w-full text-center text-sm text-gray-600 border rounded-md px-3 py-2">
-                          {cvFile.name}
-                        </div>
-                      )}
-
-                      {/* Parse Button */}
-                      <button
-                        onClick={parseCV}
-                        disabled={isParsing || !cvFile}
-                        className="bg-[#03257e] text-white px-6 py-2 rounded-lg w-full
-                   disabled:opacity-50 disabled:cursor-not-allowed
-                   hover:bg-[#021d5f] transition"
-                      >
-                        {isParsing ? "Parsing..." : "Parse CV"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <HeaderButtons
+              clearParsedCV={clearParsedCV}
+              cvData={cvData}
+              cvFile={cvFile}
+              isParsing={isParsing}
+              parseCV={parseCV}
+              previewCV={previewCV}
+              setCvFile={setCvFile}
+              setPreviewCV={setPreviewCV}
+              setShowParsedModel={setShowParsedModel}
+              showParsedModel={showParsedModel}
+            />
+            {previewCV && <NewCV cvData={cvData} setPreviewCV={setPreviewCV} />}
             {/* <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubuk.com" className="text-[#006666] underline">support@edubuk.com</a> or <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a></p> */}
             {/* Step 1 */}
             <CVCreatorPage 
