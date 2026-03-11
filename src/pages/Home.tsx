@@ -15,6 +15,7 @@ import { useUserData } from "@/context/AuthContext";
 import { Crown } from "lucide-react";
 import toast from "react-hot-toast";
 import { API_BASE_URL } from "@/main";
+import PartnerList from "@/components/HomePageSections/PartnerList";
 
 const Home:React.FC = () => {
   const [openProfile, setOpenProfile] = useState(false);
@@ -105,7 +106,7 @@ const Home:React.FC = () => {
         <div className="absolute bottom-0 left-0 w-full h-2 bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
         </div>
       </div>
-
+      <PartnerList />
       <ImageSlider />
       <ThreeDot />
       <Facts />
