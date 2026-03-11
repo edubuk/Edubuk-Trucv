@@ -187,7 +187,7 @@ export const ExperienceDetails = ({
     if(cvDataFromStorage){
       setParsedExperienceData(JSON.parse(cvDataFromStorage));
     }
-  }, [step === 3, refresh]);
+  }, [step === 4, refresh]);
 
   const updateHandler = async (index: number) => {
     try {
@@ -324,7 +324,7 @@ export const ExperienceDetails = ({
     <Form {...form}>
       <form>
         <StepCard
-          index={3}
+          index={4}
           title="Experience Details"
           icon={Briefcase}
           open={step === 3}

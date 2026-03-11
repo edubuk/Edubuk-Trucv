@@ -233,7 +233,7 @@ export const EducationDetails = ({
     if(cvDataFromStorageParsed){
       setParsedEducationData(cvDataFromStorageParsed);
     }
-  }, [step === 2, refresh]);
+  }, [step === 3, refresh]);
 
   const updateHandler = async (index: number) => {
     try {
@@ -390,11 +390,11 @@ export const EducationDetails = ({
         {/* noValidate disables native browser popup validation */}
         <form noValidate>
           <StepCard
-            index={2}
+            index={3}
             title="Educational Details"
             icon={BookOpen}
-            open={step === 2}
-            onToggle={() => setStep(step === 2 ? 0 : 2)}
+            open={step === 4}
+            onToggle={() => setStep(step === 4 ? 0 : 4)}
           >
             <p className="text-sm text-slate-500">
               Add education entries. Choose school or college. Each entry can be

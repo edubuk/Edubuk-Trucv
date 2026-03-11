@@ -141,7 +141,7 @@ export const SkillDetails = ({
 
   useEffect(() => {
     fetchSkills();
-  }, [step === 4,refresh]);
+  }, [step === 5,refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.skills.map((e: any) => e.id)),
@@ -222,7 +222,7 @@ export const SkillDetails = ({
     <Form {...form}>
       <form onSubmit={handleSubmit(formSubmitHandler)}>
         <StepCard
-          index={4}
+          index={5}
           title="Skills"
           icon={CheckCircle}
           open={step === 4}

@@ -173,7 +173,7 @@ export const AwardDetails = ({
     if(cvDataFromStorage){
       setParsedAwardsData(JSON.parse(cvDataFromStorage));
     }
-  }, [step === 3, refresh]);
+  }, [step === 7, refresh]);
 
   const updateHandler = async (index: number) => {
     try {
@@ -308,7 +308,7 @@ export const AwardDetails = ({
     <Form {...form}>
       <form >
         <StepCard
-          index={6}
+          index={7}
           title="Certificates/Courses/Awards"
           icon={Award}
           open={step === 6}

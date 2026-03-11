@@ -204,7 +204,7 @@ export const ProjectDetails = ({
     if(cvDataFromStorageParsed){
       setParsedProjectData(cvDataFromStorageParsed);
     }
-  }, [step === 5, refresh]);
+  }, [step === 6, refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.projects.map((e: any) => e.id)),
@@ -261,7 +261,7 @@ export const ProjectDetails = ({
     <Form {...form}>
       <form onSubmit={handleSubmit(projectSubmitHandler)}>
         <StepCard
-          index={5}
+          index={6}
           title="Personal Projects"
           icon={FileText}
           open={step === 5}

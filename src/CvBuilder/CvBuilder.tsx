@@ -11,6 +11,7 @@ import NewCV from "./NewCV";
 import { UploadCloud, UploadIcon } from "lucide-react";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
+import CVCreatorPage from "./CvParser";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
 //import { dummyCvData } from "./cvDummyData";
 
@@ -221,6 +222,10 @@ export default function CVBuilder() {
             </div>
             {/* <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubuk.com" className="text-[#006666] underline">support@edubuk.com</a> or <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a></p> */}
             {/* Step 1 */}
+            <CVCreatorPage 
+            step={step}
+            setStep={setStep}
+            />
 
             <PersonalDetails
               step={step}
