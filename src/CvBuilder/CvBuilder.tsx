@@ -10,6 +10,7 @@ import { Button } from "@mui/material";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import HeaderButtons from "@/components/cvBuilder/HeaderButtonns";
+import NewCV from "./NewCV";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
 //import { dummyCvData } from "./cvDummyData";
 
@@ -44,6 +45,7 @@ export default function CVBuilder() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState<boolean>(false);
   const [showParsedModel, setShowParsedModel] = useState<boolean>(false);
+  console.log("preview cv is", previewCV);
   const [cvData, setCvData] = useState<any>({
     personal: {
       fullName: "",
@@ -138,6 +140,7 @@ export default function CVBuilder() {
               setShowParsedModel={setShowParsedModel}
               showParsedModel={showParsedModel}
             />
+            {previewCV && <NewCV cvData={cvData} setPreviewCV={setPreviewCV} />}
             {/* <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubuk.com" className="text-[#006666] underline">support@edubuk.com</a> or <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a></p> */}
             {/* Step 1 */}
 
