@@ -821,10 +821,10 @@ const MOCK_CV_2 = {
       companyName: "NVIDIA",
       jobRole: "Sr. Solutions Architect (AI Inference)",
       duration: { from: "2025-10-01", to: "present" },
-      skills:
-        "AI inference, deep learning, performance optimization, resource efficiency",
-      description:
-        "Optimize inference workloads for performance and resource efficiency, Partner cross-functionally with engineering, product, data-science / ML teams and customers to define architecture, evaluate requirements, and deliver PoC or production-grade AI/ML solutions. Implement and manage infrastructure for AI inference including containerization/orchestration such as Kubernetes, GPU-orchestration, resource scheduling, monitoring/observability, CI/CD / MLOps. Participate in performance analysis, profiling and benchmarking of inference workloads.",
+      // skills:
+      //   "AI inference, deep learning, performance optimization, resource efficiency",
+      // description:
+      //   "Optimize inference workloads for performance and resource efficiency, Partner cross-functionally with engineering, product, data-science / ML teams and customers to define architecture, evaluate requirements, and deliver PoC or production-grade AI/ML solutions. Implement and manage infrastructure for AI inference including containerization/orchestration such as Kubernetes, GPU-orchestration, resource scheduling, monitoring/observability, CI/CD / MLOps. Participate in performance analysis, profiling and benchmarking of inference workloads.",
       selfAttested: false,
       isEmailSend: false,
       docUri: "",
@@ -850,8 +850,8 @@ const MOCK_CV_2 = {
       companyName: "Google",
       jobRole: "Cloud Architect",
       duration: { from: "2021-09-01", to: "2024-10-01" },
-      skills:
-        "cloud migration, integration strategies, architectural blueprints",
+      // skills:
+      //   "cloud migration, integration strategies, architectural blueprints",
       description:
         "Identify and qualify business opportunities, identify key customer technical challenges and develop a strategy to resolve technical blockers. Recommend and document migration paths, integration strategies, and application architectures required to successfully implement complete solutions using best practices on Google Cloud. Assist infrastructure solutions management teams, contributing to solution and use case specific assets. Awarded the Google Cloud Club in 2024 for exceptional performance.",
       selfAttested: false,
@@ -1204,8 +1204,8 @@ const MOCK_CV_2 = {
       projectUrl: "",
       duration: { from: "2016-11-01", to: "present" },
       skills: "",
-      description:
-        "Tuning the data by creating bins for categorical variables and applying PCA for numerical variables. Implementing Linear Regression, followed by Bagging Regression to improve efficiency.",
+      // description:
+      //   "Tuning the data by creating bins for categorical variables and applying PCA for numerical variables. Implementing Linear Regression, followed by Bagging Regression to improve efficiency.",
       selfAttested: false,
     },
     {
