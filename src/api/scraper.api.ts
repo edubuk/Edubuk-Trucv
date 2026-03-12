@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "@/main";
 import { useMutation } from "react-query";
 
+
 export const useGetLinkdeinProfile = () => {
   const getLinkdeinProfile = async (profileUrl: string): Promise<any> => {
     const response = await fetch(
@@ -26,5 +27,8 @@ export const useGetLinkdeinProfile = () => {
     },
   });
   const cvData = data?.data;
+  if(!localStorage.getItem("linkedInCvData") && cvData!==undefined) {
+    localStorage.setItem("linkedInCvData", JSON.stringify(cvData));
+  }
   return { getLinkdeinProfileData, isLoading, cvData };
 };

@@ -3,9 +3,14 @@ import { useState, useRef } from "react";
 import toast from "react-hot-toast";
 
 import LinkedinProfileCvModal from "./LinkdeinProfileCv";
+import { StepCard } from "@/CvBuilder/StepCard";
+import { autoSave, autoSaveParsedData } from "@/api/autoSave.apis";
+import { Cross, Trash2 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface HeaderButtonsProps {
+  step:number,
+  setStep:(step:number) => void,
   previewCV: boolean;
   setPreviewCV: (v: boolean) => void;
   cvData: any;
@@ -13,7 +18,7 @@ interface HeaderButtonsProps {
   setShowParsedModel: (v: boolean) => void;
   cvFile: File | null;
   setCvFile: (f: File | null) => void;
-  parseCV: () => void | Promise<void>;
+  parseCV: () => boolean | Promise<boolean>;
   clearParsedCV: () => void;
   isParsing: boolean;
 }
@@ -185,6 +190,8 @@ const isValidLinkedIn = (url: string) =>
 
 // ─── Component ────────────────────────────────────────────────────────────────
 const HeaderButtons = ({
+  step,
+  setStep,
   setPreviewCV,
   showParsedModel,
   setShowParsedModel,
@@ -194,11 +201,8 @@ const HeaderButtons = ({
   clearParsedCV,
   isParsing,
 }: HeaderButtonsProps) => {
-  const {
-    getLinkdeinProfileData,
-    cvData,
-    isLoading: isLinkdeinImportLoading,
-  } = useGetLinkdeinProfile();
+  const { getLinkdeinProfileData, cvData, isLoading: isLinkdeinImportLoading } =
+    useGetLinkdeinProfile();
   console.log("linkdein cvData is", cvData);
   const hasParsedCV = Boolean(
     typeof window !== "undefined" && localStorage.getItem("cvData"),
@@ -210,7 +214,7 @@ const HeaderButtons = ({
   const [linkedInUrl, setLinkedInUrl] = useState("");
   const [urlError, setUrlError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
-
+  const [isDataSaving, setIsDataSaving] = useState(false);
   const linkedInValid = isValidLinkedIn(linkedInUrl);
 
   // Per-tab validation — CV tab needs a file, LinkedIn tab needs a valid URL
@@ -236,10 +240,14 @@ const HeaderButtons = ({
         setLinkedInUrl("");
         setOpenLinkdeinProfileCV(true);
       });
+
       setUrlError("");
       return toast.success("LinkedIn profile imported successfully.");
     }
-    parseCV();
+    const success = parseCV();
+    if(!success) {
+      toast.error("Failed to parse CV");
+    }
   };
 
   const closeModal = () => {
@@ -250,7 +258,53 @@ const HeaderButtons = ({
     setTab("cv");
   };
 
+  const saveLinkedInData = async()=>{
+      try {
+        setIsDataSaving(true);
+        const data = localStorage.getItem("linkedInCvData");
+        const cvData = JSON.parse(data || "{}");
+        const savedData =  await autoSave(cvData);
+      if(savedData?.success) {
+        toast.success("Data saved successfully");
+        localStorage.removeItem("linkedInCvData");
+        window.location.reload();
+      } else {
+        toast.error("Something went wrong...")
+      }
+      } catch (error) {
+        toast.error("Something went wrong...")
+      } finally {
+        setIsDataSaving(false);
+      }
+  }
+  const saveParsedData = async()=>{
+      try {
+        setIsDataSaving(true);
+        const data = localStorage.getItem("cvData");
+        const cvData = JSON.parse(data || "{}");
+        const savedData =  await autoSaveParsedData(cvData);
+      if(savedData?.success) {
+        toast.success("Data saved successfully");
+        localStorage.removeItem("cvData");
+        window.location.reload();
+      } else {
+        toast.error("Something went wrong...")
+      }
+      } catch (error) {
+        toast.error("Something went wrong...")
+      } finally {
+        setIsDataSaving(false);
+      }
+  }
+
+
   return (
+    <StepCard 
+    index={1}
+    title="Smart Autofill"
+    icon={FileIcon}
+    open={step === 1}
+    onToggle={() => setStep(step === 1 ? 0 : 1)} >
     <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
@@ -273,17 +327,17 @@ const HeaderButtons = ({
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between gap-3">
         {/* Preview button */}
-        <button
+        {/* <button
           onClick={() => setPreviewCV(true)}
           className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           <EyeIcon />
           Preview CV
-        </button>
+        </button> */}
 
         {/* Right side */}
-        {hasParsedCV ? (
+        {/* {hasParsedCV ? (
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg text-[12px] font-medium text-green-700">
               <CheckBadgeIcon />
@@ -313,49 +367,27 @@ const HeaderButtons = ({
             <UploadCloudIcon />
             Import CV
           </button>
-        )}
+        )} */}
       </div>
 
       {/* ── Modal ── */}
-      {showParsedModel && (
+      {!showParsedModel && (
         <div
-          className="fixed inset-0 z-[999] flex items-center justify-center hb-animate-fadein"
-          style={{
-            background: "rgba(2,20,20,0.72)",
-            backdropFilter: "blur(6px)",
-          }}
+          className="w-full flex items-center justify-center hb-animate-fadein bg-white"
           onClick={(e) => e.target === e.currentTarget && closeModal()}
         >
           <div
-            className="w-[92%] max-w-[460px] rounded-[18px] overflow-hidden hb-animate-slideup"
-            style={{
-              boxShadow:
-                "0 24px 80px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.06)",
-            }}
+            className="w-full overflow-hidden hb-animate-slideup"
           >
             {/* ── Modal Header ── */}
             <div
-              className="relative px-6 pt-[22px] pb-5"
+              className="flex flex-col w-full px-6 pt-[22px] pb-5"
               style={{
                 background:
                   "linear-gradient(135deg, #011a1a 0%, #024544 45%, #036665 100%)",
               }}
             >
-              {/* Close button */}
-              <button
-                onClick={closeModal}
-                className="absolute top-[22px] right-5 w-[30px] h-[30px] rounded-full flex items-center justify-center border-none cursor-pointer text-white transition-all duration-150"
-                style={{ background: "rgba(255,255,255,0.12)" }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "rgba(255,255,255,0.22)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "rgba(255,255,255,0.12)")
-                }
-              >
-                <XIcon />
-              </button>
-
+            
               <p className="text-[10px] font-semibold tracking-widest uppercase text-teal-300 mb-1">
                 Smart Autofill
               </p>
@@ -403,7 +435,7 @@ const HeaderButtons = ({
                   }`}
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  <LinkedInLogo size={13} />
+                  <LinkedInLogo size={13} color={tab==="linkedin"?"#036665":"white"}/>
                   LinkedIn Profile
                 </button>
               </div>
@@ -485,8 +517,31 @@ const HeaderButtons = ({
             ) : (
               <div className="px-[22px] pb-[22px] pt-4 bg-[#fafbff]">
                 {/* ─ CV Tab ─ */}
-                {tab === "cv" && (
-                  <>
+                {tab === "cv" &&(localStorage.getItem("cvData")?
+                <div className="flex gap-2 justify-center items-center">
+                  <button className="flex items-center gap-1 bg-teal-500 text-white px-4 py-2 rounded-lg"
+                  onClick={()=>setOpenLinkdeinProfileCV(true)}
+                  ><EyeIcon /> Preview Parsed Data</button>
+                  <button 
+                  disabled={isDataSaving}
+                  onClick={saveParsedData}
+                  className="px-2 py-2 border-none rounded-lg cursor-pointer flex items-center justify-center gap-2 text-white transition-all duration-200 disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none hover:enabled:-translate-y-px"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    background:
+                      "linear-gradient(135deg, #011a1a 0%, #036665 100%)",
+                    boxShadow:
+                      !canSubmit || isParsing
+                        ? "none"
+                        : "0 3px 14px rgba(3,102,101,0.4)",
+                  }}
+                  >{isDataSaving ? "Saving..." : "Save Data for CV"}</button>
+                  <button 
+                  className="flex items-center justify-center gap-1 text-red-500 border border-red-500 rounded-lg px-2 py-2"
+                  onClick={()=>{localStorage.removeItem("cvData"); window.location.reload()}}
+                  > <Trash2 size={16} /> Clear CV Data</button>
+                </div> :
+                <>
                     <input
                       ref={fileRef}
                       type="file"
@@ -563,7 +618,30 @@ const HeaderButtons = ({
                 )}
 
                 {/* ─ LinkedIn Tab ─ */}
-                {tab === "linkedin" && (
+                {tab === "linkedin" && (localStorage.getItem("linkedInCvData")?
+                <div className="flex gap-2 justify-center items-center">
+                  <button className="bg-teal-500 text-white px-4 py-2 rounded-lg"
+                  onClick={()=>setOpenLinkdeinProfileCV(true)}
+                  >Preview LinkedIn Data</button>
+                  <button 
+                  disabled={isDataSaving}
+                  onClick={saveLinkedInData}
+                  className="px-2 py-3.5 border-none rounded-xl cursor-pointer flex items-center justify-center gap-2 text-[13.5px] font-semibold text-white transition-all duration-200 disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none hover:enabled:-translate-y-px"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    background:
+                      "linear-gradient(135deg, #011a1a 0%, #036665 100%)",
+                    boxShadow:
+                      !canSubmit || isParsing
+                        ? "none"
+                        : "0 3px 14px rgba(3,102,101,0.4)",
+                  }}
+                  >{isDataSaving ? "Saving..." : "Save Data for CV"}</button>
+                  <button 
+                  className="flex items-center justify-center gap-1 text-red-500 border border-red-500 rounded-lg px-2 py-2"
+                  onClick={()=>{localStorage.removeItem("linkedInCvData"); window.location.reload()}}
+                  > <Trash2 size={16} /> Clear CV Data</button>
+                </div>:
                   <>
                     <div className="bg-[#f0fafa] rounded-xl p-3 flex flex-col gap-2 mt-1">
                       {[
@@ -614,6 +692,7 @@ const HeaderButtons = ({
                       </p>
                     )}
                   </>
+                  
                 )}
 
                 {/* Divider */}
@@ -624,7 +703,7 @@ const HeaderButtons = ({
                 </div>
 
                 {/* Submit button */}
-                <button
+                {(!localStorage.getItem("cvData")&&!localStorage.getItem("linkedInCvData"))&&<button
                   disabled={!canSubmit || isParsing}
                   onClick={handleSubmit}
                   className="w-full py-3.5 border-none rounded-xl cursor-pointer flex items-center justify-center gap-2 text-[13.5px] font-semibold text-white transition-all duration-200 disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none hover:enabled:-translate-y-px"
@@ -669,7 +748,7 @@ const HeaderButtons = ({
                       Import LinkedIn Profile
                     </>
                   )}
-                </button>
+                </button>}
               </div>
             )}
           </div>
@@ -690,6 +769,7 @@ const HeaderButtons = ({
         />
       )} */}
     </div>
+    </StepCard>
   );
 };
 // ─── MOCK DATA for preview ────────────────────────────────────────────────────

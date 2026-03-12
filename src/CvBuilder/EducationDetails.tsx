@@ -216,7 +216,7 @@ export const EducationDetails = ({
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
         }));
-
+        cvData.educations=educations;
         // Update form values
         form.reset({ educations });
       }
@@ -342,26 +342,26 @@ export const EducationDetails = ({
   }
 
 
-  const fillParsedEducationDetails = ()=>{
-   if(parsedEducationData)
-   {
-    parsedEducationData.map((doc:any)=>
-      append({
-      id: uid("edu"),
-      eduDocId: docId(),
-      level: doc.level==="Grade 10"?"Secondary School":doc.level==="Grade 12"?"Higher Secondary School":doc.level==="Undergraduate"?"Graduation":"PostGraduation",
-      boardNameOrDegree: doc.boardNameOrDegree==="CBSE"?"Central Board of Secondary Education(CBSE)":"",
-      institutionName: doc.institutionName ?? "",
-      gpa: doc.gpa.split("/")[0] ?? "",
-      orgId:doc.boardNameOrDegree==="CBSE"?"000027":"",
-      duration: { from: "", to: "" },
-      selfAttested: false,
-      isEmailSend: false,
-      verified: false,
-      status: "pending",
-    }))
-   }
-  }
+  // const fillParsedEducationDetails = ()=>{
+  //  if(parsedEducationData)
+  //  {
+  //   parsedEducationData.map((doc:any)=>
+  //     append({
+  //     id: uid("edu"),
+  //     eduDocId: docId(),
+  //     level: doc.level==="Grade 10"?"Secondary School":doc.level==="Grade 12"?"Higher Secondary School":doc.level==="Undergraduate"?"Graduation":"PostGraduation",
+  //     boardNameOrDegree: doc.boardNameOrDegree==="CBSE"?"Central Board of Secondary Education(CBSE)":"",
+  //     institutionName: doc.institutionName ?? "",
+  //     gpa: doc.gpa.split("/")[0] ?? "",
+  //     orgId:doc.boardNameOrDegree==="CBSE"?"000027":"",
+  //     duration: { from: "", to: "" },
+  //     selfAttested: false,
+  //     isEmailSend: false,
+  //     verified: false,
+  //     status: "pending",
+  //   }))
+  //  }
+  // }
 
   const updateLocalStorageData = (level:string)=>{
     if(parsedEducationData){
@@ -985,13 +985,6 @@ export const EducationDetails = ({
                 >
                   <PlusCircle size={16} /> Add University/College
                 </button>
-                {parsedEducationData&&parsedEducationData.length>0&&<button
-                  type="button"
-                  onClick={fillParsedEducationDetails}
-                  className="flex items-center gap-2 px-3 py-1 bg-[#03257e] rounded border shadow-lg border-[#03257e] text-white"
-                >
-                  <PlusCircle size={16} /> Fill from Parsed Data
-                </button>}
               </div>
             </div>}
           </StepCard>

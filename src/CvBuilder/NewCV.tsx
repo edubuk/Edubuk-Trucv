@@ -58,6 +58,22 @@ const NewCV = ({
     );
   }
 
+  const getFieldNames = (errorMessage: string): string[] => {
+    const prefix = errorMessage.indexOf(": ");
+    const errorsOnly = errorMessage.substring(prefix + 2);
+
+    const uniqueFields = [...new Set(
+        errorsOnly.split(", ").map(err => {
+            const field = err.split(": ")[0].trim();         // "educations.0.boardNameOrDegree"
+            const parts = field.split(".");                   // ["educations", "0", "boardNameOrDegree"]
+            return parts[parts.length - 1];                  // "boardNameOrDegree" ← last part only
+        })
+    )];
+
+    return uniqueFields;
+}
+
+
   if (!cvData) {
     return (
       <div className="flex justify-center items-center">
@@ -82,8 +98,10 @@ const NewCV = ({
         toast.success("CV Created Successfully");
         navigate(`/cv/${res.data.id}`);
       }
-    } catch (error) {
-      toast.error("Something went wrong");
+    } catch (error:any) {
+      console.log("error from creating cv",error)
+      const errors = `Please fill the required field in the form: ${getFieldNames(error.response.data.message as string)}. You may have parsed your existing cv or imported through LinkedIn`;
+      toast.error(errors);
     } finally {
       setLoading(false);
     }
@@ -271,11 +289,11 @@ const NewCV = ({
                                     {education.boardNameOrDegree}
                                   </span>
                                   {Number(education.gpa) > 10 ? (
-                                    <span className="font-bold text-black">
+                                    <span className="font-bold text-white">
                                       Percentage: {education.gpa}%
                                     </span>
                                   ) : (
-                                    <span className="font-bold text-black">
+                                    <span className="font-bold text-white">
                                       GPA: {education.gpa}
                                     </span>
                                   )}
@@ -570,13 +588,6 @@ const NewCV = ({
                       <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
 
                       {cvData.experiences.map((exp: TypeExperience, index) => {
-                        //const verificationKey = exp.c;
-                        // const isSeflAtetsted =
-                        //   cvData.experienceVerifications[verificationKey]
-                        //     .isSelfAttested || false;
-                        const isSeflAtetsted = true;
-                        const mailStatus = exp.status;
-                        const hash = exp.docHash;
                         return (
                           <div
                             key={index}
@@ -607,12 +618,6 @@ const NewCV = ({
                                     )}
                                   </p>{" "}
                                   <div className="flex gap-1 w-fit">
-                                    <ShowVerifications
-                                      isAttested={isSeflAtetsted}
-                                      mailStatus={mailStatus}
-                                      hash={hash}
-                                      className="ml-5 mt-1"
-                                    />
                                     <StatusBadge
                                       status={exp.status}
                                       isEmailSend={exp.isEmailSend}
@@ -669,10 +674,6 @@ const NewCV = ({
                           <div className="flex flex-col gap-3  relative">
                             <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
                             {cvData.awards.map((award: TypeAward, index) => {
-                              //const verificationKey = award.award_name;
-                              const isSelfAttetsted = true;
-                              const hash = award.docUri;
-                              const mailStatus = award.status;
                               return (
                                 <div key={index} className="flex flex-col ml-3">
                                   <div className="flex justify-between">
@@ -700,12 +701,6 @@ const NewCV = ({
                                           {award.organisation}
                                         </p>
                                         <div className="flex gap-1 w-fit ">
-                                          <ShowVerifications
-                                            isAttested={isSelfAttetsted}
-                                            mailStatus={mailStatus}
-                                            hash={hash}
-                                            className="ml-5 mt-1"
-                                          />
                                           <StatusBadge
                                             status={award.status}
                                             isEmailSend={award.isEmailSend}
@@ -749,7 +744,6 @@ const NewCV = ({
                             {cvData.projects.map(
                               (project: TypeProject, index) => {
                                 //const verificationKey = project.project_name;
-                                const isSelfAttested = true;
                                 return (
                                   <div
                                     key={index}
@@ -776,10 +770,7 @@ const NewCV = ({
                                               </a>
                                             )}
                                           </h1>
-                                          <ShowVerifications
-                                            isAttested={isSelfAttested}
-                                            className="ml-5 mt-1"
-                                          />
+                                         <StatusBadge status="selfAttested"/>
                                         </div>
                                       </div>
                                       {/* duration */}

@@ -172,6 +172,7 @@ export const ExperienceDetails = ({
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
         }));
+        cvData.experiences=experiences;
         // Update form values
         form.reset({ experiences });
       }

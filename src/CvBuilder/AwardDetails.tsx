@@ -157,7 +157,7 @@ export const AwardDetails = ({
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
         }));
-
+        cvData.awards=awards;
         // Update form values
         form.reset({ awards });
       }
@@ -311,8 +311,8 @@ export const AwardDetails = ({
           index={7}
           title="Certificates/Courses/Awards"
           icon={Award}
-          open={step === 6}
-          onToggle={() => setStep(step === 6 ? 0 : 6)}
+          open={step === 7}
+          onToggle={() => setStep(step === 7 ? 0 : 7)}
         >
           <p className="text-sm text-slate-500">
             Add projects. Make them stand out with URL and short description.

@@ -208,11 +208,11 @@ export const PersonalDetails = ({ step, setStep, setCvData }: IStepCard) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submitFormHandler)}>
         <StepCard
-          index={1}
+          index={2}
           title="Personal Details"
           icon={User}
-          open={step === 1}
-          onToggle={() => setStep(step === 1 ? 0 : 1)}
+          open={step === 2}
+          onToggle={() => setStep(step === 2 ? 0 : 2)}
         >
           <div className="flex items-center justify-between">
             <p className="text-sm text-slate-500">

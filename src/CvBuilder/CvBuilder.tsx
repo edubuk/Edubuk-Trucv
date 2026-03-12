@@ -11,7 +11,7 @@ import api from "@/lib/api";
 import toast from "react-hot-toast";
 import HeaderButtons from "@/components/cvBuilder/HeaderButtonns";
 import NewCV from "./NewCV";
-import CVCreatorPage from "./CvParser";
+import { EyeIcon } from "lucide-react";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
 //import { dummyCvData } from "./cvDummyData";
 
@@ -72,39 +72,21 @@ export default function CVBuilder() {
     formData.append("file", cvFile as File);
     if (!cvFile) {
       toast.error("Please Upload a CV file");
-      return;
+      return false;
     }
     try {
       setIsParsing(true);
       const response = await api.post("/cv/cv-parse", formData);
       if (response.data.success) {
         localStorage.setItem("cvData", JSON.stringify(response.data.data));
-        localStorage.setItem(
-          "educations",
-          JSON.stringify(response.data.data.educations),
-        );
-        localStorage.setItem(
-          "experiences",
-          JSON.stringify(response.data.data.experiences),
-        );
-        localStorage.setItem(
-          "projects",
-          JSON.stringify(response.data.data.projects),
-        );
-        localStorage.setItem(
-          "awards",
-          JSON.stringify(response.data.data.awards),
-        );
-        localStorage.setItem(
-          "skills",
-          JSON.stringify(response.data.data.skills),
-        );
         setShowParsedModel(false);
+        return true;
       }
-      console.log("response", response);
+      return false;
     } catch (error) {
       console.log("error", error);
       toast.error("Failed to parse CV");
+      return false;
     } finally {
       setIsParsing(false);
     }
@@ -129,7 +111,16 @@ export default function CVBuilder() {
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="grid grid-cols-1">
           <div className="col-span-7 p-2 sm:p-6 bg-slate-50 space-y-3">
+            {previewCV && <NewCV cvData={cvData} setPreviewCV={setPreviewCV} />}
+            {/* <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubuk.com" className="text-[#006666] underline">support@edubuk.com</a> or <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a></p> */}
+            {/* Step 1 */}
+             <button
+             className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
+             onClick={()=>setPreviewCV(true)}
+             ><EyeIcon size={16}/>Preview CV</button>
             <HeaderButtons
+              step={step}
+              setStep={setStep}
               clearParsedCV={clearParsedCV}
               cvData={cvData}
               cvFile={cvFile}
@@ -140,13 +131,6 @@ export default function CVBuilder() {
               setPreviewCV={setPreviewCV}
               setShowParsedModel={setShowParsedModel}
               showParsedModel={showParsedModel}
-            />
-            {previewCV && <NewCV cvData={cvData} setPreviewCV={setPreviewCV} />}
-            {/* <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubuk.com" className="text-[#006666] underline">support@edubuk.com</a> or <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a></p> */}
-            {/* Step 1 */}
-            <CVCreatorPage 
-            step={step}
-            setStep={setStep}
             />
 
             <PersonalDetails
@@ -224,12 +208,10 @@ export default function CVBuilder() {
                 >
                   Next Step
                 </Button>
-                <button
-                  className="bg-[#008888] text-white px-3 py-1 rounded border shadow-lg"
-                  onClick={() => setPreviewCV(true)}
-                >
-                  Preview CV
-                </button>
+                 <button
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
+                  onClick={()=>setPreviewCV(true)}
+                  ><EyeIcon size={16}/>Preview CV</button>
               </div>
             </div>
           </div>

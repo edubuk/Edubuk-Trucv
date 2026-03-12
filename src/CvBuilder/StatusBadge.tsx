@@ -1,7 +1,7 @@
 import { CheckCircle, Clock, PenLine, X } from "lucide-react";
 
 
-export type VerificationStatus = "verified" | "pending" | "rejected" | "inProgress";
+export type VerificationStatus = "verified" | "pending" | "rejected" | "inProgress" | "selfAttested";
 // Colors
 const COLOR_PRIMARY = "#03257e"; // deep blue
 const COLOR_TEAL = "#006666"; // teal
@@ -41,7 +41,7 @@ const StatusBadge: React.FC<{ status: VerificationStatus,isEmailSend?:boolean }>
   }
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
+      className="w-fit inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
       style={{ backgroundColor: COLOR_PRIMARY + "1a", color: COLOR_PRIMARY }}
     >
       <PenLine className="h-3.5 w-3.5" /> Self Attested

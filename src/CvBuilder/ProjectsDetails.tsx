@@ -140,7 +140,7 @@ export const ProjectDetails = ({
           description: doc.description ?? "",
           selfAttested: doc.selfAttested ?? false,
         }));
-
+        cvData.projects = projects;
         // Update form values
         form.reset({ projects });
       }
@@ -264,8 +264,8 @@ export const ProjectDetails = ({
           index={6}
           title="Personal Projects"
           icon={FileText}
-          open={step === 5}
-          onToggle={() => setStep(step === 5 ? 0 : 5)}
+          open={step === 6}
+          onToggle={() => setStep(step === 6 ? 0 : 6)}
         >
           <p className="text-sm text-slate-500">
             Add projects. Make them stand out with URL and short description.
