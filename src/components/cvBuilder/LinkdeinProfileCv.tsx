@@ -8,8 +8,11 @@ import {
   Link2,
   CheckCircle,
   X,
+  Briefcase,
 } from "lucide-react";
 import { GraduationCap } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
+import { twMerge } from "tailwind-merge";
 
 // ─── tiny helpers (replace with your real imports) ───────────────────────────
 const COLOR_TEAL = "#006666";
@@ -33,9 +36,20 @@ const ShowAnimatedVerifications = ({
   </span>
 );
 
-const NotProvided = ({ label }: { label: string }) => (
-  <div className="border border-red-400/50 rounded px-2 py-1 text-xs text-red-400 w-fit">
-    {label} not provided
+const NotProvided = ({
+  label,
+  className,
+}: {
+  label: string;
+  className?: string;
+}) => (
+  <div
+    className={twMerge(
+      "border border-red-500 rounded px-2 py-1 text-xs text-white w-fit",
+      className,
+    )}
+  >
+    {label} not found
   </div>
 );
 const proxyImage = (url: string) =>
@@ -63,13 +77,31 @@ const LinkedinProfileCvModal = ({ cvData, onClose }: any) => {
         }}
       >
         {/* ── Header bar ── */}
-        <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-100 shrink-0">
-          <h2 className="text-base font-bold text-[#006666] tracking-tight">
-            Verified Curriculum Vitae (CV) on the Blockchain
-          </h2>
+        <div className="flex items-center justify-between px-4 py-2.5 bg-amber-50 border-b border-amber-200 shrink-0">
+          <div className="flex items-start gap-2.5">
+            <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">!</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs font-semibold text-amber-800 leading-snug">
+                This is your imported LinkedIn profile preview —{" "}
+              </p>
+              <p className="text-xs text-amber-700 leading-snug">
+                ⚠️ This is{" "}
+                <span className="font-bold text-amber-900">not your trucv</span>
+                . We've pre-filled this data for reference only.{" "}
+                <button
+                  onClick={onClose}
+                  className="text-[#006666] font-bold underline underline-offset-2 hover:opacity-75 transition"
+                >
+                  Close & create your trucv →
+                </button>
+              </p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-100 transition text-gray-500"
+            className="p-1.5 rounded-full hover:bg-amber-200 transition text-amber-600 shrink-0 ml-3"
           >
             <X size={18} />
           </button>
@@ -205,9 +237,16 @@ const LinkedinProfileCvModal = ({ cvData, onClose }: any) => {
                 <div className="mt-5 px-2 flex flex-col gap-3">
                   {/* Name */}
                   <div className="flex items-center gap-5">
-                    <h1 className="text-4xl text-[#333B4D] tracking-wide capitalize max-w-[500px] lg:max-w-[600px] line-clamp-1">
-                      {cvData.personal.fullName}
-                    </h1>
+                    {cvData.personal.fullName ? (
+                      <h1 className="text-4xl text-[#333B4D] tracking-wide capitalize max-w-[500px] lg:max-w-[600px] line-clamp-1">
+                        {cvData.personal.fullName}
+                      </h1>
+                    ) : (
+                      <NotProvided
+                        label="Name"
+                        className="text-black text-xl"
+                      />
+                    )}
                   </div>
 
                   {/* Personal details grid */}
@@ -219,21 +258,30 @@ const LinkedinProfileCvModal = ({ cvData, onClose }: any) => {
                             size={26}
                             className="h-4 w-4 md:h-5 md:w-5 mt-1 shrink-0"
                           />
-                          <h1 className="text-sm md:text-base tracking-wider font-normal">
-                            {cvData.personal.email}
-                          </h1>
+                          {cvData.personal.email ? (
+                            <h1 className="text-sm md:text-base tracking-wider font-normal">
+                              {cvData.personal.email}
+                            </h1>
+                          ) : (
+                            <NotProvided label="Email" />
+                          )}
                         </div>
                         <div className="flex items-center gap-3">
                           <MapPinned
                             size={26}
                             className="h-4 w-4 md:h-5 md:w-5 mt-1 shrink-0"
                           />
-                          <h1 className="text-sm md:text-base tracking-wider font-normal">
-                            {cvData.personal.city}
-                          </h1>
+                          {cvData.personal.city ? (
+                            <h1 className="text-sm md:text-base tracking-wider font-normal">
+                              {cvData.personal.city}
+                            </h1>
+                          ) : (
+                            <NotProvided label="City" />
+                          )}
                         </div>
                       </div>
                     </div>
+
                     <div className="w-full ml-3">
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3">
@@ -241,21 +289,38 @@ const LinkedinProfileCvModal = ({ cvData, onClose }: any) => {
                             size={24}
                             className="h-4 w-4 md:h-5 md:w-5 mt-1 shrink-0"
                           />
-                          <h1 className="text-sm md:text-base tracking-wider font-normal">
-                            {cvData.personal.phone}
-                          </h1>
+                          {cvData.personal.phone ? (
+                            <h1 className="text-sm md:text-base tracking-wider font-normal">
+                              {cvData.personal.phone}
+                            </h1>
+                          ) : (
+                            <NotProvided label="Mobile No." />
+                          )}
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-sm capitalize">
-                            {cvData.personal.profession}
-                          </span>
+                          <Briefcase
+                            size={24}
+                            className="h-4 w-4 md:h-5 md:w-5 mt-1 shrink-0"
+                          />
+                          {cvData.personal.profession ? (
+                            <span className="text-sm capitalize">
+                              {cvData.personal.profession}
+                            </span>
+                          ) : (
+                            <NotProvided label="Profession" />
+                          )}
                         </div>
                       </div>
                     </div>
+
                     <div className="w-full">
                       <div className="flex gap-2">
-                        {cvData.personal.github && (
-                          <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
+                          <FaGithub
+                            size={24}
+                            className="h-4 w-4 md:h-5 md:w-5 mt-1 shrink-0"
+                          />
+                          {cvData.personal.github ? (
                             <a
                               href={cvData.personal.github}
                               target="_blank"
@@ -263,14 +328,16 @@ const LinkedinProfileCvModal = ({ cvData, onClose }: any) => {
                             >
                               Github
                             </a>
-                          </div>
-                        )}
-                        {cvData.personal.linkedin && (
-                          <div className="flex items-center gap-3">
-                            <Linkedin
-                              size={24}
-                              className="h-4 w-4 md:h-5 md:w-5 mt-1 shrink-0"
-                            />
+                          ) : (
+                            <NotProvided label="Github" />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Linkedin
+                            size={24}
+                            className="h-4 w-4 md:h-5 md:w-5 mt-1 shrink-0"
+                          />
+                          {cvData.personal.linkedin ? (
                             <a
                               href={cvData.personal.linkedin}
                               target="_blank"
@@ -278,136 +345,168 @@ const LinkedinProfileCvModal = ({ cvData, onClose }: any) => {
                             >
                               LinkedIn
                             </a>
-                          </div>
-                        )}
+                          ) : (
+                            <NotProvided label="LinkedIn" />
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Summary */}
                   <div className="flex gap-2 items-center overflow-hidden">
-                    <p className="text-sm md:text-base font-semibold">
-                      {cvData.personal?.summary}
-                    </p>
+                    {cvData.personal?.summary ? (
+                      <p className="text-sm md:text-base font-semibold">
+                        {cvData.personal?.summary}
+                      </p>
+                    ) : (
+                      <NotProvided label="Summary" className="text-black" />
+                    )}
                   </div>
 
                   {/* Skills */}
                   <div className="mt-2">
-                    {cvData.skills.length > 0 && (
-                      <div className="flex items-center gap-4 mb-2">
-                        <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center text-sm font-bold">
-                          S
-                        </div>
-                        <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                          Skills
-                        </h1>
+                    <div className="flex items-center gap-4 mb-2">
+                      <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center text-sm font-bold">
+                        S
                       </div>
-                    )}
+                      <h1 className="text-2xl font-semibold tracking-wider uppercase">
+                        Skills
+                      </h1>
+                    </div>
                     <div className="flex flex-col mt-2 gap-5 md:gap-3">
-                      {cvData.skills.map((skill: any, index: any) => (
-                        <div key={index}>
-                          <div className="flex gap-1 items-center w-fit">
-                            <ShowAnimatedVerifications
-                              firstButtonText={skill.skillName}
-                              isSelfAttested
-                              mailStatus={skill.endoresBy}
-                              hash=""
-                            />
-                            {skill.endoresBy && (
-                              <span>
-                                Endorsed by{" "}
-                                <span
-                                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
-                                  style={{
-                                    backgroundColor: COLOR_TEAL + "1a",
-                                    color: COLOR_TEAL,
-                                  }}
-                                >
-                                  <CheckCircle className="h-3.5 w-3.5" />
-                                  {skill.endoresBy.slice(0, 2)}...
-                                  {skill.endoresBy.slice(-4)}
+                      {cvData?.skills && cvData?.skills?.length > 0 ? (
+                        cvData?.skills?.map((skill: any, index: any) => (
+                          <div key={index}>
+                            <div className="flex gap-1 items-center w-fit">
+                              <ShowAnimatedVerifications
+                                firstButtonText={skill.skillName}
+                                isSelfAttested
+                                mailStatus={skill.endoresBy}
+                                hash=""
+                              />
+                              {skill.endoresBy && (
+                                <span>
+                                  Endorsed by{" "}
+                                  <span
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
+                                    style={{
+                                      backgroundColor: COLOR_TEAL + "1a",
+                                      color: COLOR_TEAL,
+                                    }}
+                                  >
+                                    <CheckCircle className="h-3.5 w-3.5" />
+                                    {skill.endoresBy.slice(0, 2)}...
+                                    {skill.endoresBy.slice(-4)}
+                                  </span>
                                 </span>
-                              </span>
-                            )}
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <NotProvided
+                          label="Skills"
+                          className="text-black text-sm lg:text-xl mt-2"
+                        />
+                      )}
                     </div>
                   </div>
 
                   {/* Experience */}
                   <div className="mt-5">
-                    {cvData.experiences.length > 0 && (
-                      <div className="flex items-center gap-5">
-                        <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center text-sm font-bold">
-                          W
-                        </div>
-                        <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                          Work Experience
-                        </h1>
+                    <div className="flex items-center gap-5">
+                      <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center text-sm font-bold">
+                        W
                       </div>
-                    )}
-                    <div className="relative">
-                      <div className="absolute inset-y-2 h-auto w-[3px] bg-[#FB980E] rounded-full"></div>
-                      {cvData.experiences.map((exp: any, index: any) => (
-                        <div
-                          key={index}
-                          className="flex flex-col mt-3 px-3 ml-1"
-                        >
-                          <div className="flex justify-between">
-                            <div className="max-w-xl w-full relative">
-                              <div className="absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 -left-[21px]"></div>
-                              <h1 className="text-md md:text-xl font-semibold tracking-tight line-clamp-1">
-                                {exp.jobRole}
-                              </h1>
-                              <div className="flex flex-col">
-                                <p className="flex gap-1 items-center text-sm md:text-lg capitalize line-clamp-1">
-                                  {exp.companyName}
-                                  {exp.docUri && (
-                                    <a
-                                      href={exp.docUri}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-[#FB980E] font-semibold text-sm"
-                                    >
-                                      <Link2 size={14} />
-                                    </a>
-                                  )}
+                      <h1 className="text-2xl font-semibold tracking-wider uppercase">
+                        Work Experience
+                      </h1>
+                    </div>
+                    {cvData?.experiences && cvData?.experiences?.length > 0 ? (
+                      <div className="relative">
+                        <div className="absolute inset-y-2 h-auto w-[3px] bg-[#FB980E] rounded-full"></div>
+                        {cvData.experiences.map((exp: any, index: any) => (
+                          <div
+                            key={index}
+                            className="flex flex-col mt-3 px-3 ml-1"
+                          >
+                            <div className="flex justify-between">
+                              <div className="max-w-xl w-full relative">
+                                <div className="absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 -left-[21px]"></div>
+                                <h1 className="text-md md:text-xl font-semibold tracking-tight line-clamp-1">
+                                  {exp.jobRole}
+                                </h1>
+                                <div className="flex flex-col">
+                                  <p className="flex gap-1 items-center text-sm md:text-lg capitalize line-clamp-1">
+                                    {exp.companyName}
+                                    {exp.docUri && (
+                                      <a
+                                        href={exp.docUri}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[#FB980E] font-semibold text-sm"
+                                      >
+                                        <Link2 size={14} />
+                                      </a>
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              <div>
+                                <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
+                                  {formatDate(exp.duration.from)} —{" "}
+                                  {exp.duration.to === "Present"
+                                    ? "Present"
+                                    : formatDate(exp.duration.to)}
                                 </p>
                               </div>
                             </div>
-                            <div>
-                              <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
-                                {formatDate(exp.duration.from)} —{" "}
-                                {formatDate(exp.duration.to)}
-                              </p>
+                            <div className="mt-3">
+                              {exp.description ? (
+                                <p>{exp.description}</p>
+                              ) : (
+                                <NotProvided
+                                  label="Description"
+                                  className="text-black"
+                                />
+                              )}
+                              {exp.skills ? (
+                                <p>
+                                  <strong>Skills:</strong> {exp.skills}
+                                </p>
+                              ) : (
+                                <NotProvided
+                                  label="Skills"
+                                  className="text-black mt-2"
+                                />
+                              )}
                             </div>
                           </div>
-                          <div className="mt-3">
-                            <p>{exp.description}</p>
-                            <p>
-                              <strong>Skills:</strong> {exp.skills}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <NotProvided
+                        label="Experience"
+                        className="text-black text-sm lg:text-xl mt-2"
+                      />
+                    )}
                   </div>
 
                   {/* Achievements & Projects */}
-                  {(cvData.awards.length > 0 || cvData.projects.length > 0) && (
+                  <div className="flex items-center gap-5">
+                    <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center text-sm font-bold">
+                      A
+                    </div>
+                    <h1 className="text-2xl font-semibold tracking-wider uppercase">
+                      Achievements and Certifications
+                    </h1>
+                  </div>
+                  {cvData?.awards?.length > 0 ||
+                  cvData?.projects?.length > 0 ? (
                     <div className="my-10 space-y-5">
-                      <div className="flex items-center gap-5">
-                        <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center text-sm font-bold">
-                          A
-                        </div>
-                        <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                          Achievements and Certifications
-                        </h1>
-                      </div>
-
                       {/* Awards */}
-                      {cvData.awards.length > 0 && (
+                      {cvData?.awards && cvData?.awards?.length > 0 ? (
                         <div className="px-3 mt-2">
                           <h1 className="text-xl font-semibold text-[#44949C] mb-2">
                             Awards
@@ -448,22 +547,34 @@ const LinkedinProfileCvModal = ({ cvData, onClose }: any) => {
                                   </div>
                                 </div>
                                 <div className="mt-1">
-                                  <p className="text-base">
-                                    {award.description}
-                                  </p>
+                                  {award.description ? (
+                                    <p className="text-base">
+                                      {award.description}
+                                    </p>
+                                  ) : (
+                                    <NotProvided
+                                      label="Description"
+                                      className="text-black"
+                                    />
+                                  )}
                                 </div>
                               </div>
                             ))}
                           </div>
                         </div>
+                      ) : (
+                        <NotProvided
+                          label="Achievements and Certifications"
+                          className="text-black text-sm lg:text-xl mt-2"
+                        />
                       )}
 
                       {/* Projects */}
-                      {cvData.projects.length > 0 && (
+                      <h1 className="text-xl font-semibold text-[#44949C] mb-3">
+                        Projects
+                      </h1>
+                      {cvData?.projects && cvData?.projects?.length > 0 ? (
                         <div className="px-3 mt-2">
-                          <h1 className="text-xl font-semibold text-[#44949C] mb-3">
-                            Projects
-                          </h1>
                           <div className="flex flex-col gap-3 relative">
                             <div className="absolute inset-y-2 h-auto w-[3px] bg-[#FB980E] rounded-full"></div>
                             {cvData.projects.map((project: any, index: any) => (
@@ -490,24 +601,53 @@ const LinkedinProfileCvModal = ({ cvData, onClose }: any) => {
                                   <div>
                                     <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
                                       {formatDate(project.duration.from)} —{" "}
-                                      {formatDate(project.duration.to)}
+                                      {project.duration.to === "Present"
+                                        ? "Present"
+                                        : formatDate(project.duration.to)}
                                     </p>
                                   </div>
                                 </div>
                                 <div className="mt-1">
-                                  <p className="text-base">
-                                    {project.description}
-                                  </p>
-                                  <p>
-                                    <strong>Skills:</strong> {project.skills}
-                                  </p>
+                                  {project.description ? (
+                                    <p className="text-base">
+                                      {project.description}
+                                    </p>
+                                  ) : (
+                                    <NotProvided
+                                      label="Description"
+                                      className="text-black mb-2"
+                                    />
+                                  )}
+                                  {project.skills ? (
+                                    <>
+                                      <p>
+                                        <strong>Skills:</strong>{" "}
+                                        {project.skills}
+                                      </p>
+                                    </>
+                                  ) : (
+                                    <NotProvided
+                                      label="Skills"
+                                      className="text-black"
+                                    />
+                                  )}
                                 </div>
                               </div>
                             ))}
                           </div>
                         </div>
+                      ) : (
+                        <NotProvided
+                          label="Projects"
+                          className="text-black text-sm lg:text-xl mt-2"
+                        />
                       )}
                     </div>
+                  ) : (
+                    <NotProvided
+                      label="Achievements , Certifications and Projects"
+                      className="text-black text-sm lg:text-xl mt-2"
+                    />
                   )}
                 </div>
               </div>
