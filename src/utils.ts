@@ -22,13 +22,14 @@ import gov13 from "./assets/Gov/gov-13.png"
 import blcLogo1 from './assets/CLOGOS/blcLogo1.png'
 import blcLogo2 from './assets/CLOGOS/blcLogo2.png'
 import blcLogo3 from './assets/CLOGOS/blcLogo3.png'
-import blcLogo4 from './assets/CLOGOS/blcLogo4.png'
+import blcLogo4 from './assets/CLOGOS/blcLogo4.jpeg'
 import blcLogo5 from './assets/CLOGOS/blcLogo5.png'
 import blcLogo6 from './assets/CLOGOS/blcLogo6.png'
 import blcLogo7 from './assets/CLOGOS/blcLogo7.png'
 import blcLogo8 from './assets/CLOGOS/blcLogo8.png'
 import blcLogo9 from './assets/CLOGOS/blcLogo9.png'
 import blcLogo10 from './assets/CLOGOS/blcLogo10.png'
+import blcLogo11 from './assets/CLOGOS/blcLogo11.png'
 
 import accLogo1 from './assets/CLOGOS/accLogo1.png'
 import accLogo2 from './assets/CLOGOS/accLogo2.png'
@@ -108,7 +109,7 @@ export const convertDateToString = (value: any): string | null => {
 };
 
 export const instLogos = [instLogo1,instLogo2,instLogo3,instLogo4,instLogo5,instLogo1,instLogo2,instLogo3,instLogo4,instLogo5,instLogo1,instLogo2,instLogo3,instLogo4,instLogo5,instLogo1,instLogo2,instLogo3,instLogo4,instLogo5,instLogo1,instLogo2,instLogo3,instLogo4,instLogo5,instLogo1,instLogo2,instLogo3,instLogo4,instLogo5,instLogo1,instLogo2,instLogo3,instLogo4,instLogo5,instLogo1,instLogo2,instLogo3,instLogo4,instLogo5];
-export const blcLogos =  [blcLogo1,blcLogo2,blcLogo3,blcLogo4,blcLogo5,blcLogo6,blcLogo7,blcLogo8,blcLogo9,blcLogo10,blcLogo1,blcLogo2,blcLogo3,blcLogo4,blcLogo5,blcLogo6,blcLogo7,blcLogo8,blcLogo9,blcLogo10];
+export const blcLogos =  [blcLogo1,blcLogo2,blcLogo3,blcLogo4,blcLogo5,blcLogo6,blcLogo7,blcLogo8,blcLogo9,blcLogo10,blcLogo11,blcLogo1,blcLogo2,blcLogo3,blcLogo4,blcLogo5,blcLogo6,blcLogo7,blcLogo8,blcLogo9];
 export const govLogos =  [gov1,gov2,gov3,gov4,gov5,gov6,gov7,gov8,gov9,gov10,gov11,gov12,gov13,gov1,gov2,gov3,gov4,gov5,gov6,gov7];
 export const finLogos =  [finLogo1,finLogo2,finLogo3,finLogo4,finLogo5,finLogo6,finLogo1,finLogo2,finLogo3,finLogo4,finLogo5,finLogo6,finLogo1,finLogo2,finLogo3,finLogo4,finLogo5,finLogo6,finLogo1,finLogo2];
 export const foreignLogos = [foreignLogo1,foreignLogo2,foreignLogo3,foreignLogo4,foreignLogo5,foreignLogo6,foreignLogo1,foreignLogo2,foreignLogo3,foreignLogo4,foreignLogo5,foreignLogo6,foreignLogo1,foreignLogo2,foreignLogo3,foreignLogo4];
