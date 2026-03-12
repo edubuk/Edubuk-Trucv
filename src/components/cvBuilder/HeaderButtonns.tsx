@@ -337,18 +337,14 @@ const HeaderButtons = ({
           >
             {/* ── Modal Header ── */}
             <div
-              className="flex flex-col w-full px-6 pt-[22px] pb-5"
-              style={{
-                background:
-                  "linear-gradient(135deg, #011a1a 0%, #024544 45%, #036665 100%)",
-              }}
+              className="flex flex-col w-full px-6 pt-[22px] pb-5 bg-gray-100"
             >
             
-              <p className="text-[10px] font-semibold tracking-widest uppercase text-teal-300 mb-1">
+              <p className="text-[10px] font-semibold tracking-widest uppercase text-[#03257e] mb-1">
                 Smart Autofill
               </p>
-              <h2 className="text-[18px] font-bold text-white leading-snug mb-5">
-                Import &amp; <span className="text-[#5dd4d3]">auto-fill</span>
+              <h2 className="text-[18px] font-bold text-[#006666] leading-snug mb-5">
+                Import &amp; <span className="text-[#03257e]">auto-fill</span>
                 <br />
                 your Trucv
               </h2>
@@ -356,7 +352,6 @@ const HeaderButtons = ({
               {/* Tabs */}
               <div
                 className="flex gap-1 rounded-[10px] p-[3px]"
-                style={{ background: "rgba(255,255,255,0.07)" }}
               >
                 <button
                   onClick={() => setTab("cv")}
