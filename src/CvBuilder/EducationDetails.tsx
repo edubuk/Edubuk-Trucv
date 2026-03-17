@@ -552,11 +552,11 @@ export const EducationDetails = ({
                             value={customLevel}
                             onChange={(e: any) => setCustomLevel(e.target.value)}
                             placeholder="Enter your level"
-                            className="border text-[#03257e] bg-gray-100 h-9 rounded w-full px-2 focus:outline-none focus:ring-1 focus:ring-[#006666]"
+                            className="border text-[#000000] bg-gray-100 h-9 rounded w-full px-2 focus:outline-none focus:ring-1 focus:ring-[#000000]"
                           />
                           <button
                             type="button"
-                            className="flex gap-1 items-center bg-[#03257e] text-white px-2 py-1 rounded-lg hover:bg-[#005555]"
+                            className="flex gap-1 items-center bg-[#000000] text-white px-2 py-1 rounded-lg"
                             onClick={()=>addCustomLevel(index,field)}
                           >
                             <PlusCircle size={18}/>Add

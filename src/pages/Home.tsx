@@ -88,7 +88,12 @@ const Home:React.FC = () => {
           </p>
           <p className="text-[#f14419] text-center font-bold text-xl sm:text-2xl" data-aos="fade-up">
             [ Academic & Professional Credentials ]
+            <br />
+            <span className="text-[#03257e] text-center font-bold text-xl sm:text-2xl" data-aos="fade-up">
+              Integrated with DigiLocker
+            </span>
           </p>
+          
 
           {/* Create CV CTA */}
         </div>
