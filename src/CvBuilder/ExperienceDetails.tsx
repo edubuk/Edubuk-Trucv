@@ -75,7 +75,8 @@ export const ExperienceDetails = ({
       ],
     },
   });
-  const { control, setValue, getValues } = form;
+  const { control, setValue, getValues, formState } = form;
+  const { errors } = formState;
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isCurrentlyWorking, setIsCurrentlyWorking] = useState<boolean>(false);
@@ -192,8 +193,12 @@ export const ExperienceDetails = ({
 
   const updateHandler = async (index: number) => {
     try {
+      console.log("hitting");
+      console.log("errors", errors);
+
       const isValid = await form.trigger(`experiences.${index}`);
       if (!isValid) return;
+      console.log("hitting");
       setLoadingState("Updating");
       const payload = getValues(`experiences.${index}`);
       console.log("payload", payload);

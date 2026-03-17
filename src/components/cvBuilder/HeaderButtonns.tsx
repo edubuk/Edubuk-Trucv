@@ -277,56 +277,6 @@ const HeaderButtons = ({
         .hb-spin { animation: hb-spin 0.7s linear infinite; display: inline-flex; }
       `}</style>
 
-        {/* ── Top bar ── */}
-        <div className="flex items-center justify-between gap-3">
-          {/* Preview button */}
-          {/* <button
-          onClick={() => setPreviewCV(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          <EyeIcon />
-          Preview CV
-        </button> */}
-
-          {/* imported linkdein profiles list */}
-          {/* {!isAllImportedProfilesLoading && profiles && profiles?.length > 0 && (
-          <AllImportedLinkdeinProfilesModel importedProfiles={profiles} />
-        )} */}
-          {/* Right side */}
-          {/* {hasParsedCV ? (
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg text-[12px] font-medium text-green-700">
-              <CheckBadgeIcon />
-              CV Parsed
-            </span>
-            <button
-              onClick={clearParsedCV}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-lg text-[12px] font-medium text-rose-600 cursor-pointer transition-all duration-200 hover:bg-rose-100 hover:border-rose-300 hover:-translate-y-px"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              <TrashIcon />
-              Clear
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowParsedModel(true)}
-            disabled={isParsing}
-            className="inline-flex items-center gap-1.5 px-4 py-2 border-none rounded-lg text-[13px] font-medium text-white cursor-pointer transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-px hover:shadow-lg"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              background:
-                "linear-gradient(135deg, #024544 0%, #036665 55%, #048a89 100%)",
-              boxShadow: "0 2px 10px rgba(3,102,101,0.35)",
-            }}
-          >
-            <UploadCloudIcon />
-            Import CV
-          </button>
-        )} */}
-        </div>
-
         {/* ── Modal ── */}
         {!showParsedModel && (
           <div
@@ -442,14 +392,6 @@ const HeaderButtons = ({
                   {tab === "cv" &&
                     (localStorage.getItem("cvData") ? (
                       <div className="flex gap-2 justify-center items-center">
-                        {/* <button
-                          className="flex items-center gap-1 bg-[#006666] text-white px-4 py-2 rounded-lg"
-                          onClick={() => setOpenLinkdeinProfileCV(true)}
-                        >
-                          <EyeIcon />
-                          Preview Parsed Data
-                        </button> */}
-
                         <button
                           disabled={isDataSaving}
                           onClick={saveParsedData}
@@ -474,6 +416,22 @@ const HeaderButtons = ({
                         </button>
                       </div>
                     ) : (
+                      localStorage.getItem("linkedInCvData") ? 
+                      (
+                        <div className="flex flex-col justify-center items-center gap-2">
+                          <span className="text-[#03257e] font-bold text-center">LinkedIn CV Data Available. If You want to import cv please clear linkedin existing data.</span>
+                          <button
+                            className="flex items-center justify-center gap-1 text-[#f14419] border border-[#f14419] rounded-lg px-3 py-2"
+                            onClick={() => {
+                              localStorage.removeItem("linkedInCvData");
+                              window.location.reload();
+                            }}
+                          >
+                            <Trash2 size={16} />
+                            Clear LinkedIn CV Data
+                          </button>
+                        </div>
+                      ):
                       <>
                         <input
                           ref={fileRef}
@@ -556,6 +514,7 @@ const HeaderButtons = ({
                   {/* ─ LinkedIn Tab ─ */}
                   {tab === "linkedin" &&
                     (localStorage.getItem("linkedInCvData") ? (
+                      <div className="flex flex-col items-center justify-center gap-2">
                       <div className="flex gap-2 justify-center items-center">
                         <button
                           className="bg-[#006666] text-white px-4 py-2 rounded-lg flex items-center gap-1"
@@ -588,7 +547,29 @@ const HeaderButtons = ({
                           Clear CV Data
                         </button>
                       </div>
+                      <p className="text-[#03257e] text-center"><span className="font-bold text-[#f14419]">Note:</span> All fetched data may not be accurate and complete, so please verify and update each saved field after saving it.</p>
+                      </div>
                     ) : (
+                      localStorage.getItem("cvData") ? 
+                      (
+                        <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="flex flex-col justify-center items-center gap-2">
+                          <span className="text-[#03257e] font-bold text-center">Parsed CV Data Available. If You want to import CV data from LinkedIn please clear existing parsed CV data.</span>
+                          <button
+                            className="flex items-center justify-center gap-1 text-[#f14419] border border-[#f14419] rounded-lg px-3 py-2"
+                            onClick={() => {
+                              localStorage.removeItem("cvData");
+                              window.location.reload();
+                            }}
+                          >
+                            <Trash2 size={16} />
+                            Clear Parsed CV Data
+                          </button>
+                        </div>
+                        <p className="text-[#03257e] text-center"><span className="font-bold text-[#f14419]">Note:</span> All fetched data may not be accurate and complete, so please verify and update each saved field after saving it.</p>
+                        </div>
+
+                      ):
                       <>
                         <div className="bg-[#006666]/5 border border-[#006666]/20 rounded-xl p-3 flex flex-col gap-2 mt-1">
                           {[
@@ -735,14 +716,6 @@ const HeaderButtons = ({
             onClose={() => setOpenLinkdeinProfileCV(false)}
           />
         )}
-
-        {/* for testing */}
-        {/* {!showParsedModel && (
-        <LinkedinProfileCvModal
-          cvData={MOCK_CV_2}
-          onClose={() => setOpenLinkdeinProfileCV(false)}
-        />
-      )} */}
       </div>
     </StepCard>
   );

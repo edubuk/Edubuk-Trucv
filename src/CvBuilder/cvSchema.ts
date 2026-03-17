@@ -94,7 +94,7 @@ export type TypeEducation = z.infer<typeof EducationItemSchema>;
 
 export const ExperienceItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
-  expDocId:z.string().uuid(),
+  expDocId:z.string(),
   companyName: z.string().min(1, "Company name is required"),
   jobRole: z.string().min(1, "Position is required"),
   duration: z.object({
