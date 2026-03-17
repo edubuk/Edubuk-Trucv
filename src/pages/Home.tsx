@@ -16,6 +16,7 @@ import { Crown } from "lucide-react";
 import toast from "react-hot-toast";
 import { API_BASE_URL } from "@/main";
 import PartnerList from "@/components/HomePageSections/PartnerList";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const Home:React.FC = () => {
   const [openProfile, setOpenProfile] = useState(false);
@@ -42,6 +43,9 @@ const Home:React.FC = () => {
     <div className="flex justify-center items-center flex-col gap-8 overflow-hidden">
      <div className="relative w-full flex flex-col">
      <div className="relative flex justify-end items-center w-full h-[20px] mt-2 p-6">
+      <div className="block mr-2 xl:hidden">
+      <ConnectButton />
+      </div>
           {user&&<div className="flex flex-col justify-center items-center">
             {user?.subscriptionPlan === "pro" && <Crown size={20} className="absolute -top-1 text-[#f14419] bg-white" />}
               <p

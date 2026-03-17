@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { googleLogout } from "@react-oauth/google";
 import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 
 interface LinkItem {
@@ -154,6 +155,7 @@ console.log("currentPath",currentPath);
               </Link>
             </div>
           ) : (
+            <>
            <div className="relative hidden lg:flex rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
               <button
                 onClick={handlerLogout}
@@ -164,6 +166,10 @@ console.log("currentPath",currentPath);
                 {loading?"Please Wait...":"Logout"}
               </button>
             </div>
+            <div className="hidden xl:block">
+              <ConnectButton />
+            </div>
+          </>
           )}
         {/* Hamburger Menu */}
         <div className="flex items-center justify-center gap-2 ml-2">

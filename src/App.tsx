@@ -32,6 +32,7 @@ import CVBuilder from "./CvBuilder/CvBuilder";
 import CreateCv from "./pages/CreateCv";
 import CertificateTimerPage from "./components/Certification/CertificateTimerPage";
 import AdminDashBoard from "./components/Admin/AdminDashboard";
+import { Providers } from "./app/providers";
 
 
 function App() {
@@ -46,6 +47,7 @@ useEffect(() => {
 
   return (
     <div>
+      <Providers>
           <Suspense fallback={<div className="flex justify-center items-center text-3xl text-[#03257e] font-bold h-[80vh]" data-aos="zoom-in">Loading {""} <ThreeDotLoader w={2} h={2} yPos={'end'} /></div>}>
             <Routes>
               <Route
@@ -75,6 +77,7 @@ useEffect(() => {
               <Route path="/certificate-timer" element={<Layout><ProtectedRoute><CertificateTimerPage /></ProtectedRoute></Layout>} />
             </Routes>
           </Suspense>
+      </Providers>
     </div>
   );
 }
