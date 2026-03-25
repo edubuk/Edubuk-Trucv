@@ -38,4 +38,4 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </StrictMode>
 );
-export const API_BASE_URL = "https://dev-server.trucv.org";
+export const API_BASE_URL = "https://backend-dev-server.edubuktrucv.com";
