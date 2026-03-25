@@ -6,7 +6,7 @@ import axios, {
 } from "axios";
 import toast from "react-hot-toast";
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const API_BASE_URL = "https://dev-server.trucv.org";
 // Create main axios instance used everywhere
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
