@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { ShieldCheck, X, FileText, BadgeCheck, Loader2, Copy, Hash, ChevronDown, RefreshCwIcon, Crown, Edit, ExternalLink, User, XCircle,CircleCheckBig, FolderCheck} from "lucide-react";
+import { ShieldCheck, X, FileText, Copy, ChevronDown, RefreshCwIcon, Crown, Edit, ExternalLink, User, XCircle,CircleCheckBig, FolderCheck} from "lucide-react";
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
-import AccessDeniedPage from "./AccessDenied";
+import AccessDeniedPage from "../../pages/AccessDenied";
 import { useUserData } from "@/context/AuthContext";
 import UpdateSubscription from "@/components/Subscription/UpdateSubscription";
 import StatusBadge from "@/CvBuilder/StatusBadge";
 // Colors
 const COLOR_PRIMARY = "#03257e"; // deep blue
-const COLOR_TEAL = "#006666"; // teal
+//const COLOR_TEAL = "#006666"; // teal
 
 
 // Types
@@ -95,15 +95,18 @@ export default function AdminUserProfilesPage() {
   const [viewUserData, setViewUserData] = useState<boolean>(false);
   const [activeUser, setActiveUser] = useState<UserProfile | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [mintResult, setMintResult] = useState<{ txId: string; assetId?: number } | null>(null);
+  const [refreshKey,setRefreshKey]= useState(false);
+  const [loadingCvs,setLoadingCvs] = useState(false);
+  const [cvError,setCvError] = useState("");
+  //const [mintResult, setMintResult] = useState<{ txId: string; assetId?: number } | null>(null);
   const [usersList, setUsersList] = useState<UserProfile[]>([]);
   const [pageNum, setPageNum] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [userSubscriptionDetails, setUserSubscriptionDetails] = useState<ISubscription>();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [email, setEmail] = useState<string>("");
-  const [refreshKey, setRefreshKey] = useState<boolean>(false);
   const [cvIds, setCvIds] = useState([]);
+  const [isFetching,setIsFetching] = useState(true);
   const [currentUserId,setCurrentUserId] = useState<string>("");
   const [educationDocs, setEducationDocs] = useState({
     educations: [],
@@ -115,6 +118,7 @@ export default function AdminUserProfilesPage() {
 
   const userListHandler = async () => {
     try {
+      setIsFetching(true);
       setLoading(true);
       const users = await fetch(`${API_BASE_URL}/admin/users-list?page=${pageNum}&email=${email ? email : ""}`, { credentials: "include" })
       const usersList = await users.json();
@@ -132,6 +136,7 @@ export default function AdminUserProfilesPage() {
       toast.error(error.message);
     } finally {
       setLoading(false);
+      setIsFetching(false);
     }
   }
 
@@ -199,27 +204,32 @@ export default function AdminUserProfilesPage() {
     setExpandedUserId((prev) => (prev === userId ? null : userId));
     setActiveCert(null);
     setActiveUser(null);
-    setMintResult(null);
     setCvIds([])
   }
 
   const fetchIds = async (userId: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/cv/cv-ids?userId=${userId}`, {
+      setLoadingCvs(true);
+      const response = await fetch(`${API_BASE_URL}/admin/user-cvs?userIdThroughAdmin=${userId}`, {
         method: "GET",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      const data = await response.json();
-      if (!data.success) {
-        return toast.error("No CV found");
+      const res = await response.json();
+      console.log("Cvs", res);
+      if(res.success && res.data.length > 0){
+        setCvIds(res.data);
+      }else{
+        setCvError("No CV Found...");
+        toast.error("No CV found");
       }
-      setCvIds(data.data);
     }
     catch (err) {
       toast.error("something went wrong")
+    }finally{
+      setLoadingCvs(false);
     }
   }
 
@@ -255,51 +265,16 @@ export default function AdminUserProfilesPage() {
     }
   }
 
-  // function updateCertificate(userId: string, certId: string, patch: Partial<Certificate>) {
-  //   setUsers((prev:any) => prev.map((u:any) => {
-  //     if (u._id !== userId) return u;
-  //     return {
-  //       ...u,
-  //       certificates: u.certificates.map((c:any) => c._id === certId ? { ...c, ...patch } : c)
-  //     };
-  //   }));
-  // }
-
-  // async function simulateMintOnAlgorand(user: UserProfile, cert: IUserDoc) {
-  //   setIsMinting(true);
-  //   setMintResult(null);
-
-  //   // Build ARC-3 style metadata object (for display only)
-  //   const metadata = {
-  //     name: `${user.name} – ${cert.title}`,
-  //     description: `Verifiable credential token for ${cert.title}`,
-  //     properties: {
-  //       holderEmail: user.email,
-  //       phoneNumber: user.phoneNumber,
-  //       issuedBy: cert.organisation,
-  //       issuedOn: cert.createdAt,
-  //       verificationStatus: cert.status,
-  //       verificationMethod: cert.verifiedThrough,
-  //       link: cert.docUrl,
-  //     },
-  //     standard: "arc3",
-  //   };
-
-  //   await new Promise((r) => setTimeout(r, 1200));
-  //   const txId = "TX-" + Math.random().toString(16).slice(2) + Date.now().toString(16);
-  //   const assetId = Math.floor(10_000_000 + Math.random() * 90_000_000);
-
-  //   setIsMinting(false);
-  //   setMintResult({ txId, assetId });
-
-  //   // attach arc3 preview back to the cert
-  //   //updateCertificate(user._id, cert._id, { metadata: { ...(cert.meta || {}), arc3: metadata } });
-  // }
 
   useEffect(() => {
+    console.log("hiting")
     userListHandler();
   }, [pageNum, refreshKey]);
 
+  if(isFetching)
+  {
+    return <ThreeDotLoader w={4} h={4} yPos="center" />;
+  }
 
   return (
     <>
@@ -312,7 +287,7 @@ export default function AdminUserProfilesPage() {
               <div className="flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Search User"
+                  placeholder="Search User With Email ID"
                   className="border border-gray-200 rounded-lg px-4 py-2"
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -370,7 +345,7 @@ export default function AdminUserProfilesPage() {
                           key={cert?.eduDocId}
                           className="group bg-white border border-gray-100 rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow"
                           aria-label={`Open ${cert.level}`}
-                          onClick={() => { setActiveCert(cert); setActiveUser(userData); setMintResult(null); }}
+                          onClick={() => { setActiveCert(cert); setActiveUser(userData);}}
 
                         >
                           <div className="flex items-start justify-between gap-2">
@@ -394,7 +369,7 @@ export default function AdminUserProfilesPage() {
                           key={cert?.expDocIdId}
                           className="group bg-white border border-gray-100 rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow"
                           aria-label={`Open ${cert.level}`}
-                          onClick={() => { setActiveCert(cert); setActiveUser(userData); setMintResult(null); }}
+                          onClick={() => { setActiveCert(cert); setActiveUser(userData); }}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div>
@@ -417,7 +392,7 @@ export default function AdminUserProfilesPage() {
                           key={cert?.awDocIdId}
                           className="group bg-white border border-gray-100 rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow"
                           aria-label={`Open ${cert.level}`}
-                          onClick={() => { setActiveCert(cert); setActiveUser(userData); setMintResult(null); }}
+                          onClick={() => { setActiveCert(cert); setActiveUser(userData); }}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div>
@@ -519,20 +494,42 @@ export default function AdminUserProfilesPage() {
                             </div>
 
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-col justify-start gap-2">
                             <button
                               className="mt-2 p-2 bg-[#006666] text-white rounded-lg"
                               onClick={() => fetchIds(userData._id)}
                             >Fetch User CV</button>
                             {
-                              cvIds?.map((id: any, index) => {
+                              loadingCvs&&<p className="text-[#f14419] text-center mt-2 font-md">Fetching...</p>
+                            }
+                            {
+                              cvError&&<p className="text-[#f14419] text-center mt-2 font-md">{cvError}</p>
+                            }
+                            <div className="flex justify-start items-center gap-2 flex-wrap">
+                            {
+                              cvIds?.map((cv: any, index) => {
                                 return (
-                                  <div key={index}>
-                                    <a className="underline text-[#f14419]" href={`/cv/${id.nanoId}`}>{id.nanoId}</a>
-                                  </div>
+                                  <div
+                                      key={index}
+                                      className="group rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md"
+                                    >
+                                      <a
+                                        href={`/cv/${cv._id}`}
+                                        className="flex items-center justify-between text-sm font-medium text-gray-800 hover:text-[#f14419]"
+                                      >
+                                        <span className="truncate">
+                                          {cv.title}
+                                        </span>
+
+                                        <span className="ml-3 text-xs text-gray-400 group-hover:text-[#f14419] transition">
+                                          View →
+                                        </span>
+                                      </a>
+                                    </div>
                                 )
                               })
                             }
+                            </div>
                           </div>
                         </div>
                       </div>}
@@ -546,7 +543,7 @@ export default function AdminUserProfilesPage() {
           {/* MODAL — restored to previous detailed design */}
           {activeCert && activeUser && (
             <div className="fixed inset-0 z-50">
-              <div className="absolute inset-0 bg-black/30" onClick={() => { setActiveCert(null); setActiveUser(null); setMintResult(null); }} />
+              <div className="absolute inset-0 bg-black/30" onClick={() => { setActiveCert(null); setActiveUser(null); }} />
               <div className="absolute inset-0 flex items-end sm:items-center justify-center p-2 sm:p-4">
                 <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-y">
                   {/* Modal Header */}
@@ -555,7 +552,7 @@ export default function AdminUserProfilesPage() {
                       <FileText className="h-5 w-5" />
                       <div className="font-semibold flex items-center gap-2">{activeCert?.level??activeCert?.jobRole} • {activeUser?.name} {activeCert?.status === "verified" && <CircleCheckBig size={20} className="text-green-600 font-semibold" />}</div>
                     </div>
-                    <button className="p-1 rounded-lg hover:bg-white/10" onClick={() => { setActiveCert(null); setActiveUser(null); setMintResult(null); }} aria-label="Close">
+                    <button className="p-1 rounded-lg hover:bg-white/10" onClick={() => { setActiveCert(null); setActiveUser(null);}} aria-label="Close">
                       <X className="h-5 w-5" />
                     </button>
                   </div>
@@ -628,7 +625,7 @@ export default function AdminUserProfilesPage() {
                         </button>
                       </div> */}
 
-                      <div className="flex items-center gap-2 sm:ml-auto">
+                      {/* <div className="flex items-center gap-2 sm:ml-auto">
                         <button
                           className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-white text-sm font-semibold shadow"
                           style={{ backgroundColor: COLOR_PRIMARY }}
@@ -643,10 +640,10 @@ export default function AdminUserProfilesPage() {
                         >
                           Close
                         </button>
-                      </div>
+                      </div> */}
                     </div>
 
-                    {mintResult && (
+                    {/* {mintResult && (
                       <div className="mt-4 border border-gray-200 rounded-xl p-3 bg-gray-50">
                         <div className="text-sm font-semibold flex items-center gap-2" style={{ color: COLOR_TEAL }}>
                           <BadgeCheck className="h-4 w-4" /> Token simulated successfully
@@ -663,38 +660,7 @@ export default function AdminUserProfilesPage() {
                         </div>
                         <div className="mt-2 text-[11px] text-gray-500"></div>
                       </div>
-                    )}
-
-                    {/* Original developer notes */}
-                    <details className="mt-4 group">
-                      <summary className="cursor-pointer text-xs text-gray-500 group-open:text-gray-700">To be discussed on token generation</summary>
-                      <div className="mt-2 text-xs text-gray-600 space-y-2 bg-gray-50 border border-gray-200 rounded-xl p-3">
-
-                        <pre className="bg-white p-2 rounded border overflow-auto">
-                          {`// Example (pseudo):
-                            import algosdk from 'algosdk';
-                            const client = new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', '');
-                            const acct = algosdk.mnemonicToSecretKey(process.env.NEXT_PUBLIC_ALGO_MNEMONIC!);
-                            const params = await client.getTransactionParams().do();
-                            const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
-                              from: acct.addr,
-                              total: 1,
-                              decimals: 0,
-                              assetName: '${'${activeUser?.fullName ?? ""} – ${activeCert?.name ?? ""}'}',
-                              unitName: 'CERT',
-                              defaultFrozen: false,
-                              assetURL: 'https://your-domain.com/metadata/123.json',
-                              metadataHash: new Uint8Array([/* sha256 of JSON */]),
-                              suggestedParams: params,
-                            });
-                            const signed = txn.signTxn(acct.sk);
-                            const { txId } = await client.sendRawTransaction(signed).do();
-                            const result = await algosdk.waitForConfirmation(client, txId, 4);
-                            const assetId = result['asset-index'];
-                            `}
-                        </pre>
-                      </div>
-                    </details>
+                    )} */}
                   </div>
                 </div>
               </div>

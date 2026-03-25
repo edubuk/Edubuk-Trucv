@@ -37,6 +37,10 @@ import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
 import StatusBadge from "./StatusBadge";
+import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
+import { useContract } from "@/Blockchain/hooks/useMyContract";
+import { useAccount } from "wagmi";
+import { parseContractError } from "@/Blockchain/utils/error";
 
 export const AwardDetails = ({
   step,
@@ -49,8 +53,10 @@ export const AwardDetails = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [idx,setIdx] = useState<number>();
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<boolean>(false);
+  const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
+  const [refresh, setRefresh] = useState<boolean>(true);
+  const {submitDocument} = useContract();
+  const {address} = useAccount();
   // const { user } = useUserData();
   const form = useForm<AwardFormValues>({
     resolver: zodResolver(AwardSchema),
@@ -109,27 +115,55 @@ export const AwardDetails = ({
     const payload = getValues(`awards.${index}`);
     try {
       setIdx(index);
-      setLoading(true);
-      const result = await api.post(`/doc/save-awards`, {
-        data:payload
-      });
-      const res = await result.data;
-      if (!res.success) {
-        toast.error(res.message);
-        setLoading(false);
+      setLoadingState("Submitting");
+      // step-1 submitting on blockchain 
+      if (payload.docHash) {
+        const id = toast.loading("Submitting on chain...");
+        try {
+          await submitDocument({
+            name       : payload.name,
+            hashString : `0x${payload.docHash}` as `0x${string}`,
+            docType    : "award",
+            tokenUri   : "",
+            currAddress: address as `0x${string}`,
+          });
+          toast.dismiss(id);
+        } catch (txError) {
+          const errMsg = parseContractError(txError);
+  
+          if (errMsg === "This document has already been submitted.") {
+            // Already on chain — skip and proceed to DB save
+            toast.dismiss(id);
+            toast.custom(() => (
+              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+                <p>Document already on chain. Retrying database save...</p>
+              </div>
+            ));
+          } else {
+            // Any other chain error — stop everything
+            toast.dismiss(id);
+            throw txError;
+          }
+        }
+      }
+
+      const { data } = await api.post(`/doc/save-awards`, { data: payload });
+
+      if (!data.success) {
+        toast.error(data.message);
         return;
       }
-      toast.success(res.message);
-      setLoading(false);
+  
+      toast.success(data.message);
       setRefresh((prev) => !prev);
     } catch (error: any) {
       toast.error(error.message ?? error ?? "Something went wrong");
     } finally {
-      setLoading(false);
+      setLoadingState(null);
     }
   };
 
-  const fetchExpDocs = async () => {
+  const fetchAwdDocs = async () => {
     try {
       const data = await api.get(`/doc/award-docs`);
       const res = await data.data;
@@ -153,24 +187,26 @@ export const AwardDetails = ({
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
         }));
-
+        cvData.awards=awards;
         // Update form values
         form.reset({ awards });
       }
     } catch (error) {
       toast.error("something went wrong");
+    }finally{
+      setRefresh(false);
     }
   };
 
   useEffect(() => {
-    fetchExpDocs();
-  }, [step === 3, refresh]);
+    fetchAwdDocs();
+  }, [step === 7, refresh]);
 
   const updateHandler = async (index: number) => {
     try {
       const isValid = await form.trigger(`awards.${index}`);
       if (!isValid) return;
-      setLoading(true);
+      setLoadingState("Updating");
       setIdx(index);
       const payload = getValues(`awards.${index}`);
       console.log("payload", payload);
@@ -188,7 +224,7 @@ export const AwardDetails = ({
       setRefresh((prev) => !prev);
     } catch (error) {
       toast.error("something went wrong");
-    }finally{setLoading(false)}
+    }finally{setLoadingState(null)}
   };
 
   const uploadDocHandler = async(file:File,index:number)=>{
@@ -216,7 +252,7 @@ export const AwardDetails = ({
     try {
       const confirm = window.confirm("Are you sure you want to delete this document?");
       if (!confirm) return;
-      setLoading(true);
+      setLoadingState("Deleting");
       setIdx(index);
       const payload = getValues(`awards.${index}`);
       const res = await api.delete(`/doc/delete-awardDoc/${payload.id}`);
@@ -230,7 +266,7 @@ export const AwardDetails = ({
     } catch (error: any) {
       toast.error(error.data.message || error.message || error || "something went wrong");
     }finally{
-      setLoading(false);
+      setLoadingState(null);
     }
   };
 
@@ -265,23 +301,29 @@ export const AwardDetails = ({
     });
   }
 
+
+
   return (
     <Form {...form}>
       <form >
         <StepCard
-          index={6}
+          index={7}
           title="Certificates/Courses/Awards"
           icon={Award}
-          open={step === 6}
-          onToggle={() => setStep(step === 6 ? 0 : 6)}
+          open={step === 7}
+          onToggle={() => setStep(step === 7 ? 0 : 7)}
         >
           <p className="text-sm text-slate-500">
             Add projects. Make them stand out with URL and short description.
             Each item can be removed.
           </p>
+          {refresh?<ThreeDotLoader w={3} h={3} yPos="center"/>:
           <div className="mt-4 space-y-4">
             {fields.map((a, index) => (
               <>
+              {!isMongoId(a.id) &&<div className="flex items-center justify-center border-dashed border-[#03257e] border-b">
+                      <span className="relative top-4 bg-white p-1 text-md text-center text-[#03257e]">Save New Document</span>
+                    </div>}
                 {isMongoId(a.id) && (
                   <div className="flex justify-start items-center gap-2">
                     <input
@@ -339,12 +381,12 @@ export const AwardDetails = ({
                         {isMongoId(a.id) ? (
                           <Button
                             type="button"
-                            disabled={a.verified || loading}
+                            disabled={a.verified || loadingState==="Updating"}
                             onClick={() => updateHandler(index)}
                             className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
                           >
                             <Replace size={18} />{" "}
-                            {loading && idx === index
+                            {loadingState === "Updating" && idx === index
                               ? "Updating..."
                               : "Update"}
                           </Button>
@@ -359,12 +401,15 @@ export const AwardDetails = ({
                         )}
                         {isMongoId(a.id) && (
                           <Button
-                            disabled={a.verified || loading}
+                            disabled={a.verified || loadingState==="Deleting"}
                             type="button"
                             onClick={() => deleteHandler(index)}
                             className="mt-2 px-1 sm:py-1 sm:px-3 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
                           >
-                            <Delete size={18} /> Delete
+                            <Delete size={18} />
+                            {loadingState === "Deleting" && idx === index
+                              ? "Deleting..."
+                              : "Delete"}
                           </Button>
                         )}
                       </div>
@@ -404,10 +449,10 @@ export const AwardDetails = ({
                             </div>
                           </FormLabel>
                           <FormControl>
-                            <Input
-                            disabled={a.verified}
+                            <Input 
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              disabled={a.verified}
                               placeholder={`${a.level} name`}
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -428,9 +473,9 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-                            disabled={a.verified}
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              disabled={a.verified}
                               placeholder="Organisation"
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -453,8 +498,11 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input 
-                            disabled={a.verified}
-                            type="date" {...field} />
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              disabled={a.verified}
+                              type="date" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -474,8 +522,11 @@ export const AwardDetails = ({
                             </FormLabel>
                             <FormControl>
                               <Input 
-                              disabled={a.verified}
-                              type="date" {...innerField} />
+                                className={`w-full ${isMongoId(a.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                                disabled={a.verified}
+                                type="date" 
+                                {...innerField} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -495,9 +546,9 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                            disabled={a.verified}
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              disabled={a.verified}
                               placeholder="Description(write as paragraph format)"
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -631,7 +682,7 @@ export const AwardDetails = ({
                       />
                     </div>
                   </div>}
-                  {loading ? (
+                  {loadingState === "Submitting" ? (
               (index===idx)&&<LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]"/>
             ) : (
               !isMongoId(a.id)&&<Button
@@ -646,7 +697,7 @@ export const AwardDetails = ({
               </>
             ))}
 
-            <div>
+            <div className="flex justify-start items-center gap-2">
               <button
                 onClick={addAward}
                 className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
@@ -655,6 +706,7 @@ export const AwardDetails = ({
               </button>
             </div>
           </div>
+         }
         </StepCard>
       </form>
     </Form>

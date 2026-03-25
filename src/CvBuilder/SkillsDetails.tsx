@@ -131,6 +131,7 @@ export const SkillDetails = ({
           endoresBy: doc?.endoresBy ?? "",
           endoresThrough: doc?.endoresThrough ?? "",
         }));
+        cvData.skills = skills;
         form.reset({ skills });
       }
     } catch (error: any) {
@@ -141,7 +142,7 @@ export const SkillDetails = ({
 
   useEffect(() => {
     fetchSkills();
-  }, [step === 4,refresh]);
+  }, [step === 5,refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.skills.map((e: any) => e.id)),
@@ -222,11 +223,11 @@ export const SkillDetails = ({
     <Form {...form}>
       <form onSubmit={handleSubmit(formSubmitHandler)}>
         <StepCard
-          index={4}
+          index={5}
           title="Skills"
           icon={CheckCircle}
-          open={step === 4}
-          onToggle={() => setStep(step === 4 ? 0 : 4)}
+          open={step === 5}
+          onToggle={() => setStep(step === 5 ? 0 : 5)}
         >
           <p className="text-sm text-slate-500">
             Add skills manually. Each skill supports self-attestation and can be
@@ -336,9 +337,9 @@ export const SkillDetails = ({
                             <FormItem>
                               <FormControl>
                                 <Input
+                                  className={`w-full ${isMongoId(s.id) && field.value === "" ? "border-red-500" : ""}`}
                                   disabled
                                   {...field}
-                                  className="w-full"
                                   placeholder="Skill name"
                                 />
                               </FormControl>

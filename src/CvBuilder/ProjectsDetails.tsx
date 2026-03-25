@@ -30,6 +30,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState, useMemo } from "react";
 import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
+import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 
 export const ProjectDetails = ({
   step,
@@ -38,10 +39,14 @@ export const ProjectDetails = ({
   setCvData,
   cvData,
 }: IStepCard) => {
-  const [refresh, setRefresh] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(true);
+  const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
   const [count,setCount] = useState<number>(0);
   const [idx, setIdx] = useState<number>();
+  const [parsedProjectData, setParsedProjectData] = useState<[]>();
+  const cvDataFromStorage = localStorage.getItem("projects");
+
+
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(ProjectSchema),
     defaultValues: {
@@ -94,7 +99,7 @@ export const ProjectDetails = ({
   const projectSubmitHandler = async (data: ProjectFormValues) => {
     console.log("project form values", data);
     try {
-      setLoading(true);
+      setLoadingState("Submitting")
       const payload = data.projects;
       const res = await api.post(`/doc/save-projects`, {
         data: payload,
@@ -102,8 +107,9 @@ export const ProjectDetails = ({
       const result = await res.data;
       if (result.success) {
         toast.success(result.message);
-        setRefresh((prev) => !prev);
         setCount(0);
+        localStorage.removeItem("projects");
+        setParsedProjectData([]);
       } else {
         toast.error(result.message);
       }
@@ -111,7 +117,8 @@ export const ProjectDetails = ({
       console.log(error);
       toast.error(error.message || "Something went wrong");
     } finally {
-      setLoading(false);
+      setLoadingState(null)
+      setRefresh(false);
     }
   };
 
@@ -133,12 +140,14 @@ export const ProjectDetails = ({
           description: doc.description ?? "",
           selfAttested: doc.selfAttested ?? false,
         }));
-
+        cvData.projects = projects;
         // Update form values
         form.reset({ projects });
       }
     } catch (error) {
       toast.error("something went wrong");
+    }finally{
+      setRefresh(false);
     }
   };
 
@@ -146,7 +155,7 @@ export const ProjectDetails = ({
     try {
       const isValid = await form.trigger(`projects.${index}`);
       if (!isValid) return;
-      setLoading(true);
+      setLoadingState("Updating");
       setIdx(index);
       const payload = getValues(`projects.${index}`);
       console.log("payload", payload);
@@ -163,7 +172,7 @@ export const ProjectDetails = ({
     } catch (error) {
       toast.error("something went wrong");
     } finally {
-      setLoading(false);
+      setLoadingState(null);
     }
   };
 
@@ -171,7 +180,7 @@ export const ProjectDetails = ({
     try {
       const confirm = window.confirm("Are you sure you want to delete this project?");
       if (!confirm) return;
-      setLoading(true);
+      setLoadingState("Deleting");
       setIdx(index);
       const payload = getValues(`projects.${index}`);
       const res = await api.delete(`/doc/delete-projDoc/${payload.id}`);
@@ -185,13 +194,17 @@ export const ProjectDetails = ({
     } catch (error: any) {
       toast.error(error.message ?? error ?? "something went wrong");
     } finally {
-      setLoading(false);
+      setLoadingState(null);
     }
   };
 
   useEffect(() => {
     fetchProjDocs();
-  }, [step === 5, refresh]);
+    const cvDataFromStorageParsed = cvDataFromStorage ? JSON.parse(cvDataFromStorage) : null;
+    if(cvDataFromStorageParsed){
+      setParsedProjectData(cvDataFromStorageParsed);
+    }
+  }, [step === 6, refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.projects.map((e: any) => e.id)),
@@ -224,20 +237,41 @@ export const ProjectDetails = ({
     });
   }
 
+  const fillParsedProjectsDetails = ()=>{
+   if(parsedProjectData)
+   {
+    parsedProjectData.map((doc:any)=>
+    {
+      setCount((prev)=>prev+1)
+      append({
+      id: uid("prj"),
+      projectName:doc.projectName || "",
+      projectUrl: doc.projectUrl || "",
+      duration: { from: "", to: "" },
+      skills:doc.skills || "",
+      description: doc.description || "",
+      selfAttested: false,
+    })
+    })
+   }
+  }
+
+
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(projectSubmitHandler)}>
         <StepCard
-          index={5}
+          index={6}
           title="Personal Projects"
           icon={FileText}
-          open={step === 5}
-          onToggle={() => setStep(step === 5 ? 0 : 5)}
+          open={step === 6}
+          onToggle={() => setStep(step === 6 ? 0 : 6)}
         >
           <p className="text-sm text-slate-500">
             Add projects. Make them stand out with URL and short description.
             Each item can be removed.
           </p>
+          {refresh?<ThreeDotLoader w={3} h={3} yPos="center"/>:
           <div className="mt-4 space-y-4">
             {fields.map((p, index) => (
               <>
@@ -292,13 +326,13 @@ export const ProjectDetails = ({
                     <div className="flex items-center gap-1">
                       {isMongoId(p.id) ? (
                         <button
-                          disabled={loading}
+                          disabled={loadingState==="Updating"}
                           type="button"
                           onClick={() => updateHandler(index)}
                           className="mt-2 px-3 py-1 rounded bg-[#006666] border border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
                         >
                           <Replace size={14} />{" "}
-                          {loading && idx === index ? "Updating..." : "Update"}
+                          {loadingState==="Updating" && idx === index ? "Updating..." : "Update"}
                         </button>
                       ) : (
                         <button
@@ -312,11 +346,12 @@ export const ProjectDetails = ({
                       {isMongoId(p.id) && (
                         <Button
                           type="button"
-                          disabled={loading}
+                          disabled={loadingState==="Deleting"}
                           onClick={() => deleteHandler(index)}
                           className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
                         >
-                          <Delete size={18} /> Delete
+                          <Delete size={18} /> 
+                          {loadingState==="Deleting" && idx === index ? "Deleting..." : "Delete"}
                         </Button>
                       )}
                     </div>
@@ -335,8 +370,8 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                              className={`w-full ${isMongoId(p.id) && field.value === "" ? "border-red-500" : ""}`}
                               placeholder="Project Name"
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -357,8 +392,8 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Project Url"
                               className="w-full"
+                              placeholder="Project Url"
                               {...field}
                             />
                           </FormControl>
@@ -378,7 +413,11 @@ export const ProjectDetails = ({
                             </div>
                           </FormLabel>
                           <FormControl>
-                            <Input type="date" {...innerField} />
+                            <Input 
+                              className={`w-full ${isMongoId(p.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              type="date" 
+                              {...innerField} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -396,7 +435,11 @@ export const ProjectDetails = ({
                             </div>
                           </FormLabel>
                           <FormControl>
-                            <Input type="date" {...innerField} />
+                            <Input 
+                              className={`w-full ${isMongoId(p.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              type="date" 
+                              {...innerField} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -415,8 +458,8 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                              className={`w-full ${isMongoId(p.id) && field.value === "" ? "border-red-500" : ""}`}
                               placeholder="Write your used skills in this project. e.g.(ReactJs,Java,NodeJs)"
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -437,8 +480,8 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Textarea
+                              className={`w-full ${isMongoId(p.id) && field.value === "" ? "border-red-500" : ""}`}
                               placeholder="Description(write as paragraph format)"
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -451,14 +494,28 @@ export const ProjectDetails = ({
               </>
             ))}
 
-            <div>
+            <div className="flex justify-start items-center gap-2">
               <button
                 onClick={addProject}
                 className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
               >
                 <PlusCircle size={16} /> {fields.length>0?"Add More Project":"Add Project"}
               </button>
+              {parsedProjectData&&parsedProjectData.length>0&&<button
+                type="button"
+                onClick={fillParsedProjectsDetails}
+                className="flex items-center shadow-lg border-[#03257e] text-white bg-[#03257e] gap-2 px-3 py-1 rounded border"
+              >
+                <PlusCircle size={16} /> Fill Parsed Projects
+              </button>}
             </div>
+            {loadingState==="Submitting"?
+            <Button
+              type="button"
+              className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+            >
+              Saving...
+            </Button>:
             <Button
             disabled={count===0}
               type="submit"
@@ -466,7 +523,9 @@ export const ProjectDetails = ({
             >
               {fields.length>0?"Save New Project":"Save Project"}
             </Button>
+            }
           </div>
+          }
         </StepCard>
       </form>
     </Form>

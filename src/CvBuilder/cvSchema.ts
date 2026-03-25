@@ -28,7 +28,18 @@ export type PersonalDetailsItem = z.infer<typeof personalDetailsSchema>;
 export const EducationItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
   eduDocId:z.string(),
-  level: z.enum(["Secondary School","Higher Secondary School", "Graduation","PostGraduation","Other"], { required_error: "Level is required" }),
+  level:z.union([
+  z.enum([
+    "Secondary School",
+    "Higher Secondary School",
+    "Graduation",
+    "PostGraduation",
+    "Other",
+  ]),
+  z.string().min(1)
+], {
+  required_error: "Level is required",
+}),
   boardNameOrDegree: z.string().min(1,"This field is required"),
   institutionName: z.string().min(1,"Institution name is required"),
   gpa: z.string().min(1,"This field is required"),
@@ -83,7 +94,7 @@ export type TypeEducation = z.infer<typeof EducationItemSchema>;
 
 export const ExperienceItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
-  expDocId:z.string().uuid(),
+  expDocId:z.string(),
   companyName: z.string().min(1, "Company name is required"),
   jobRole: z.string().min(1, "Position is required"),
   duration: z.object({

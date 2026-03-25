@@ -54,9 +54,12 @@ export const handleProofUploaded = async ({file,setIsUploading,setUploadError,se
         if (!file) return;
         setIsUploading(true);
         //let docHash = null;
+        setUploadError(null);
         const validation = validateProofFile(file);
             if (!validation.isValid) {
                 alert(validation.error);
+                setIsUploading(false);
+                setUploadError(validation?.error || "Not a valid file");
                 setSelectedFileName(null);
                 return;
             }

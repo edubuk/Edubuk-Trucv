@@ -7,12 +7,12 @@ import social5 from '../assets/Social/social5.png'
 import social6 from '../assets/Social/social6.png'
 import { MdEmail, MdLocationPin, MdPhone } from "react-icons/md";
 import { FaPhone, FaRegFileAlt } from "react-icons/fa";
-
+import newLog from "../assets/newLogo.png"
 const Footer = () => {
   return (
     <div className="flex flex-col bg-white sm:px-4 gap-4 border-b-8 border-[#006666] w-full" data-aos="fade-up">
       <div className="flex flex-wrap justify-start sm:justify-between items-center gap-4 border-b-2 border-t-2 border-gray-300 pb-3 " >
-        <img src="/newLogo.png" alt="logo" className="md:w-[200px] md:h-[200px] w-[152px] h-[152px]"></img>
+        <img src={newLog} alt="logo" className="md:w-[200px] md:h-[200px] w-[152px] h-[152px]"></img>
         <div className="flex flex-col justify-center gap-4 sm:pl-12 ml-6">
             <div className="font-semibold text-xl text-black uppercase">Contact Us:</div>
             <div className="flex justify-start gap-2 items-center text-black"><MdEmail />Email: support@edubuk.com</div>

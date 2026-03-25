@@ -3,8 +3,8 @@ import { ExternalLink, ShieldCheck, FileText,UserCircle} from "lucide-react";
 
 import { useUserData } from "@/context/AuthContext";
 import StatusBadge from "@/CvBuilder/StatusBadge";
-import ResendEmail from "./ResendEmail";
-import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
+import ResendEmail from "../../pages/ResendEmail";
+import UserDocsSkeleton from "./UserDocsSkeleton";
 
 const COLOR_PRIMARY = "#03257e";
 
@@ -134,7 +134,7 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs,setRefr
   if(isFetching)
   {
     return(
-      <ThreeDotLoader w={4} h={4} yPos={"center"} />
+      <UserDocsSkeleton />
     )
   }
 
@@ -165,7 +165,7 @@ export default function UserDocs({educationDocs,experienceDocs,awardDocs,setRefr
             </div>
 
             {/* Smooth expandable section with ORIGINAL certificate card design */}
-            <div className={`transition-[max-height] duration-500 ease-in-out overflow-hidden max-h-[1200px]`}>
+            <div className={`transition-[max-height] duration-500 ease-in-out overflow-hidden`}>
               <div className="px-4 sm:px-6 pb-5">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2 mt-2">
                   <FileText className="h-5 w-5" /> Uploaded Certificates
