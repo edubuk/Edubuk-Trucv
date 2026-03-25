@@ -1,5 +1,4 @@
-export const CONTRACT_ADDRESS = "0xE6d30fe7d2AEb017E8cD6f26EB21b0FB0703dA63"
-
+export const CONTRACT_ADDRESS = "0x5D627e6e3e6FC8f9bBC67d417FCcEB7ED5897A30"
 
 export const ABI = [
 	{
@@ -643,6 +642,11 @@ export const ABI = [
 				"internalType": "address",
 				"name": "issuer",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
 			}
 		],
 		"name": "whitelistIssuer",
@@ -713,6 +717,47 @@ export const ABI = [
 				"internalType": "string",
 				"name": "docType",
 				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "offset",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "limit",
+				"type": "uint256"
+			}
+		],
+		"name": "getAllIssuers",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "wallet",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					}
+				],
+				"internalType": "struct DocumentNFT.IssuerInfo[]",
+				"name": "result",
+				"type": "tuple[]"
+			},
+			{
+				"internalType": "uint256",
+				"name": "total",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -916,6 +961,25 @@ export const ABI = [
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "issuerNames",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",

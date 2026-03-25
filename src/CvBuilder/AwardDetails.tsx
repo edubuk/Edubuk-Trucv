@@ -38,6 +38,9 @@ import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
 import StatusBadge from "./StatusBadge";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
+import { useContract } from "@/Blockchain/hooks/useMyContract";
+import { useAccount } from "wagmi";
+import { parseContractError } from "@/Blockchain/utils/error";
 
 export const AwardDetails = ({
   step,
@@ -52,9 +55,8 @@ export const AwardDetails = ({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
   const [refresh, setRefresh] = useState<boolean>(true);
-  const [parsedAwardsData, setParsedAwardsData] = useState<[]>();
-  const cvDataFromStorage = localStorage.getItem("awards");
-
+  const {submitDocument} = useContract();
+  const {address} = useAccount();
   // const { user } = useUserData();
   const form = useForm<AwardFormValues>({
     resolver: zodResolver(AwardSchema),
@@ -114,18 +116,46 @@ export const AwardDetails = ({
     try {
       setIdx(index);
       setLoadingState("Submitting");
-      const result = await api.post(`/doc/save-awards`, {
-        data:payload
-      });
-      const res = await result.data;
-      if (!res.success) {
-        toast.error(res.message);
+      // step-1 submitting on blockchain 
+      if (payload.docHash) {
+        const id = toast.loading("Submitting on chain...");
+        try {
+          await submitDocument({
+            name       : payload.name,
+            hashString : `0x${payload.docHash}` as `0x${string}`,
+            docType    : "award",
+            tokenUri   : "",
+            currAddress: address as `0x${string}`,
+          });
+          toast.dismiss(id);
+        } catch (txError) {
+          const errMsg = parseContractError(txError);
+  
+          if (errMsg === "This document has already been submitted.") {
+            // Already on chain — skip and proceed to DB save
+            toast.dismiss(id);
+            toast.custom(() => (
+              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+                <p>Document already on chain. Retrying database save...</p>
+              </div>
+            ));
+          } else {
+            // Any other chain error — stop everything
+            toast.dismiss(id);
+            throw txError;
+          }
+        }
+      }
+
+      const { data } = await api.post(`/doc/save-awards`, { data: payload });
+
+      if (!data.success) {
+        toast.error(data.message);
         return;
       }
-      toast.success(res.message);
-      setLoadingState(null);
+  
+      toast.success(data.message);
       setRefresh((prev) => !prev);
-      updateLocalStorageData(payload.name);
     } catch (error: any) {
       toast.error(error.message ?? error ?? "Something went wrong");
     } finally {
@@ -170,9 +200,6 @@ export const AwardDetails = ({
 
   useEffect(() => {
     fetchAwdDocs();
-    if(cvDataFromStorage){
-      setParsedAwardsData(JSON.parse(cvDataFromStorage));
-    }
   }, [step === 7, refresh]);
 
   const updateHandler = async (index: number) => {
@@ -274,35 +301,7 @@ export const AwardDetails = ({
     });
   }
 
-  const fillParsedAwardsDetails = ()=>{
-   if(parsedAwardsData)
-   {
-    parsedAwardsData.map((doc:any)=>
-      append({
-      id: uid("awd"),
-      level:"Certificate",
-      name: doc.name,
-      organisation: doc.organisation,
-      duration: { from: "", to: "" },
-      description:doc.description || "",
-      isEmailSend: false,
-      selfAttested: false,
-      verified: false,
-      status: "pending",
-      verifiedThrough: "",
-    }))
-   }
-  }
 
-    const updateLocalStorageData = (awardName:string)=>{
-    if(parsedAwardsData){
-      const cvData = cvDataFromStorage ? JSON.parse(cvDataFromStorage):null;
-      const updatedData = cvData?.filter((doc:any)=>
-        doc.name!==awardName
-      )
-      localStorage.setItem("awards",JSON.stringify(updatedData))
-    }
-  }
 
   return (
     <Form {...form}>
@@ -450,10 +449,10 @@ export const AwardDetails = ({
                             </div>
                           </FormLabel>
                           <FormControl>
-                            <Input
-                            disabled={a.verified}
+                            <Input 
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              disabled={a.verified}
                               placeholder={`${a.level} name`}
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -474,9 +473,9 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-                            disabled={a.verified}
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              disabled={a.verified}
                               placeholder="Organisation"
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -499,8 +498,11 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input 
-                            disabled={a.verified}
-                            type="date" {...field} />
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              disabled={a.verified}
+                              type="date" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -520,8 +522,11 @@ export const AwardDetails = ({
                             </FormLabel>
                             <FormControl>
                               <Input 
-                              disabled={a.verified}
-                              type="date" {...innerField} />
+                                className={`w-full ${isMongoId(a.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                                disabled={a.verified}
+                                type="date" 
+                                {...innerField} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -541,9 +546,9 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                            disabled={a.verified}
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              disabled={a.verified}
                               placeholder="Description(write as paragraph format)"
-                              className="w-full"
                               {...field}
                             />
                           </FormControl>
@@ -699,13 +704,6 @@ export const AwardDetails = ({
               >
                 <PlusCircle size={16} /> Add Award/Certificate
               </button>
-              {parsedAwardsData&&parsedAwardsData.length > 0 && <button
-              type="button"
-                onClick={fillParsedAwardsDetails}
-                className="flex items-center shadow-lg border-[#03257e] text-white bg-[#03257e] gap-2 px-3 py-1 rounded border"
-              >
-                <PlusCircle size={16} /> Fill from Parsed Data
-              </button>}
             </div>
           </div>
          }

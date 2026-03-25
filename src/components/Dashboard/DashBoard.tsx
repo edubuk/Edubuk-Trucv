@@ -5,6 +5,7 @@ import {
   FileText,
   FolderOpen,
   Image as NftIcon,
+  Database,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -13,6 +14,7 @@ import UserDocs from "./UserDocs";
 import api from "@/lib/api";
 import Certificate from "./Certificate";
 import { useUserData } from "@/context/AuthContext";
+import OnChainSubmission from "./On-ChainSubmission";
 //import DocumentNFTCard from "@/components/Dashboard/DocumentNFTCard";
 
 const DashBoard = () => {
@@ -28,7 +30,7 @@ const DashBoard = () => {
     awards: [],
   });
 
-  const [selected, setSelected] = useState<"cv" | "nft" | "docs">("docs");
+  const [selected, setSelected] = useState<"cv" | "nft" | "docs" | "onchain">("docs");
 
   const getDocs = async () => {
     setSelected("docs");
@@ -88,13 +90,14 @@ const DashBoard = () => {
     userCvs();
   }, [cvRefresh]);
 
+
   const NavItem = ({
     id,
     label,
     Icon,
     onClick,
   }: {
-    id: "docs" | "cv" | "nft";
+    id: "docs" | "cv" | "nft" | "onchain";
     label: string;
     Icon: any;
     onClick: () => void;
@@ -153,6 +156,12 @@ const DashBoard = () => {
             Icon={FileText}
             onClick={userCvs}
           />
+          <NavItem
+            id="onchain"
+            label="On-Chain Submission"
+            Icon={Database}
+            onClick={() => setSelected("onchain")}
+          />
           {user?.isHackathonUser && <NavItem
             id="nft"
             label="Certification"
@@ -206,6 +215,9 @@ const DashBoard = () => {
           <Certificate 
           cvData={cvData}
           />
+        )}
+        {selected === "onchain" && (
+          <OnChainSubmission />
         )}
       </main>
     </div>

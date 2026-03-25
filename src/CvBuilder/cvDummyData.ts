@@ -1822,3 +1822,5 @@ export const dummyCvData = [
 //     },
 //   ],
 // };
+
+// response from parsed cv

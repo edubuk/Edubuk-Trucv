@@ -90,9 +90,9 @@ console.log("currentPath",currentPath);
       name: "Dashboard",
       path: "/dashboard",
     },
-    {
-      name: "Admin",
-      path: "/admin",
+   {
+      name:"Verify",
+      path:"/verify"
     }
   ];
 
@@ -145,6 +145,20 @@ console.log("currentPath",currentPath);
               )
             )
           )}
+        {user?.roles === "admin" && (
+        <Link
+          key="admin"
+          to="/admin"
+          onClick={() => handlerActive("Admin")}
+          className={`hidden lg:flex ${
+            currentPath === "/admin"
+              ? "text-[#f14419]"
+              : "text-[#03257e]"
+          } hover:text-[#f14419] transition duration-200 py-2 text-[22px] font-medium`}
+        >
+          Admin
+        </Link>
+        )}
         {!user ? (
             <div className="hidden lg:flex relative rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
               <Link
@@ -246,7 +260,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {link.name}
             </Link>
           ) : (
-            (localStorage.getItem("googleIdToken") || user) && (
+            (user) && (
               <Link
                 key={i + 1}
                 to={link.path}
@@ -260,7 +274,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             )
           )
         )}
-        {!(localStorage.getItem("googleIdToken") || user)? (
+
+        {user?.roles === "admin" && (
+        <Link
+          to="/admin"
+          onClick={() => setIsSidebarOpen(false)}
+          className={`${
+            currentPath === "/admin" ? "text-[#f14419]" : "text-[#03257e]"
+          } hover:text-[#f14419] transition duration-200 py-2`}
+        >
+          Admin
+        </Link>
+        )}
+
+        {!(user)? (
           <Link
             to="/login"
             className="bg-[#03257e] py-2 px-4 rounded-full text-center text-white"

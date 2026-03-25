@@ -337,9 +337,9 @@ export const SkillDetails = ({
                             <FormItem>
                               <FormControl>
                                 <Input
+                                  className={`w-full ${isMongoId(s.id) && field.value === "" ? "border-red-500" : ""}`}
                                   disabled
                                   {...field}
-                                  className="w-full"
                                   placeholder="Skill name"
                                 />
                               </FormControl>
