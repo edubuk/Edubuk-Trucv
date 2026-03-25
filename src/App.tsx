@@ -37,7 +37,7 @@ const SkillVerify = lazy(()=>import("./components/Verification/VerifySkill"))
 const DocumentVerificationPage = lazy(()=>import("./components/Verification/DocumentVerificationPage"))
 const DocumentVerifier = lazy(()=>import("./components/Verification/Documentverifier"))
 const MetamaskGuide = lazy(()=>import("./pages/Metamaskguide"));
-const DigilockerConnectPage = lazy(()=>import("./pages/DigilockerConnectPage"));
+const DigilockerConnectPage = lazy(()=>import("./pages/DigiLockerConnectPage"));
 
 function App() {
 
