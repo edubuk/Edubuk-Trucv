@@ -1,51 +1,70 @@
-name: CI/CD Pipeline
+name: Azure Static Web Apps CI/CD
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
-
+      - dev
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - dev
 jobs:
-  ci:
-    name: Build & Test
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-
+    name: Build and Deploy Job
+    env:
+      VITE_AZUREGATWAY: ${{ secrets.VITE_AZUREGATWAY }}
+      VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+      VITE_BASEURL: ${{ secrets.VITE_BASEURL }}
+      VITE_CONTRACTADDRESS: ${{ secrets.VITE_CONTRACTADDRESS }}
+      VITE_FIREBASE_APIKEY: ${{ secrets.VITE_FIREBASE_APIKEY }}
+      VITE_FIREBASE_APPID: ${{ secrets.VITE_FIREBASE_APPID }}
+      VITE_FIREBASE_AUTHDOMAIN: ${{ secrets.VITE_FIREBASE_AUTHDOMAIN }}
+      VITE_FIREBASE_MEASUREMENTID: ${{ secrets.VITE_FIREBASE_MEASUREMENTID }}
+      VITE_FIREBASE_MESSAGINGSENDERID: ${{ secrets.VITE_FIREBASE_MESSAGINGSENDERID }}
+      VITE_FIREBASE_PROJECTID: ${{ secrets.VITE_FIREBASE_PROJECTID }}
+      VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+      VITE_OKTO_CLIENT_PRIVATE_KEY: ${{ secrets.VITE_OKTO_CLIENT_PRIVATE_KEY }}
+      VITE_OKTO_CLIENT_SWA: ${{ secrets.VITE_OKTO_CLIENT_SWA }}
+      VITE_OKTO_ENVIRONMENT: ${{ secrets.VITE_OKTO_ENVIRONMENT }}
+      VITE_OKTO_TREASURY_API_KEY: ${{ secrets.VITE_OKTO_TREASURY_API_KEY }}
+      VITE_OKTO_TSWA: ${{ secrets.VITE_OKTO_TSWA }}
+      VITE_OKTO_TWA: ${{ secrets.VITE_OKTO_TWA }}
+      VITE_PINATAGATWAY: ${{ secrets.VITE_PINATAGATWAY }}
+      VITE_PINATAJWT: ${{ secrets.VITE_PINATAJWT }}
+      VITE_PUBLICKEY: ${{ secrets.VITE_PUBLICKEY }}
+      VITE_RZ_KEY: ${{ secrets.VITE_RZ_KEY }}
+      VITE_SERVICEID: ${{ secrets.VITE_SERVICEID }}
+      VITE_TEMPLATEID1: ${{ secrets.VITE_TEMPLATEID1 }}
+      VITE_TEMPLATEID2: ${{ secrets.VITE_TEMPLATEID2 }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v3
         with:
-          node-version: '20'
-          cache: 'npm'
+          submodules: true
+          lfs: false
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_FIELD_00067D40F }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          action: "upload"
+          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
+          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
+          app_location: "/" # App source code path
+          api_location: "" # Api source code path - optional
+          output_location: "dist" # Built app content directory - optional
+          ###### End of Repository/Build Configurations ######
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests (optional)
-        run: npm test || echo "No tests configured"
-
-  deploy:
-    name: Deploy to Azure VM
-    needs: ci
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
+    name: Close Pull Request Job
     steps:
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY_B64 }}" | base64 -d > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          cat >> ~/.ssh/config <<EOF
-          Host azure-vm
-            HostName ${{ secrets.SSH_HOST }}
-            User ${{ secrets.SSH_USER }}
-            IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking no
-          EOF
-
-      - name: Run deployment script on server
-        run: ssh azure-vm "cd /home/azureuser/trucvfrontend-v2 && ./deploy.sh"
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_FIELD_00067D40F }}
+          action: "close"
