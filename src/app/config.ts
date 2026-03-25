@@ -29,7 +29,7 @@ export const myCustomChain = defineChain({
 
 export const config = getDefaultConfig({
   appName: 'TruCV',
-  projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID,
+  projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || "eab12bd1a2511f9b3d7fb2d5757a2d30",
   chains: [mainnet, sepolia, polygon,eni,myCustomChain],
   ssr: false,
 });
