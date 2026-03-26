@@ -77,7 +77,7 @@ const DocumentVerificationPage: React.FC = () => {
           toast.dismiss(id);
         } catch (txError) {
           const errMsg = parseContractError(txError);
-
+          console.log("err", errMsg);
           if (errMsg === "This document is no longer pending.") {
             // Already on chain — skip and proceed to DB save
             toast.dismiss(id);
@@ -88,6 +88,7 @@ const DocumentVerificationPage: React.FC = () => {
             ));
           } else {
             // Any other chain error — stop everything
+            setError(errMsg);
             toast.dismiss(id);
             throw txError;
           }
@@ -105,9 +106,10 @@ const DocumentVerificationPage: React.FC = () => {
       setPopupStatus("Document approved successfully!");
       setIsProcessing(false);
     } catch (error: any) {
-      console.error("Error approving document:", error.data?.message);
+      console.error("Error approving document:", error);
+      const errMsg = parseContractError(error);
       setPopupStatus("");
-      setError(error.data?.message || "Something went wrong during approval.");
+      setError(errMsg||error.data?.message || "Something went wrong during approval.");
       setIsProcessing(false);
     } finally {
       //setIsProcessing(false);
@@ -155,9 +157,9 @@ const DocumentVerificationPage: React.FC = () => {
       setPopupStatus("Document rejected successfully!");
       setIsProcessing(false);
     } catch (error) {
-      console.error("Error rejecting document:", error);
+      const errMsg = parseContractError(error);
       setPopupStatus("");
-      setError("Document rejection failed");
+      setError(errMsg||"Document rejection failed");
     } finally {
       setLoading(false);
     }
