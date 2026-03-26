@@ -1,203 +1,315 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+// // SPDX-License-Identifier: MIT
+// pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts@5.0.0/token/ERC721/ERC721.sol";
+// import "@openzeppelin/contracts@5.0.0/token/ERC721/extensions/ERC721Enumerable.sol";
+// import "@openzeppelin/contracts@5.0.0/token/ERC721/extensions/ERC721URIStorage.sol";
+// import "@openzeppelin/contracts@5.0.0/access/Ownable.sol";
 
-contract DocumentNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
-    uint256 public nextId;
+// contract DocumentNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
 
-    mapping(address => bool) public isIssuer;
+//     //packed into one slot: 4 + 4 = 8 bytes
+//     uint32 public nextId;
+//     uint32 private _activeIssuers;
+    
 
-    error CallerNotIssuer(address caller, string message);
-    error NotAuthorized(address caller);
-    error DocumentAlreadySubmitted(bytes32 hash);
-    error DocumentNotPending(bytes32 hash);
+//     address[] private _issuerList;
 
-    enum SubmissionStatus { Pending, Approved, Rejected }
+//     error NotAuthorized(address caller);
+//     error DocumentAlreadySubmitted(bytes32 hash);
+//     error DocumentNotPending(bytes32 hash);
 
-    struct Submission {
-        address submitter;
-        string name;
-        bytes32 hash;
-        string docType;
-        string tokenUri;
-        SubmissionStatus status;
-        uint256 submittedAt;
-        string rejectReason;
-    }
+//     enum SubmissionStatus { Pending, Approved, Rejected }
 
-    struct Document {
-        string name;
-        bytes32 hash;
-        address issuer;
-        address recipient;
-        uint256 issuedAt;
-        bool isValid;
-        string docType;
-    }
+//     struct IssuerInfo {
+//         address wallet;
+//         string name;
+//     }
 
-    mapping(bytes32 => Submission) public submissions;      // hash => Submission
-    mapping(address => bytes32[]) public userSubmissions;   // user => hashes
-    mapping(uint256 => Document) public documents;          // tokenId => Document
-    mapping(bytes32 => uint256) public hashToTokenId;       // hash => tokenId
 
-    event DocumentSubmitted(bytes32 indexed hash, address indexed submitter, string name);
-    event DocumentApproved(bytes32 indexed hash, uint256 indexed tokenId, address indexed to);
-    event DocumentRejected(bytes32 indexed hash, string reason);
-    event DocumentRevoked(bytes32 indexed hash, uint256 indexed tokenId);
+//     struct Submission {
+//         address submitter;       // 20 bytes ─┐ slot 0
+//         uint96  submittedAt;     // 12 bytes ─┘ packed!
+//         SubmissionStatus status; //  1 byte  — slot 1
+//         string name;             // slot 2
+//         string docType;          // slot 3
+//         string tokenUri;         // slot 4
+//         string rejectReason;     // slot 5
+//     }
 
-    constructor(address initialOwner) ERC721("DocumentNFT", "DOC") Ownable(initialOwner) {}
 
-    function whitelistIssuer(address issuer) external onlyOwner {
-        isIssuer[issuer] = true;
-    }
+//     struct SubmissionWithHash {
+//         bytes32 hash;
+//         address submitter;
+//         uint96  submittedAt;
+//         SubmissionStatus status;
+//         string name;
+//         string docType;
+//         string tokenUri;
+//         string rejectReason;
+//     }
 
-    function revokeIssuer(address issuer) external onlyOwner {
-        isIssuer[issuer] = false;
-    }
+//     struct Document {
+//         address issuer;      // 20 bytes — slot 0
+//         address recipient;   // 20 bytes — slot 1
+//         uint96  issuedAt;    // 12 bytes ─┐ slot 2
+//         bool    isValid;     //  1 byte  ─┘ packed!
+//         bytes32 hash;        // slot 3
+//         string  name;        // slot 4
+//         string  docType;     // slot 5
+//     }
 
-    modifier onlyAuthorized() {
-        if (!isIssuer[msg.sender] && msg.sender != owner())
-            revert NotAuthorized(msg.sender);
-        _;
-    }
+//     mapping(address => bool)       public isIssuer;
+//     mapping(address => string)     public issuerNames;
+//     mapping(bytes32 => Submission) public submissions;
+//     mapping(address => bytes32[])  public userSubmissions;
+//     mapping(uint256 => Document)   public documents;
+//     mapping(bytes32 => uint256)    public hashToTokenId;
 
-    // Step 1 — User submits document using hash as key
-    function submitDocument(
-        string calldata name,
-        bytes32 hash,
-        string calldata docType,
-        string calldata tokenUri
-    ) external {
-        // prevent duplicate submissions
-        if (submissions[hash].submitter != address(0))
-            revert DocumentAlreadySubmitted(hash);
+//     event DocumentSubmitted(bytes32 indexed hash, address indexed submitter, string name);
+//     event DocumentApproved(bytes32 indexed hash, uint256 indexed tokenId, address indexed to);
+//     event DocumentRejected(bytes32 indexed hash, string reason);
+//     event DocumentRevoked(bytes32 indexed hash, uint256 indexed tokenId);
 
-        submissions[hash] = Submission({
-            submitter: msg.sender,
-            name: name,
-            hash: hash,
-            docType: docType,
-            tokenUri: tokenUri,
-            status: SubmissionStatus.Pending,
-            submittedAt: block.timestamp,
-            rejectReason: ""
-        });
+//     constructor(address initialOwner)
+//         ERC721("EDUBUK", "EDUBK")
+//         Ownable(initialOwner)
+//     {}
 
-        userSubmissions[msg.sender].push(hash);
+//     //modifiers 
+//     modifier onlyAuthorized() {
+//         if (!isIssuer[msg.sender] && msg.sender != owner())
+//             revert NotAuthorized(msg.sender);
+//         _;
+//     }
 
-        emit DocumentSubmitted(hash, msg.sender, name);
-    }
+//     //issuer management
+//     function whitelistIssuer(
+//         address issuer,
+//         string calldata name
+//     ) external onlyOwner {
+//         require(issuer != address(0), "Invalid address");
+//         require(!isIssuer[issuer], "Already whitelisted");
+//         isIssuer[issuer] = true;
+//         issuerNames[issuer] = name;
+//         _issuerList.push(issuer);
+//         unchecked { ++_activeIssuers; }
+//     }
 
-    //Step 2a — Issuer approves by hash
-    function approveDocument(
-        bytes32 hash
-    ) external onlyAuthorized {
-        Submission storage sub = submissions[hash];
-        if (sub.status != SubmissionStatus.Pending)
-            revert DocumentNotPending(hash);
+//     function revokeIssuer(address issuer) external onlyOwner {
+//         require(isIssuer[issuer], "Not whitelisted");
+//         isIssuer[issuer] = false;
+//         unchecked { --_activeIssuers; }
+//     }
 
-        sub.status = SubmissionStatus.Approved;
+//     //step 1: user submits document
+//     function submitDocument(
+//         string calldata name,
+//         bytes32 hash,
+//         string calldata docType,
+//         string calldata tokenUri
+//     ) external {
+//         if (submissions[hash].submitter != address(0))
+//             revert DocumentAlreadySubmitted(hash);
 
-        uint256 tokenId = ++nextId;
-        _mint(sub.submitter, tokenId);
-        _setTokenURI(tokenId, sub.tokenUri);
+//         submissions[hash] = Submission({
+//             submitter:   msg.sender,
+//             submittedAt: uint96(block.timestamp),
+//             status:      SubmissionStatus.Pending,
+//             name:        name,
+//             docType:     docType,
+//             tokenUri:    tokenUri,
+//             rejectReason: ""
+//         });
 
-        documents[tokenId] = Document({
-            name: sub.name,
-            hash: hash,
-            issuer: msg.sender,
-            recipient: sub.submitter,
-            issuedAt: block.timestamp,
-            isValid: true,
-            docType: sub.docType
-        });
+//         userSubmissions[msg.sender].push(hash);
+//         emit DocumentSubmitted(hash, msg.sender, name);
+//     }
 
-        //map hash to tokenId for easy lookup
-        hashToTokenId[hash] = tokenId;
+//     //step 2a: issuer approves
+//     function approveDocument(bytes32 hash) external onlyAuthorized {
+//         Submission storage sub = submissions[hash];
+//         if (sub.status != SubmissionStatus.Pending)
+//             revert DocumentNotPending(hash);
 
-        emit DocumentApproved(hash, tokenId, sub.submitter);
-    }
+//         sub.status = SubmissionStatus.Approved;
 
-    //Step 2b — Issuer rejects by hash
-    function rejectDocument(
-        bytes32 hash,
-        string calldata reason
-    ) external onlyAuthorized {
-        Submission storage sub = submissions[hash];
-        if (sub.status != SubmissionStatus.Pending)
-            revert DocumentNotPending(hash);
+//         uint256 tokenId;
+//         unchecked { tokenId = ++nextId; }
 
-        sub.status = SubmissionStatus.Rejected;
-        sub.rejectReason = reason;
+//         _mint(sub.submitter, tokenId);
+//         _setTokenURI(tokenId, sub.tokenUri);
 
-        emit DocumentRejected(hash, reason);
-    }
+//         documents[tokenId] = Document({
+//             issuer:    msg.sender,
+//             recipient: sub.submitter,
+//             issuedAt:  uint96(block.timestamp),
+//             isValid:   true,
+//             hash:      hash,
+//             name:      sub.name,
+//             docType:   sub.docType
+//         });
 
-    //Revoke by hash
-    function revokeDocument(bytes32 hash) external onlyAuthorized {
-        uint256 tokenId = hashToTokenId[hash];
-        documents[tokenId].isValid = false;
-        emit DocumentRevoked(hash, tokenId);
-    }
+//         hashToTokenId[hash] = tokenId;
+//         emit DocumentApproved(hash, tokenId, sub.submitter);
+//     }
 
-    //Verify by hash directly — no need for tokenId
-    function verifyDocument(bytes32 hash)
-        external view
-        returns (bool isValid, Document memory doc)
-    {
-        uint256 tokenId = hashToTokenId[hash];
-        doc = documents[tokenId];
-        isValid = doc.isValid && doc.hash == hash;
-        return (isValid, doc);
-    }
+//     //step 2b: issuer rejects 
+//     function rejectDocument(
+//         bytes32 hash,
+//         string calldata reason
+//     ) external onlyAuthorized {
+//         Submission storage sub = submissions[hash];
+//         if (sub.status != SubmissionStatus.Pending)
+//             revert DocumentNotPending(hash);
 
-    //Get submission by hash
-    function getSubmission(bytes32 hash) external view returns (Submission memory) {
-        return submissions[hash];
-    }
+//         sub.status = SubmissionStatus.Rejected;
+//         sub.rejectReason = reason;
+//         emit DocumentRejected(hash, reason);
+//     }
 
-    //Get all submissions of a user
-    function getUserSubmissions(address user) external view returns (Submission[] memory) {
-        bytes32[] memory hashes = userSubmissions[user];
-        Submission[] memory result = new Submission[](hashes.length);
-        for (uint256 i = 0; i < hashes.length; i++) {
-            result[i] = submissions[hashes[i]];
-        }
-        return result;
-    }
+//     //revoke document
+//     function revokeDocument(bytes32 hash) external onlyAuthorized {
+//         uint256 tokenId = hashToTokenId[hash];
+//         documents[tokenId].isValid = false;
+//         emit DocumentRevoked(hash, tokenId);
+//     }
 
-    // list all tokenIds owned by an address
-    function tokensOfOwner(address owner_) external view returns (uint256[] memory) {
-        uint256 count = balanceOf(owner_);
-        uint256[] memory tokenIds = new uint256[](count);
-        for (uint256 i = 0; i < count; i++) {
-            tokenIds[i] = tokenOfOwnerByIndex(owner_, i);
-        }
-        return tokenIds;
-    }
+//     //verify 
+//     function verifyDocument(bytes32 hash)
+//         external view
+//         returns (bool isValid, Document memory doc)
+//     {
+//         uint256 tokenId = hashToTokenId[hash];
+//         require(tokenId != 0, "Document not found");
+//         doc = documents[tokenId];
+//         isValid = doc.isValid && doc.hash == hash;
+//         return (isValid, doc);
+//     }
 
-    // required overrides
-    function tokenURI(uint256 tokenId)
-        public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        return ERC721URIStorage.tokenURI(tokenId);
-    }
+//     //read: single submission by hash
+//     function getSubmission(bytes32 hash)
+//         external view
+//         returns (SubmissionWithHash memory)
+//     {
+//         Submission storage sub = submissions[hash];
+//         return SubmissionWithHash({
+//             hash:         hash,
+//             submitter:    sub.submitter,
+//             submittedAt:  sub.submittedAt,
+//             status:       sub.status,
+//             name:         sub.name,
+//             docType:      sub.docType,
+//             tokenUri:     sub.tokenUri,
+//             rejectReason: sub.rejectReason
+//         });
+//     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public view override(ERC721, ERC721Enumerable, ERC721URIStorage) returns (bool) {
-        return super.supportsInterface(interfaceId);
-    }
+//     //read: all submissions by user (with hash included)
+//     function getUserSubmissions(address user)
+//         external view
+//         returns (SubmissionWithHash[] memory result)
+//     {
+//         bytes32[] memory hashes = userSubmissions[user];
+//         uint256 len = hashes.length;
+//         result = new SubmissionWithHash[](len);
 
-    function _update(address to, uint256 tokenId, address auth)
-        internal override(ERC721, ERC721Enumerable) returns (address) {
-        return super._update(to, tokenId, auth);
-    }
+//         for (uint256 i; i < len;) {
+//             bytes32 hash = hashes[i];
+//             Submission storage sub = submissions[hash];
+//             result[i] = SubmissionWithHash({
+//                 hash:         hash,
+//                 submitter:    sub.submitter,
+//                 submittedAt:  sub.submittedAt,
+//                 status:       sub.status,
+//                 name:         sub.name,
+//                 docType:      sub.docType,
+//                 tokenUri:     sub.tokenUri,
+//                 rejectReason: sub.rejectReason
+//             });
+//             unchecked { ++i; }
+//         }
+//         return result;
+//     }
 
-    function _increaseBalance(address account, uint128 value)
-        internal override(ERC721, ERC721Enumerable) {
-        super._increaseBalance(account, value);
-    }
-}
+//     //read: all tokenIds owned by address 
+//     function tokensOfOwner(address owner_)
+//         external view
+//         returns (uint256[] memory tokenIds)
+//     {
+//         uint256 count = balanceOf(owner_);
+//         tokenIds = new uint256[](count);
+//         for (uint256 i; i < count;) {
+//             tokenIds[i] = tokenOfOwnerByIndex(owner_, i);
+//             unchecked { ++i; }
+//         }
+//         return tokenIds;
+//     }
+
+//     // read: paginated issuer list (O(1) total, O(n) window)
+//     function getAllIssuers(
+//         uint256 offset,
+//         uint256 limit
+//     ) external view returns (IssuerInfo[] memory result, uint256 total) {
+//         total = _activeIssuers;
+
+//         if (offset >= total || limit == 0)
+//             return (new IssuerInfo[](0), total);
+
+//         uint256 size = (offset + limit > total) ? total - offset : limit;
+//         result = new IssuerInfo[](size);
+//         uint256 filled;
+//         uint256 skipped;
+//         uint256 len = _issuerList.length;
+
+//         for (uint256 i; i < len;) {
+//             address addr = _issuerList[i];
+//             if (isIssuer[addr]) {
+//                 if (skipped < offset) {
+//                     unchecked { ++skipped; }
+//                 } else {
+//                     result[filled] = IssuerInfo({
+//                         wallet: addr,
+//                         name:   issuerNames[addr]
+//                     });
+//                     unchecked { ++filled; }
+//                     if (filled == size) break;
+//                 }
+//             }
+//             unchecked { ++i; }
+//         }
+//         return (result, total);
+//     }
+
+//     //required overrides
+//     function tokenURI(uint256 tokenId)
+//         public view
+//         override(ERC721, ERC721URIStorage)
+//         returns (string memory)
+//     {
+//         return ERC721URIStorage.tokenURI(tokenId);
+//     }
+
+//     function supportsInterface(bytes4 interfaceId)
+//         public view
+//         override(ERC721, ERC721Enumerable, ERC721URIStorage)
+//         returns (bool)
+//     {
+//         return super.supportsInterface(interfaceId);
+//     }
+
+//     function _update(address to, uint256 tokenId, address auth)
+//         internal
+//         override(ERC721, ERC721Enumerable)
+//         returns (address)
+//     {
+//         return super._update(to, tokenId, auth);
+//     }
+
+//     function _increaseBalance(address account, uint128 value)
+//         internal
+//         override(ERC721, ERC721Enumerable)
+//     {
+//         super._increaseBalance(account, value);
+//     }
+// }

@@ -1,4 +1,8 @@
-export const CONTRACT_ADDRESS = "0x5D627e6e3e6FC8f9bBC67d417FCcEB7ED5897A30"
+
+//Mainnet
+export const CONTRACT_ADDRESS = "0x007aa7830d7E894C312d46389D1bD89144fCf076"
+//ENI-Testnet
+//export const TESTNET_CONTRACT_ADDRESS = "0xfE275537Fd0a56288A3BcDf5A41a2Ef546FedF6F"
 
 export const ABI = [
 	{
@@ -42,22 +46,6 @@ export const ABI = [
 		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "caller",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "message",
-				"type": "string"
-			}
-		],
-		"name": "CallerNotIssuer",
-		"type": "error"
 	},
 	{
 		"inputs": [
@@ -684,16 +672,6 @@ export const ABI = [
 		"name": "documents",
 		"outputs": [
 			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "hash",
-				"type": "bytes32"
-			},
-			{
 				"internalType": "address",
 				"name": "issuer",
 				"type": "address"
@@ -704,14 +682,24 @@ export const ABI = [
 				"type": "address"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "uint96",
 				"name": "issuedAt",
-				"type": "uint256"
+				"type": "uint96"
 			},
 			{
 				"internalType": "bool",
 				"name": "isValid",
 				"type": "bool"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
 			},
 			{
 				"internalType": "string",
@@ -795,19 +783,29 @@ export const ABI = [
 			{
 				"components": [
 					{
+						"internalType": "bytes32",
+						"name": "hash",
+						"type": "bytes32"
+					},
+					{
 						"internalType": "address",
 						"name": "submitter",
 						"type": "address"
 					},
 					{
+						"internalType": "uint96",
+						"name": "submittedAt",
+						"type": "uint96"
+					},
+					{
+						"internalType": "enum DocumentNFT.SubmissionStatus",
+						"name": "status",
+						"type": "uint8"
+					},
+					{
 						"internalType": "string",
 						"name": "name",
 						"type": "string"
-					},
-					{
-						"internalType": "bytes32",
-						"name": "hash",
-						"type": "bytes32"
 					},
 					{
 						"internalType": "string",
@@ -820,22 +818,12 @@ export const ABI = [
 						"type": "string"
 					},
 					{
-						"internalType": "enum DocumentNFT.SubmissionStatus",
-						"name": "status",
-						"type": "uint8"
-					},
-					{
-						"internalType": "uint256",
-						"name": "submittedAt",
-						"type": "uint256"
-					},
-					{
 						"internalType": "string",
 						"name": "rejectReason",
 						"type": "string"
 					}
 				],
-				"internalType": "struct DocumentNFT.Submission",
+				"internalType": "struct DocumentNFT.SubmissionWithHash",
 				"name": "",
 				"type": "tuple"
 			}
@@ -856,19 +844,29 @@ export const ABI = [
 			{
 				"components": [
 					{
+						"internalType": "bytes32",
+						"name": "hash",
+						"type": "bytes32"
+					},
+					{
 						"internalType": "address",
 						"name": "submitter",
 						"type": "address"
 					},
 					{
+						"internalType": "uint96",
+						"name": "submittedAt",
+						"type": "uint96"
+					},
+					{
+						"internalType": "enum DocumentNFT.SubmissionStatus",
+						"name": "status",
+						"type": "uint8"
+					},
+					{
 						"internalType": "string",
 						"name": "name",
 						"type": "string"
-					},
-					{
-						"internalType": "bytes32",
-						"name": "hash",
-						"type": "bytes32"
 					},
 					{
 						"internalType": "string",
@@ -881,23 +879,13 @@ export const ABI = [
 						"type": "string"
 					},
 					{
-						"internalType": "enum DocumentNFT.SubmissionStatus",
-						"name": "status",
-						"type": "uint8"
-					},
-					{
-						"internalType": "uint256",
-						"name": "submittedAt",
-						"type": "uint256"
-					},
-					{
 						"internalType": "string",
 						"name": "rejectReason",
 						"type": "string"
 					}
 				],
-				"internalType": "struct DocumentNFT.Submission[]",
-				"name": "",
+				"internalType": "struct DocumentNFT.SubmissionWithHash[]",
+				"name": "result",
 				"type": "tuple[]"
 			}
 		],
@@ -1003,9 +991,9 @@ export const ABI = [
 		"name": "nextId",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "uint32",
 				"name": "",
-				"type": "uint256"
+				"type": "uint32"
 			}
 		],
 		"stateMutability": "view",
@@ -1059,14 +1047,19 @@ export const ABI = [
 				"type": "address"
 			},
 			{
+				"internalType": "uint96",
+				"name": "submittedAt",
+				"type": "uint96"
+			},
+			{
+				"internalType": "enum DocumentNFT.SubmissionStatus",
+				"name": "status",
+				"type": "uint8"
+			},
+			{
 				"internalType": "string",
 				"name": "name",
 				"type": "string"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "hash",
-				"type": "bytes32"
 			},
 			{
 				"internalType": "string",
@@ -1077,16 +1070,6 @@ export const ABI = [
 				"internalType": "string",
 				"name": "tokenUri",
 				"type": "string"
-			},
-			{
-				"internalType": "enum DocumentNFT.SubmissionStatus",
-				"name": "status",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint256",
-				"name": "submittedAt",
-				"type": "uint256"
 			},
 			{
 				"internalType": "string",
@@ -1184,7 +1167,7 @@ export const ABI = [
 		"outputs": [
 			{
 				"internalType": "uint256[]",
-				"name": "",
+				"name": "tokenIds",
 				"type": "uint256[]"
 			}
 		],
@@ -1265,16 +1248,6 @@ export const ABI = [
 			{
 				"components": [
 					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					},
-					{
-						"internalType": "bytes32",
-						"name": "hash",
-						"type": "bytes32"
-					},
-					{
 						"internalType": "address",
 						"name": "issuer",
 						"type": "address"
@@ -1285,14 +1258,24 @@ export const ABI = [
 						"type": "address"
 					},
 					{
-						"internalType": "uint256",
+						"internalType": "uint96",
 						"name": "issuedAt",
-						"type": "uint256"
+						"type": "uint96"
 					},
 					{
 						"internalType": "bool",
 						"name": "isValid",
 						"type": "bool"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "hash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
 					},
 					{
 						"internalType": "string",
