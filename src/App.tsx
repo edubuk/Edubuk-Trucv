@@ -81,7 +81,7 @@ useEffect(() => {
               <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />
               <Route path="/register" element={<Register />} />
               <Route path="/certificate-timer" element={<Layout><ProtectedRoute><CertificateTimerPage /></ProtectedRoute></Layout>} />
-              <Route path="/metamask-guide" element={<Layout><ProtectedRoute><MetamaskGuide /></ProtectedRoute></Layout>} />
+              <Route path="/setup-wallet" element={<Layout><ProtectedRoute><MetamaskGuide /></ProtectedRoute></Layout>} />
               <Route path="/dl-connect" element={<DigilockerConnectPage />} />
             </Routes>
           </Suspense>
