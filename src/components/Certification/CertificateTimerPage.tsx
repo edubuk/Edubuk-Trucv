@@ -1,28 +1,42 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation} from "react-router-dom";
+import { useLocation, Link} from "react-router-dom";
+import { API_BASE_URL } from "@/main";
 import {
   CheckCircle,
   FileText,
+  QrCode,
+  Upload,
   Shield,
   AlertCircle,
   RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AddCertToLinkedIn from "../Dashboard/AddCertToLinkedIn";
 import { useUserData } from "@/context/AuthContext";
 import { uploadFile } from "@/uploadFile";
-import { API_BASE_URL } from "@/main";
+import AddCertToLinkedIn from "../Dashboard/AddCertToLinkedIn";
 
 const steps = [
   { id: 1, label: "Verification", icon: CheckCircle, endpoint: "/api/verify" },
   {
     id: 2,
-    label: "Certificate Generation & Upload",
+    label: "Certificate Generation",
     icon: FileText,
     endpoint: "/api/generate-certificate",
   },
   {
     id: 3,
+    label: "QR Code Attachment",
+    icon: QrCode,
+    endpoint: "/api/attach-qr",
+  },
+  {
+    id: 4,
+    label: "Certificate Upload",
+    icon: Upload,
+    endpoint: "/api/upload-certificate",
+  },
+  {
+    id: 5,
     label: "Blockchain Registration",
     icon: Shield,
     endpoint: "/api/register-blockchain",
@@ -37,16 +51,14 @@ export default function CertificateStepper() {
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const id = useLocation().pathname.split("/").pop();
-
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [errorCount, setErrorCount] = useState(0);
   const {user} = useUserData();
-
-
-
-  const [txHash, setTxHash] = useState("");
+  const storedData = JSON.parse(localStorage.getItem("uploadData") || "{}");
   //console.log("userFormData", userFormData);
   const [allStepData, setAllStepData] = useState<any>({
     name: user?.name,
-    certificate_type: "agentic-ai",
+    certificate_type: "",
     certId: "",
     fileHash: "",
     uri: "",
@@ -101,13 +113,31 @@ export default function CertificateStepper() {
   const handleGenerationAndUpload = async () => {
     try {
       // 1) Generate certificate (external service)
+      if(storedData && storedData.cert_id && storedData.fileHashWithTimeStampExt && storedData.url) {
+        const uploadData = storedData;
+        console.log("uploadData", uploadData);
+        setAllStepData((prev: any) => {
+        const next = {
+          ...prev,
+          certId: uploadData.cert_id,
+          fileHash: uploadData?.fileHashWithTimeStampExt?.split("_")[0],
+          uri: uploadData.url,
+        };
+        console.log("next", next);
+        allStepDataRef.current = next;
+        return next;
+      });
+      return {
+        success: true,
+        data: { certId: uploadData.cert_id, upload: uploadData },
+      };
+    }
       const res: any = await fetch("https://edubuktrucveduchain.org/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          template_type:"participation",
           name: user?.name,
         }),
       });
@@ -119,19 +149,10 @@ export default function CertificateStepper() {
 
       const data = await res.json();
       console.log("data", data);
-      if (!data || !data.pdf_base64) {
+      if (!data || !data.pdf_base64 || !data.cert_id) {
         throw new Error("Invalid generation response");
       }
-      setAllStepData((prev: any) => {
-        const next = {
-          ...prev,
-          certId:"",
-          fileHash:"",
-          uri:""
-        };
-        allStepDataRef.current = next;
-        return next;
-      });
+
       // convert base64 to file and upload to your BASE_URL upload endpoint
       const responseBlob = base64ToBlob(data.pdf_base64);
       const file = new File([responseBlob], "document.pdf", {
@@ -141,15 +162,17 @@ export default function CertificateStepper() {
       formData.append("file", file);
 
       const upload: any = await uploadFile(formData);
-      console.log("upload", upload);
+
       if (!upload.data.success) {
         throw new Error(`Upload failed: ${upload.data.message}`);
       }
-
-      const uploadData = upload.data;
+      const dataToSTore = {
+        ...upload.data,
+        cert_id: data.cert_id,
+      }
+      localStorage.setItem("uploadData", JSON.stringify(dataToSTore));
+      const uploadData = dataToSTore;
       console.log("uploadData", uploadData);
-      console.log("fileHash", uploadData.fileHashWithTimeStampExt.split("_")[0]);
-      console.log("uri", uploadData.fileHashWithTimeStampExt);
       // Update step data
       setAllStepData((prev: any) => {
         const next = {
@@ -172,63 +195,65 @@ export default function CertificateStepper() {
   };
 
   // Handler for mapping QR (step 2)
-//   const handleAttachQr = async () => {
-//     try {
-//       const payload = {
-//         qrUrl: allStepDataRef.current.uri,
-//         qrId: allStepDataRef.current.certId,
-//       };
-//       const mappingUrl: any = await fetch(`http://localhost:8000/certification/dynamicQrUrlMap`,
-//         {
-//           method: "PUT",
-//           credentials:"include",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify(payload),
-//         }
-//       );
+  const handleAttachQr = async () => {
+    try {
+      const payload = {
+        url: allStepDataRef.current.uri || storedData.url,
+        id: allStepDataRef.current.certId || storedData.cert_id,
+        hackathonName: "GDG-IIMT-Meerut",
+      };
+      const mappingUrl: any = await fetch(
+        `${API_BASE_URL}/certification/dynamicQrUrlMap`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
-//       if (!mappingUrl.ok) {
-//         const txt = await mappingUrl.text().catch(() => "");
-//         throw new Error(`QR mapping failed: ${mappingUrl.status} ${txt}`);
-//       }
+      if (!mappingUrl.ok) {
+        const txt = await mappingUrl.text().catch(() => "");
+        throw new Error(`QR mapping failed: ${mappingUrl.status} ${txt}`);
+      }
 
-//       const mappingUrlData = await mappingUrl.json();
-//       console.log("mappingUrlData", mappingUrlData);
-//       // if the API returns useful info, you can store it
-//       setAllStepData((prev: any) => {
-//         const next = { ...prev, qrMapping: mappingUrlData };
-//         allStepDataRef.current = next;
-//         return next;
-//       });
+      const mappingUrlData = await mappingUrl.json();
+      console.log("mappingUrlData", mappingUrlData);
+      // if the API returns useful info, you can store it
+      setAllStepData((prev: any) => {
+        const next = { ...prev, qrMapping: mappingUrlData };
+        allStepDataRef.current = next;
+        return next;
+      });
 
-//       return { success: true, data: mappingUrlData };
-//     } catch (err: any) {
-//       return { success: false, error: err?.message || String(err) };
-//     }
-//   };
+      return { success: true, data: mappingUrlData };
+    } catch (err: any) {
+      return { success: false, error: err?.message || String(err) };
+    }
+  };
 
   // Handler for certificate upload step (if you need any extra logic - here we mock)
-//   const handleCertificateUpload = async () => {
-//     // If everything was uploaded already in generation step, this can be a no-op or a verification call
-//     return await mockAPICall(3);
-//   };
+  const handleCertificateUpload = async () => {
+    // If everything was uploaded already in generation step, this can be a no-op or a verification call
+    return await mockAPICall(3);
+  };
 
   // Handler for blockchain registration (step 4)
   const handleRegisterOnChain = async () => {
     try {
       const payload = {
-        name: allStepDataRef.current.name,
-        uri: allStepDataRef.current.uri,
-        filehash: allStepDataRef.current.fileHash,
-        issuerName:"TechEra",
+        name: user?.name || "",
+        uri: allStepDataRef.current.uri || storedData.url,
+        filehash: allStepDataRef.current.fileHash || storedData.fileHashWithTimeStampExt.split("_")[0],
         certificateType:"Participation",
-        hackathonName: "CV To CAREER: A TruTalk by Edubuk x TechEra"
+        issuerName: "IIMT Business Incubator Foundation",
+        hackathonName: "GDG-IIMT-Meerut",
       };
 
       const txData = await fetch(`${API_BASE_URL}/certification/register-on-chain`, {
-        method: "POST",
+        method: "PUT",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -242,14 +267,12 @@ export default function CertificateStepper() {
       }
 
       const tx = await txData.json();
-
+       setTxHash(tx.txHash);
       setAllStepData((prev: any) => {
         const next = { ...prev, onChainTx: tx };
         allStepDataRef.current = next;
         return next;
       });
-      setTxHash(tx.txHash);
-      //navigate("/user/dashboard");
       return { success: true, data: tx };
     } catch (err: any) {
       return { success: false, error: err?.message || String(err) };
@@ -262,6 +285,8 @@ export default function CertificateStepper() {
   > = [
       handleVerification,
       handleGenerationAndUpload,
+      handleAttachQr,
+      handleCertificateUpload,
       handleRegisterOnChain,
     ];
 
@@ -378,6 +403,9 @@ export default function CertificateStepper() {
       // optionally resume: only use this if you want to continue after successful retry
       await runAllStepsSequentially(idx + 1);
     }
+    setErrorCount((prev) => prev + 1);
+    console.log("countError", errorCount);
+    
   };
 
 
@@ -408,7 +436,7 @@ export default function CertificateStepper() {
             Certificate Processing
           </h1>
           <p className="text-gray-600">
-            Your hackathon certificate is being generated and secured
+            Your exam certificate is being generated and secured
           </p>
           <p className="text-[#03257e]">
             <span className="font-bold text-red-500">Note:</span> Please do not refresh or close this page before completion of certificate generation
@@ -486,6 +514,7 @@ export default function CertificateStepper() {
                       )}
 
                       {isFailed && (
+                        <div className="flex flex-col gap-2">
                         <div className="mt-2">
                           <p className="text-sm text-red-600 mb-2">
                             {errorMessage}
@@ -499,14 +528,18 @@ export default function CertificateStepper() {
                               className={`w-4 h-4 mr-1 cursor-pointer ${isProcessing ? "animate-spin" : ""
                                 }`}
                             />
-                            Click to Retry
+                            Retry
                           </Button>
+                        </div>
+                        {errorCount > 5 && <div className="flex flex-col gap-2">
+                        <p className="text-xs text-gray-500 mt-2">if you have already retried more than 3-4 times and still facing issue, please go back to dashboard. Your certificate are in queue and will available in dashboard after some time.</p>
+                        <Link to="/user/dashboard" className="bg-[#016765] text-white text-center cursor-pointer hover:bg-[#016765]/80 py-2 px-2 rounded-xl w-40">Go to Dashboard</Link>
+                        </div>}
                         </div>
                       )}
                     </div>
                   </div>
-
-                  {index < steps.length - 1 && (
+                   {index < steps.length - 1 && (
                     <div
                       className={`
                         absolute left-7 top-16 w-0.5 h-6 transition-colors duration-500
@@ -534,12 +567,12 @@ export default function CertificateStepper() {
                   View Certificate
                 </a>
                 <AddCertToLinkedIn
-                  certName="CV To CAREER: A TruTalk by Edubuk x TechEra"
-                  organizationId={108289846}
+                  certName="Certificate of Participation - TechSprint Campaign"
+                  organizationId={80662446}
                   issueYear={2026}
-                  issueMonth={2}
+                  issueMonth={3}
                   certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${allStepData?.uri}`}
-                  certId={Number(user?.uuid)|| 108289846}
+                  certId={Number(user?.uuid)|| 80662446}
                 />
                 <Link to="/dashboard" className="bg-[#016765] text-white cursor-pointer hover:bg-[#016765]/80 py-3 px-6 rounded-xl">
                   Go to Dashboard

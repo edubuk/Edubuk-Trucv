@@ -295,26 +295,6 @@ export const ExperienceDetails = ({
     });
   }
 
-  const fillParsedExperienceDetails = (e: React.MouseEvent)=>{
-    e.preventDefault();
-   if(parsedExperienceData)
-   {
-    parsedExperienceData.map((doc:any)=>
-      append({
-      id: uid("exp"),
-      expDocId: docId(),
-      companyName:doc.companyName,
-      jobRole:doc.jobRole,
-      duration: { from: "", to: "" },
-      skills:doc.skills || "",
-      description:doc.description || "",
-      selfAttested: false,
-      isEmailSend: false,
-      verified: false,
-      status: "pending",
-    }))
-   }
-  }
 
   const updateLocalStorageData = (jobRole:string)=>{
     if(parsedExperienceData){
@@ -465,7 +445,7 @@ export const ExperienceDetails = ({
                             <Input
                               disabled={field.verified}
                               placeholder="Company Name"
-                              className="w-full"
+                              className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               {...innerField}
                             />
                           </FormControl>
@@ -488,7 +468,7 @@ export const ExperienceDetails = ({
                             <Input
                             disabled={field.verified}
                               placeholder="eg. Software Engineer"
-                              className="w-full"
+                              className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               {...innerField}
                             />
                           </FormControl>
@@ -509,6 +489,7 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input 
+                            className={`${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                             disabled={field.verified}
                             type="date" {...innerField} />
                           </FormControl>
@@ -529,7 +510,7 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-
+                              className={`${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               type="date"
                               {...innerField}
                               disabled={isCurrentlyWorking || field.verified}
@@ -552,9 +533,9 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                            className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                             disabled={field.verified}
                               placeholder="Write your skills"
-                              className="w-full"
                               {...innerField}
                             />
                           </FormControl>
@@ -577,7 +558,7 @@ export const ExperienceDetails = ({
                             <Textarea
                             disabled={field.verified}
                               placeholder="Description(write as paragraph format)"
-                              className="w-full"
+                              className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               {...innerField}
                             />
                           </FormControl>
@@ -754,13 +735,7 @@ export const ExperienceDetails = ({
                 className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
               >
                 <PlusCircle size={16} /> Add Experience
-              </button>
-             {parsedExperienceData &&parsedExperienceData.length>0&&<button
-                onClick={fillParsedExperienceDetails}
-                className="flex items-center shadow-lg border-[#03257e] text-white bg-[#03257e] gap-2 px-3 py-1 rounded border"
-              >
-                <PlusCircle size={16} /> Fill from Parsed Data
-              </button>}              
+              </button>            
             </div>
           </div>
           }
