@@ -3,6 +3,19 @@ import { lazy, Suspense, useEffect } from "react";
 import ThreeDotLoader from "./components/Loader/ThreeDotLoader";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import AppPrivacyPolicy from "./pages/AppPrivacy";
+import SubscriptionPlans from "./components/Subscription/Subscription";
+import GoogleLoginModal from "./pages/Login";
+import ProtectedRoute from "./protectRoute";
+import Layout from "./Layout/Layout";
+import Register from "./pages/Register";
+import PasswordResetUI from "./pages/ForgotPassword";
+import CVBuilder from "./CvBuilder/CvBuilder";
+import CreateCv from "./pages/CreateCv";
+import CertificateTimerPage from "./components/Certification/CertificateTimerPage";
+import AdminDashBoard from "./components/Admin/AdminDashboard";
 
 // Lazy-loaded pages
 //const HomePage = lazy(() => import("./pages/HomePage"));
@@ -19,19 +32,8 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const Digilocker = lazy(()=>import("./pages/Digilocker"));
 const SkillVerify = lazy(()=>import("./components/SkillVerification/VerifySkill"))
-import AOS from "aos";
-import "aos/dist/aos.css";
-import AppPrivacyPolicy from "./pages/AppPrivacy";
-import SubscriptionPlans from "./components/Subscription/Subscription";
-import GoogleLoginModal from "./pages/Login";
-import ProtectedRoute from "./protectRoute";
-import Layout from "./Layout/Layout";
-import Register from "./pages/Register";
-import PasswordResetUI from "./pages/ForgotPassword";
-import CVBuilder from "./CvBuilder/CvBuilder";
-import CreateCv from "./pages/CreateCv";
-import CertificateTimerPage from "./components/Certification/CertificateTimerPage";
-import AdminDashBoard from "./components/Admin/AdminDashboard";
+const DigilockerConnectPage = lazy(()=>import("./pages/DigiLockerConnectPage"))
+
 
 
 function App() {
@@ -73,6 +75,8 @@ useEffect(() => {
               <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />
               <Route path="/register" element={<Register />} />
               <Route path="/certificate-timer" element={<Layout><ProtectedRoute><CertificateTimerPage /></ProtectedRoute></Layout>} />
+              <Route path="/dl-connect" element={<DigilockerConnectPage />} />
+
             </Routes>
           </Suspense>
     </div>
