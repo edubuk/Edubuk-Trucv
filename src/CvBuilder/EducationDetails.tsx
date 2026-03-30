@@ -580,6 +580,7 @@ export const EducationDetails = ({
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                className={isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}
                                 type="date"
                                   placeholder="YYYY"
                                   {...innerField}
@@ -602,6 +603,7 @@ export const EducationDetails = ({
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                className={isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}
                                 disabled={field.verified}
                                   type="date"
                                   placeholder="YYYY"
@@ -683,7 +685,7 @@ export const EducationDetails = ({
                                       ? "School Name"
                                       : "Degree(e.g. BTech,BSc.)"
                                   }
-                                  className="w-full"
+                                  className={`w-full ${isMongoId(field.id) && f.value === "" ? "border-red-500" : ""}`}
                                   {...f}
                                 />
                               </FormControl>
@@ -715,7 +717,7 @@ export const EducationDetails = ({
                                       ? "Percentage*"
                                       : "GPA(Grade Point Average)*"
                                   }
-                                  className="w-full"
+                                  className={`w-full ${isMongoId(field.id) && f.value === "" ? "border-red-500" : ""}`}
                                   {...f}
                                 />
                               </FormControl>

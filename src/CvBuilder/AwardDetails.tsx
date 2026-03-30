@@ -453,7 +453,7 @@ export const AwardDetails = ({
                             <Input
                             disabled={a.verified}
                               placeholder={`${a.level} name`}
-                              className="w-full"
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
                               {...field}
                             />
                           </FormControl>
@@ -476,7 +476,7 @@ export const AwardDetails = ({
                             <Input
                             disabled={a.verified}
                               placeholder="Organisation"
-                              className="w-full"
+                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
                               {...field}
                             />
                           </FormControl>
@@ -499,6 +499,7 @@ export const AwardDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input 
+                            className={`${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
                             disabled={a.verified}
                             type="date" {...field} />
                           </FormControl>
@@ -520,6 +521,7 @@ export const AwardDetails = ({
                             </FormLabel>
                             <FormControl>
                               <Input 
+                              className={`w-full ${isMongoId(a.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               disabled={a.verified}
                               type="date" {...innerField} />
                             </FormControl>

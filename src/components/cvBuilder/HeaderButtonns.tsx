@@ -391,7 +391,8 @@ const HeaderButtons = ({
                   {/* ─ CV Tab ─ */}
                   {tab === "cv" &&
                     (localStorage.getItem("cvData") ? (
-                      <div className="flex gap-2 justify-center items-center">
+                      <div className="flex flex-col gap-2 justify-center items-center">
+                        <div className="flex gap-2 justify-center items-center">
                         <button
                           disabled={isDataSaving}
                           onClick={saveParsedData}
@@ -414,6 +415,8 @@ const HeaderButtons = ({
                           <Trash2 size={16} />
                           Clear CV Data
                         </button>
+                        </div>
+                        {localStorage.getItem("cvData") && <p className="text-[#03257e] text-center"><span className="font-bold text-[#f14419]">Note:</span> All fetched data may not be accurate and complete, so please verify and update each saved field after saving it.</p>}
                       </div>
                     ) : (
                       localStorage.getItem("linkedInCvData") ? 
@@ -430,6 +433,7 @@ const HeaderButtons = ({
                             <Trash2 size={16} />
                             Clear LinkedIn CV Data
                           </button>
+
                         </div>
                       ):
                       <>
@@ -566,7 +570,7 @@ const HeaderButtons = ({
                             Clear Parsed CV Data
                           </button>
                         </div>
-                        <p className="text-[#03257e] text-center"><span className="font-bold text-[#f14419]">Note:</span> All fetched data may not be accurate and complete, so please verify and update each saved field after saving it.</p>
+                        {localStorage.getItem("linkedInCvData")&&<p className="text-[#03257e] text-center"><span className="font-bold text-[#f14419]">Note:</span> All fetched data may not be accurate and complete, so please verify and update each saved field after saving it.</p>}
                         </div>
 
                       ):
