@@ -51,7 +51,7 @@ const ShowVerifications = (
             )}
           >
             {isAttested && (
-              <span className="">Self attested</span>
+              <span className="">Self Attested</span>
             )}
             {!onlySelfAttest && (
               <>

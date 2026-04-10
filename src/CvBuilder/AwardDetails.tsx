@@ -200,7 +200,7 @@ export const AwardDetails = ({
 
   useEffect(() => {
     fetchAwdDocs();
-  }, [step === 7, refresh]);
+  }, [refresh]);
 
   const updateHandler = async (index: number) => {
     try {

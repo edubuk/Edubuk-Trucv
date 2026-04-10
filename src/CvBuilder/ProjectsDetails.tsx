@@ -204,7 +204,7 @@ export const ProjectDetails = ({
     if(cvDataFromStorageParsed){
       setParsedProjectData(cvDataFromStorageParsed);
     }
-  }, [step === 6, refresh]);
+  }, [refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.projects.map((e: any) => e.id)),

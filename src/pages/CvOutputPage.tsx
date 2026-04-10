@@ -3,10 +3,22 @@ import { SiHyperskill } from "react-icons/si";
 import { FaBriefcase, FaCopy, FaGithub } from "react-icons/fa";
 import { GiAchievement } from "react-icons/gi";
 import { BiSolidBriefcase } from "react-icons/bi";
-import { CheckCircle, CircleUser, GraduationCap, Link2, Linkedin, Mail, MapPinned, Phone } from "lucide-react";
+
+import {
+  CheckCircle,
+  CircleUser,
+  FolderOpen,
+  GraduationCap,
+  Link2,
+  Linkedin,
+  Mail,
+  MapPinned,
+  Phone,
+} from "lucide-react";
+import { useReactToPrint } from "react-to-print";
 // import HyperText from "@/components/ui/AnimateHypertext";
 import ShowVerifications from "@/components/ShowVerifications";
-import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
+//import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
 //import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useState, useRef, useEffect } from "react";
@@ -23,9 +35,12 @@ import {
 } from "@/CvBuilder/cvSchema";
 import { MdSchool } from "react-icons/md";
 import StatusBadge from "@/CvBuilder/StatusBadge";
+import { EdubukQR } from "@/components/QrCode";
 const COLOR_TEAL = "#006666";
 export const formatDate = (dateString: string) => {
-  if(!dateString){return ""}
+  if (!dateString) {
+    return "";
+  }
   const date = new Date(dateString);
 
   // Check if year is 1970, return "Present"
@@ -50,14 +65,15 @@ export const formatDate = (dateString: string) => {
   const month = months[date.getMonth()];
   const day = date.getDate().toString().padStart(2, "0");
   const year = date.getFullYear();
-  if(month==="undefined" || day==="NaN")
-  return "Present";
+  if (month === "undefined" || day === "NaN") return "Present";
   return `${day} ${month} ${year}`;
 };
+
 const CvOutputPage = () => {
   const { id } = useParams();
   const [copied, setCopied] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
+
   //const { user } = useUserData();
   const [cvData, setCvData] = useState<ICvData>({
     personal: {
@@ -69,7 +85,7 @@ const CvOutputPage = () => {
       github: "",
       summary: "",
       imgUrl: "",
-      profession:"",
+      profession: "",
     },
     educations: [],
     experiences: [],
@@ -85,24 +101,46 @@ const CvOutputPage = () => {
   // });
 
   const [loading, setLoading] = useState(false);
-  //   const handlePrint = useReactToPrint({
-  //   contentRef: pdfRef,
-  //   documentTitle: "My CV"
-  // });
-  // const formatDate = (dateString: string): string => {
-  //   const date = new Date(dateString);
-  //   console.log("date", dateString);
-  //   const formatedDate = date.toLocaleDateString("en-GB", {
-  //     day: "numeric",
-  //     month: "short",
-  //     year: "numeric",
-  //   });
-  //   console.log("formated date", formatedDate);
-  //   if (formatedDate == "Invalid Date" || formatedDate == "1 Jan 1970") {
-  //     return "Present";
-  //   }
-  //   return formatedDate;
-  // };
+
+  const handlePrint = useReactToPrint({
+  contentRef: pdfRef,
+  documentTitle: "My CV",
+  pageStyle: `
+    @page {
+      size: A4;
+      margin: 10mm;
+    }
+    @media print {
+      .print-no-break {
+  break-inside: auto;
+  page-break-inside: auto;
+}
+      .print-section {
+        break-before: auto;
+        page-break-before: auto;
+      }
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  `,
+});
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    console.log("date", dateString);
+    const formatedDate = date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    console.log("formated date", formatedDate);
+    if (formatedDate == "Invalid Date" || formatedDate == "1 Jan 1970") {
+      return "Present";
+    }
+    return formatedDate;
+  };
   const userCv = async () => {
     try {
       setLoading(true);
@@ -160,625 +198,613 @@ const CvOutputPage = () => {
 
   return (
     <div className="px-1 mt-5 md:mt-0 md:px-10 mb-10 overflow-x auto ">
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 px-4 py-4">
-        <h1 className="text-xl md:text-2xl text-center font-bold text-[#006666]">
+       <div className="flex items-center justify-center gap-3 mt-4">
+          {/* Copy Link */}
+          <button
+            onClick={() =>
+              copyResumeLink(`https://edubuktrucv.com/cv/${id}`)
+            }
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#03257e]/30 text-[#03257e] hover:bg-[#03257e] hover:text-white transition-all duration-200 text-sm font-medium"
+          >
+            <FaCopy size={13} />
+            <span>{copied ? "Copied!" : "Copy CV Link"}</span>
+          </button>
+
+          {/* Download PDF */}
+          <button
+            onClick={handlePrint}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#006666] text-white hover:bg-[#006666]/85 transition-all duration-200 text-sm font-semibold"
+          >
+            <span>Download as PDF</span>
+          </button>
+        </div>
+      <div className="flex flex-col items-center gap-3 px-4 py-5 border-b border-gray-100">
+        <div>
+        <p className="lg:hidden text-sm text-[#F1441C] flex items-center gap-1.5 font-medium">
+          <span>👉</span>
+          <span>Swipe left/right to view the full CV</span>
+        </p>
+      </div>
+      <div  className=" mt-2 max-w-6xl mx-auto w-full overflow-x-scroll xl:overflow-x-clip">
+        {/* main */}
+
+        <div ref={pdfRef} className="flex flex-col gap-3 md:gap-7 w-[1100px]">
+        <h1
+          className="text-xl md:text-2xl font-bold text-center ml-[300px]"
+          style={{
+            background: "linear-gradient(90deg, #03257e, #006666, #f14419)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
           Verified Curriculum Vitae (CV) on the Blockchain
         </h1>
 
-        {/* <Link
-          to={`/new-cv/${id}`}
-          className="px-4 py-2 border-2 border-[#f14419] text-[#f14419] font-semibold rounded-lg hover:bg-[#f14419] hover:text-white transition duration-200"
-        >
-          View Other Template
-        </Link> */}
-
-        <div
-          className="flex items-center gap-2 cursor-pointer text-[#03257e] hover:text-[#006666]"
-          onClick={() => copyResumeLink(`https://www.edubuktrucv.com/cv/${id}`)}
-        >
-          <FaCopy />
-          <span className="font-medium">
-            {copied ? "Copied" : "Copy CV Link"}
-          </span>
+        <div className="flex justify-center items-center flex-col ml-[300px]">
+          <EdubukQR url={`https://edubuktrucv.com/cv/${id}`} />
+          <div className="flex flex-col gap-0.5 justify-center items-center">
+            <p className="text-lg text-[#03257e] tracking-wide">
+              <span className="font-bold">TruCV</span> powered by
+              <span
+                className="text-xl font-bold tracking-tight"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #03257e, #006666, #f14419)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                {" "}
+                Edubuk
+              </span>
+            </p>
+          </div>
         </div>
-      </div>
-      <div className="w-full text-center text-[#F1441C] text-lg mt-2 lg:hidden">
-        👉 Swipe left/right to view the full CV
-      </div>
-      <div
-        ref={pdfRef}
-        className=" mt-2 max-w-6xl mx-auto w-full border  border-l-0 shadow-lg   rounded-md overflow-x-scroll xl:overflow-x-clip"
-      >
-        {/* main */}
-        <div className="flex gap-3 md:gap-7 w-[1100px]">
+        <div className="flex gap-3 md:gap-7 w-[1100px] border  border-t shadow-lg">
           {/* left sidebar */}
-          <div className="w-72  h-auto  bg-[#006666] rounded-ss-2xl px-2 md:px-5 text-white py-2 space-y-20 md:space-y-10">
-            {/* image */}
-          {cvData.personal.imgUrl?<div className="mt-5">
-            <img
-              src={cvData.personal.imgUrl}
-              alt="image"
-              className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 mx-auto border-[#449298] object-cover"
-            />
-            <ShowVerifications
-              isAttested={
-                true
-              }
-              className="flex justify-center mt-2"
-              onlySelfAttest
-              textClass="text-white"
-              fillCheck
-              fillcheckClass="mt-1"
-            />
-          </div>:<div className="mt-5">
-            <CircleUser size={24} 
-            className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 mx-auto border-[#449298] object-cover"
-            />
-          </div>}
+          <div
+            className="w-72 bg-[#006666] px-4 md:px-5 text-white py-6 flex flex-col gap-8"
+            style={{ minHeight: "100%" }}
+          >
+            {/* Profile Image */}
+            <div className="flex flex-col items-center gap-2 mt-2">
+              {cvData.personal.imgUrl ? (
+                <img
+                  src={cvData.personal.imgUrl}
+                  alt="profile"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 border-[#449298] object-cover"
+                />
+              ) : (
+                <CircleUser className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 border-[#449298] text-white/60" />
+              )}
+              {/* <ShowVerifications
+                isAttested={true}
+                className="flex justify-center"
+                onlySelfAttest
+                textClass="text-white"
+                fillCheck
+                fillcheckClass="mt-1"
+              /> */}
+            </div>
+
+            {/* Divider */}
+            <div className="w-full h-px bg-white/20" />
 
             {/* Education */}
-            <div>
-              <div className="flex items-center gap-3 px-1">
-                <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                  <GraduationCap size={20} />
+            {cvData.educations.length > 0 && (
+              <div className="flex flex-col gap-4">
+                {/* Section Header */}
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 bg-[#FB980E] rounded-full flex items-center justify-center shrink-0">
+                    <GraduationCap size={18} />
+                  </div>
+                  <h2 className="text-base md:text-lg font-semibold tracking-wider uppercase">
+                    Education
+                  </h2>
                 </div>
-                <h1 className="text-black-500 text-sm md:text-xl lg:text-2xl font-semibold tracking-tight uppercase">
-                  Education
-                </h1>
+
+                {/* Education Cards */}
+                <div className="relative pl-5 border-l-2 border-[#FB980E]/60 flex flex-col gap-5">
+                  {cvData.educations.map(
+                    (education: TypeEducation, index: number) => (
+                      <div key={index} className="relative flex flex-col gap-1">
+                        {/* Timeline dot */}
+                        <div className="absolute -left-[25px] top-1.5 h-2.5 w-2.5 rounded-full bg-[#FB980E] ring-2 ring-[#006666]" />
+
+                        {/* Level + doc link */}
+                        <h3 className="font-semibold text-sm md:text-base text-white flex items-center gap-1 leading-tight">
+                          {education.level}
+                          {education.docUri && (
+                            <a
+                              href={education.docUri}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#FB980E] hover:opacity-75 transition-opacity"
+                            >
+                              <Link2 size={13} />
+                            </a>
+                          )}
+                        </h3>
+
+                        {/* Institution | Degree */}
+                        <p className="text-xs text-white/80 leading-snug">
+                          {education.institutionName}
+                        </p>
+                        <p className="text-xs text-white/60">
+                          {education.boardNameOrDegree}
+                        </p>
+
+                        {/* GPA / Percentage */}
+                        <p className="text-xs font-semibold text-[#FB980E]">
+                          {Number(education.gpa) > 10
+                            ? `${education.gpa}%`
+                            : `GPA: ${education.gpa}`}
+                        </p>
+
+                        {/* Duration */}
+                        <p className="text-xs text-white/60 italic">
+                          {formatDate(education.duration?.from!)}
+                          {education.duration?.to
+                            ? ` – ${formatDate(education.duration.to!)}`
+                            : ""}
+                        </p>
+
+                        {/* Status Badge */}
+                        <div className="bg-white rounded-full w-fit mt-0.5">
+                          <StatusBadge
+                            status={education.status}
+                            isEmailSend={education.isEmailSend}
+                          />
+                        </div>
+                      </div>
+                    ),
+                  )}
+                </div>
               </div>
-
-              {/* showcasing education higher to lower*/}
-              <div className="flex flex-col gap-10 md:gap-5 mt-3">
-                {cvData.educations.length > 0 &&
-                    cvData.educations.map(
-                      (education: TypeEducation, index: number) => {
-                        return (
-                          <div
-                            className="flex flex-col p-4 md:p-5 rounded-lg shadow-sm"
-                            key={index + 1}
-                          >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex items-center gap-3">
-                                <h1 className="flex items-center gap-1 font-semibold text-sm md:text-base text-white">
-                                  {education.level}
-                                  {education.docUri && (
-                                  <a
-                                    href={education.docUri}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label={`Open document for ${education.level}`}
-                                    className="inline-flex items-center justify-center ml-1 p-1 rounded-md text-[#FB980E] hover:bg-[#FB980E]/10 transition"
-                                  >
-                                    <Link2 />
-                                  </a>
-                                )}
-                                </h1>
-                              </div>
-                            </div>
-                            <div className="bg-white rounded-full w-fit">
-                            <StatusBadge status={education.status} isEmailSend={education.isEmailSend}/>
-                            </div>
-                            {/* meta row: degree, gpa and duration */}
-                            <div className="mt-2 flex flex-col gap-2">
-                              <div className="text-sm flex flex-col justify-start text-white dark:text-gray-300">
-                                <span className="font-medium text-white">
-                                  {education.institutionName } | {education.boardNameOrDegree}
-                                </span>
-                                {
-                                  Number(education.gpa)>10?
-                                  <span className="font-bold text-black">Percentage: {education.gpa}%</span>:
-                                  <span className="font-bold text-black">GPA: {education.gpa}</span>
-                                }
-                                {/* <span className="font-normal ml-0 md:ml-2">
-                                  GPA: {education.gpa ?? "—"}
-                                </span>{" "} */}
-                              </div>
-
-                              {/* optional duration on the right for larger screens */}
-                              <div className="text-sm text-white">
-                                {formatDate(education.duration?.from!)}{" "}
-                                  {education.duration?.to
-                                  ? `— ${formatDate(education.duration.to!)}`
-                                  : ""}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
-                    )}
-                </div>
-              {/*  */}
-            </div>
+            )}
           </div>
 
           {/* right bar */}
           <div className="flex-1">
-            <div className="mt-5 px-2 flex flex-col gap-3">
-              <div className="flex items-center gap-5">
-                <h1
-                  className="text-4xl text-[#333B4D] tracking-wide capitalize 
-                max-w-[500px] lg:max-w-[600px]  line-clamp-1 "
-                >
+            <div className="mt-5 px-2 flex flex-col gap-3 ">
+              {/* Name + Single Centered Self-Attest Badge */}
+              <div className="flex flex-col items-center gap-1">
+                <h1 className="text-4xl text-[#333B4D] tracking-wide capitalize max-w-[500px] lg:max-w-[600px] line-clamp-1 text-center">
                   {cvData.personal.fullName}
                 </h1>
-
                 <ShowVerifications
-                  isAttested={
-                    true
-                  }
-                  onlySelfAttest
-                />
-              </div>
-              {/* personal details */}
-              <div className="bg-[#006666] grid grid-cols-2 rounded-md text-white px-5 py-1 flex md:max-w-3xl w-full gap-3">
-                {/* email and location */}
-                <div className="w-full">
-                  <div className="flex flex-col gap-2">
-                    {/* email */}
-                    <div className="flex items-center gap-3">
-                      <div className="self-start">
-                        <Mail
-                          size={26}
-                          className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                        />
-                      </div>
-                      <h1 className="text-sm md:text-base tracking-wider font-normal">
-                        {cvData.personal.email}
-                      </h1>
-                      <ShowVerifications
-                        isAttested={
-                          true
-                        }
-                        className="self-start"
-                        onlySelfAttest
-                        textClass="text-white"
-                        badge
-                      />
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="self-start">
-                        <MapPinned
-                          size={26}
-                          className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                        />
-                      </div>
-                      <h1 className="text-sm md:text-base tracking-wider font-normal">
-                        {cvData.personal.city}
-                      </h1>
-                      <ShowVerifications
-                        isAttested={
-                          true
-                        }
-                        className="self-start mt-2"
-                        onlySelfAttest
-                        textClass="text-white"
-                        badge
-                      />
-                    </div>
-                  </div>
-                </div>
-                {/* phoneNumber and profesion */}
-                <div className="w-full ml-3">
-                  <div className="flex flex-col gap-2">
-                    {/* email */}
-                    <div className="flex items-center gap-3">
-                      <div className="self-start">
-                        <Phone
-                          size={24}
-                          className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                        />
-                      </div>
-                      <h1 className="text-sm md:text-base tracking-wider font-normal">
-                        {cvData.personal.phone}
-                      </h1>
-                      <ShowVerifications
-                        isAttested={true}
-                        // className="self-start mt-2"
-                        onlySelfAttest
-                        textClass="text-white"
-                        badge
-                      />
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="self-start">
-                        {cvData.personal.profession === "student" ? (
-                          <span className="flex item-center gap-1"><MdSchool
-                            size={26}
-                            className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                          />Student </span> 
-                        ) : (
-                          <span className="flex item-center gap-1"> <FaBriefcase
-                            size={26}
-                            className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                          />Employee</span>
-                        )}
-                      </div>
-                      <h1 className="text-sm md:text-base tracking-wider font-normal">
-                        {cvData.personal.profession}
-                      </h1>
-                      <ShowVerifications
-                        isAttested={
-                          true
-                        }
-                        // className="self-start mt-2"
-                        onlySelfAttest
-                        textClass="text-white"
-                        badge
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full">
-                  <div className="flex gap-2">
-                    {/* email */}
-                    {cvData.personal.github&&<div className="flex items-center gap-3">
-                      <div className="self-start">
-                        <FaGithub
-                          size={24}
-                          className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                        />
-                      </div>
-                      <a 
-                      href={cvData.personal.github}
-                      target="_blank"
-                      className="text-sm md:text-base tracking-wider font-normal underline">
-                        Github
-                      </a>
-                      <ShowVerifications
-                        isAttested={true}
-                        // className="self-start mt-2"
-                        onlySelfAttest
-                        textClass="text-white"
-                        badge
-                      />
-                    </div>}
-                    {cvData.personal.linkedin&&<div className="flex items-center gap-3">
-                      <div className="flex items-center gap-3">
-                      <div className="self-start">
-                        <Linkedin
-                          size={24}
-                          className="h-4 w-4 md:h-5 md:w-5 mt-1"
-                        />
-                      </div>
-                      <a href={cvData.personal.linkedin} 
-                      target="_blank"
-                      className="text-sm md:text-base tracking-wider font-normal underline">
-                        LinkedIn
-                      </a>
-                      <ShowVerifications
-                        isAttested={true}
-                        // className="self-start mt-2"
-                        onlySelfAttest
-                        textClass="text-white"
-                        badge
-                      />
-                    </div>
-                    </div>}
-                  </div>
-                </div>
-              </div>
-              {/* profile summary */}
-              <div className="flex gap-2 items-center  overflow-hidden">
-                <p className="text-sm md:text-base font-semibold">
-                  {cvData.personal?.summary}
-                </p>
-                <ShowVerifications
-                  // isAttested={
-                  //   cvData.profileSummaryVerification.profile_summary
-                  //     .isSelfAttested
-                  // }
                   isAttested={true}
-                  className="self-start mt-2 w-[440px]"
                   onlySelfAttest
-                  // textClass="text-white"
+                  className="flex justify-center"
                 />
               </div>
+
+              {/* Personal Details Grid */}
+              <div className="bg-[#006666] rounded-xl text-white px-6 py-4 md:max-w-3xl w-full shadow-md">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Email */}
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
+                      <Mail size={15} />
+                    </span>
+                    <span className="text-sm flex items-center gap-1 tracking-wide truncate">
+                      {cvData.personal.email}
+                      <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
+                    </span>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
+                      <Phone size={15} />
+                    </span>
+                    <span className="text-sm flex items-center gap-1 tracking-wide">
+                      {cvData.personal.phone}
+                      <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
+                    </span>
+                  </div>
+
+                  {/* Location */}
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
+                      <MapPinned size={15} />
+                    </span>
+                    <span className="text-sm flex items-center gap-1 tracking-wide">
+                      {cvData.personal.city}
+                      <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
+                    </span>
+                  </div>
+
+                  {/* Profession */}
+                  {cvData.personal.profession && (
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
+                        {cvData.personal.profession === "student" ? (
+                          <MdSchool size={15} />
+                        ) : (
+                          <FaBriefcase size={15} />
+                        )}
+                      </span>
+                      <span className="text-sm flex items-center gap-1 tracking-wide capitalize text-white">
+                        {cvData.personal.profession}
+                        <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
+                      </span>
+                    </div>
+                  )}
+
+                  {/* GitHub */}
+                  {cvData.personal.github && (
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
+                        <FaGithub size={15} />
+                      </span>
+                      <a
+                        href={cvData.personal.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm flex items-center gap-1 tracking-wide underline underline-offset-2 hover:text-[#FB980E] transition-colors"
+                      >
+                        GitHub
+                        <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
+                      </a>
+                    </div>
+                  )}
+
+                  {/* LinkedIn */}
+                  {cvData.personal.linkedin && (
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
+                        <Linkedin size={15} />
+                      </span>
+                      <a
+                        href={cvData.personal.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm flex items-center gap-1 tracking-wide underline underline-offset-2 hover:text-[#FB980E] transition-colors"
+                      >
+                        LinkedIn
+                        <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* profile summary */}
+              {cvData.personal?.summary && (
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm md:text-base font-semibold leading-relaxed">
+                    {cvData.personal?.summary}
+                  </p>
+                  <ShowVerifications
+                    isAttested={true}
+                    className="self-start"
+                    onlySelfAttest
+                  />
+                </div>
+              )}
 
               {/* skill section */}
               {/* skills */}
               <div className="mt-2">
-              {cvData.skills.length>0&&<div className="flex items-center gap-4">
-                <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                  <SiHyperskill size={20} />
-                </div>
-                <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                  Skills
-                </h1>
-              </div>}
+                {cvData.skills.length > 0 && (
+                  <>
+                    {/* Section Header */}
+                    <h1 className="text-xl flex items-center gap-2 font-heading font-semibold tracking-wider uppercase border-b border-black mb-2">
+                      <SiHyperskill size={20} color="#FB980E" /> Skills
+                    </h1>
 
-                {/* showcasing skills */}
-                <div className="">
-                  <div className="flex flex-col  mt-2 gap-5 md:gap-3 ">
-                    {cvData.skills.length > 0 &&
-                      cvData.skills.map((skill:TypeSkill) => {
-                        // const isSelfAttested =
-                        //   cvData.skillsVerifications[skill.skillName]
-                        //     .isSelfAttested || false;
-                        const isSelfAttested = true;
-                        const mailStatus = skill.endoresBy
-                        return (
-                          <div>
-                            {/* <div
-                          key={index}
-                          className="px-2 py-1  text-sm tracking-wide font-semibold rounded-sm bg-[#006666] text-white w-fit"
+                    {/* Skills Grid */}
+                    <div className="flex font-body flex-wrap gap-2">
+                      {cvData.skills.map((skill: TypeSkill) => (
+                        <div
+                          key={skill.skillName}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#006666]/10 border border-[#006666]/20 text-[#006666]"
                         >
-                          {skill}
-                        </div> */}
-                        <div className="flex gap-1 items-center w-fit">
-                            <ShowAnimatedVerifications
-                              firstButtonText={skill.skillName}
-                              // buttonClass="text-sm lg:text-base"
-                              isSelfAttested={isSelfAttested}
-                              mailStatus={mailStatus}
-                              hash=""
-                            />
-                            {skill.endoresBy&&<span>Endorsed by 
-                              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
-                              style={{ backgroundColor: COLOR_TEAL + "1a", color: COLOR_TEAL }}
+                          <span className="text-sm font-medium">
+                            {skill.skillName}
+                          </span>
+                          {skill.endoresBy && (
+                            <span
+                              className="inline-flex items-center gap-1 pl-2 border-l border-[#006666]/20 text-xs font-medium"
+                              style={{ color: COLOR_TEAL }}
                             >
-                            <CheckCircle className="h-3.5 w-3.5" /> {skill.endoresBy.slice(0,2)}...{skill.endoresBy.slice(-4)}
+                              <CheckCircle className="h-3 w-3" />
+                              {skill.endoresBy.slice(0, 2)}...
+                              {skill.endoresBy.slice(-4)}
                             </span>
-                              </span>}
-                              </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* experience */}
-              <div className="mt-5">
-                {/* title */}
+              <div className="mt-5 print-section">
                 {cvData.experiences.length > 0 && (
-                  <div className="flex items-center gap-5">
-                    <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                      <BiSolidBriefcase size={20} />
-                    </div>
-                    <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                      Work Experience
+                  <>
+                    {/* Section Header */}
+                    <h1 className="text-xl flex items-center gap-2 font-heading font-semibold tracking-wider uppercase border-b border-black mb-2">
+                      <BiSolidBriefcase size={18} color="#FB980E" /> Work
+                      Experience
                     </h1>
-                  </div>
-                )}
 
-                {/* experience cards */}
-                <div className="relative">
-                  <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
+                    {/* Timeline */}
+                    <div className="relative font-body pl-6 border-l-2 border-[#FB980E] flex flex-col gap-6">
+                      {cvData.experiences.map((exp: TypeExperience, index) => {
+                        return (
+                          <div key={index} className="relative print-no-break">
+                            {/* Timeline dot */}
+                            <div className="absolute -left-[29px] top-1.5 h-3 w-3 rounded-full bg-[#FB980E] ring-2 ring-white" />
 
-                  {cvData.experiences.map((exp:TypeExperience, index) => {
-                    //const verificationKey = exp.c;
-                    // const isSeflAtetsted =
-                    //   cvData.experienceVerifications[verificationKey]
-                    //     .isSelfAttested || false;
-                    const isSeflAtetsted = true;
-                    const mailStatus = exp.status
-                    const hash = exp.docHash;
-                    return (
-                      <div
-                        key={index}
-                        className="flex flex-col mt-3  px-3 ml-1"
-                      >
-                        <div className="flex justify-between">
-                          {/* job role,company name  */}
-                          <div className="max-w-xl w-full relative">
-                            {/* bulletdot */}
-                            <div
-                              className={`absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 -left-[21px]`}
-                            ></div>
-                            <h1 className="text-md md:text-xl font-semibold tracking-tight line-clamp-1">
-                              {exp.jobRole}
-                            </h1>
-                            <div className="flex flex-col">
-                              <p className="flex gap-1 items-center text-sm md:text-lg capitalize line-clamp-1">
-                                {exp.companyName}{" "}
+                            {/* Card */}
+                            <div className="flex flex-col gap-1">
+                              {/* Row 1: Job Role + Duration */}
+                              <div className="flex items-start justify-between gap-3">
+                                <h1 className="text-base md:text-xl font-semibold tracking-tight line-clamp-1">
+                                  {exp.jobRole}
+                                </h1>
+                                <p className="text-[#006666] italic text-xs md:text-sm text-nowrap shrink-0">
+                                  {formatDate(exp.duration.from)} –{" "}
+                                  {formatDate(exp.duration.to)}
+                                </p>
+                              </div>
+
+                              {/* Row 2: Company + doc link */}
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm md:text-base capitalize text-gray-600 line-clamp-1">
+                                  {exp.companyName}
+                                </p>
                                 {exp.docUri && (
                                   <a
                                     href={exp.docUri}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-[#FB980E] font-semibold text-sm"
+                                    className="text-[#FB980E] hover:opacity-75 transition-opacity"
                                   >
-                                    <Link2 />
+                                    <Link2 size={15} />
                                   </a>
                                 )}
-                              </p>{" "}
-                              <div className="flex gap-1 w-fit">
-                              <ShowVerifications
-                                isAttested={isSeflAtetsted}
-                                mailStatus={mailStatus}
-                                hash={hash}
-                                className="ml-5 mt-1"
-                              />
-                              <StatusBadge status={exp.status} isEmailSend={exp.isEmailSend}/>
                               </div>
+
+                              {/* Row 3: Verification + Status */}
+                              <div className="flex items-center gap-2">
+                                <StatusBadge
+                                  status={exp.status}
+                                  isEmailSend={exp.isEmailSend}
+                                />
+                              </div>
+
+                              {/* Row 4: Description */}
+                              {exp.description && (
+                                <ul className="mt-1 flex flex-col gap-1">
+                                  {exp.description
+                                    .split(".")
+                                    .filter((s) => s.trim())
+                                    .map((point, i) => (
+                                      <li
+                                        key={i}
+                                        className="flex items-start gap-2 text-sm text-gray-600"
+                                      >
+                                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-black shrink-0" />
+                                        <span className="leading-relaxed">
+                                          {point.trim()}
+                                        </span>
+                                      </li>
+                                    ))}
+                                </ul>
+                              )}
+
+                              {/* Row 5: Skills */}
+                              {exp.skills && (
+                                <p className="text-sm mt-1">
+                                  <span className="font-bold text-[#006666]">
+                                    Skills:
+                                  </span>{" "}
+                                  <span className="font-semibold text-gray-600">
+                                    {exp.skills}
+                                  </span>
+                                </p>
+                              )}
                             </div>
                           </div>
-                          {/* duration */}
-                          {/* yash */}
-                          <div className="">
-                            <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
-                              <>
-                                {/* {exp.duration.from} - {exp.duration.to} */}
-                                {formatDate(exp.duration.from)} -{" "}
-                                {formatDate(exp.duration.to)}
-                              </>
-                            </p>
-                          </div>
-                        </div>
-                        {/* description of work */}
-                        <div className="mt-3">
-                          <p>{exp.description}</p>
-                          <p><strong>Skills:</strong> { exp.skills}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Achievements */}
-              {((cvData.awards.length>0 || cvData.projects.length>0) && (
-                <div className="my-10 space-y-5">
-                  {/* title */}
-                  <div className="flex items-center gap-5">
-                    <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                      <GiAchievement size={27} />
-                    </div>
-                    <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                      Achievements and Certifications
-                    </h1>
+              {cvData.projects.length > 0 && (
+                <div>
+                  <h2 className="text-xl flex items-center gap-2 font-heading font-semibold text-black mb-3 mt-3 border-b-[1px] border-black">
+                    <FolderOpen size={20} color="#FB980E" /> Projects
+                  </h2>
+
+                  <div className="relative font-body pl-6 border-l-2 border-[#FB980E] flex flex-col gap-6">
+                    {cvData.projects.map((project: TypeProject, index) => {
+                      return (
+                        <div key={index} className="relative">
+                          {/* Timeline dot */}
+                          <div className="absolute -left-[29px] top-1.5 h-3 w-3 rounded-full bg-[#FB980E] ring-2 ring-white" />
+
+                          <div className="flex flex-col gap-1">
+                            {/* Row 1: Project name + duration */}
+                            <div className="flex items-start justify-between gap-3">
+                              <h3 className="text-base md:text-xl font-semibold tracking-tight line-clamp-1 flex items-center gap-1">
+                                {project.projectName}
+                                {project.projectUrl && (
+                                  <a
+                                    href={project.projectUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[#FB980E] hover:opacity-75 transition-opacity"
+                                  >
+                                    <Link2 size={15} />
+                                  </a>
+                                )}
+                              </h3>
+                              <p className="text-[#006666] italic text-xs md:text-sm text-nowrap shrink-0">
+                                {formatDate(project.duration.from)} –{" "}
+                                {formatDate(project.duration.to)}
+                              </p>
+                            </div>
+
+                            {/* Row 2: Verification */}
+                            <div className="flex items-center gap-2">
+                              <StatusBadge
+                                status="selfAttested"
+                                isEmailSend={false}
+                              />
+                            </div>
+
+                            {/* Row 3: Description */}
+                            {project.description && (
+                              <ul className="mt-1 flex flex-col gap-1">
+                                {project.description
+                                  .split(".")
+                                  .filter((s) => s.trim())
+                                  .map((point, i) => (
+                                    <li
+                                      key={i}
+                                      className="flex items-start gap-2 text-sm text-gray-600"
+                                    >
+                                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-black shrink-0" />
+                                      <span className="leading-relaxed">
+                                        {point.trim()}
+                                      </span>
+                                    </li>
+                                  ))}
+                              </ul>
+                            )}
+
+                            {/* Row 4: Skills */}
+                            {project.skills && (
+                              <p className="text-sm mt-1">
+                                <span className="font-bold text-[#006666]">
+                                  Skills:
+                                </span>{" "}
+                                <span className="font-semibold text-gray-600">
+                                  {project.skills}
+                                </span>
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
+                </div>
+              )}
+
+              {/* Achievements */}
+              {(cvData.awards.length > 0 || cvData.projects.length > 0) && (
+                <div className="my-10 space-y-8">
+                  {/* <div className="flex items-center gap-4">
+                    <div className="h-8 w-8 bg-[#FB980E] rounded-full text-white flex items-center justify-center shrink-0">
+                      <GiAchievement size={18} />
+                    </div>
+                    <h1 className="text-xl font-heading font-semibold tracking-wider uppercase">
+                      Achievements & Certifications
+                    </h1>
+                  </div> */}
 
                   {/* Awards */}
                   {cvData.awards.length > 0 && (
-                      // award container
-                      <div className="px-3 mt-2">
-                        <h1 className="text-xl font-semibold text-[#44949C] mb-2">
-                          Awards
-                        </h1>
-                        {/* award cards */}
-                        <div className="flex flex-col gap-3  relative">
-                          <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
-                          {cvData.awards.map((award:TypeAward, index) => {
-                            //const verificationKey = award.award_name;
-                            const isSelfAttetsted = true;
-                            const hash = award.docUri;
-                            const mailStatus = award.status
-                            return (
-                              <div key={index} className="flex flex-col ml-3">
-                                <div className="flex justify-between">
-                                  {/* job role,company name  */}
-                                  <div className="max-w-xl w-full relative">
-                                    {/* bulletdot */}
-                                    <div
-                                      className={`absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 left-[-17px]`}
-                                    ></div>
-                                    <h1 className="text-md flex items-center gap-1 md:text-xl font-semibold tracking-tight line-clamp-1">
-                                      {award.name}{" "}
-                                      {award.docUri && (
-                                        <a
-                                          href={award.docUri}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-[#FB980E] font-semibold text-sm"
-                                        >
-                                          <Link2 />
-                                        </a>
-                                      )}
-                                    </h1>
-                                    <div className="flex flex-col">
-                                      <p className="text-sm md:text-lg capitalize line-clamp-1 mb-1">
-                                        {award.organisation}
-                                      </p>
-                                      <div className="flex gap-1 w-fit ">
-                                      <ShowVerifications
-                                        isAttested={isSelfAttetsted}
-                                        mailStatus={mailStatus}
-                                        hash={hash}
-                                        className="ml-5 mt-1"
-                                      />
-                                      <StatusBadge status={award.status} isEmailSend={award.isEmailSend}/>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  {/* duration */}
-                                  <div className="">
-                                    <p className="text-[#006666] italic text-xs md:text-base">
-                                      {formatDate(award.duration?.from!)}{" "}
-                                {award.duration?.to
-                                  ? `-${formatDate(award.duration.to!)}`
-                                  : ""}
-                                    </p>
-                                  </div>
-                                </div>
-                                {/* description of work */}
-                                <div className="mt-1">
-                                  <p className="text-base">
-                                    {award.description}
+                    <div>
+                      <h2 className="text-xl flex items-center gap-2 font-heading font-semibold text-black mb-3 border-b border-black">
+                        <GiAchievement size={20} color="#FB980E" /> Achievements
+                        & Certifications
+                      </h2>
+
+                      <div className="relative font-body pl-6 border-l-2 border-[#FB980E] flex flex-col gap-6">
+                        {cvData.awards.map((award: TypeAward, index) => {
+                          return (
+                            <div key={index} className="relative">
+                              {/* Timeline dot */}
+                              <div className="absolute -left-[29px] top-1.5 h-3 w-3 rounded-full bg-[#FB980E] ring-2 ring-white" />
+
+                              <div className="flex flex-col gap-1">
+                                {/* Row 1: Award name + duration */}
+                                <div className="flex items-start justify-between gap-3">
+                                  <h3 className="text-base md:text-xl font-semibold tracking-tight line-clamp-1 flex items-center gap-1">
+                                    {award.name}
+                                    {award.docUri && (
+                                      <a
+                                        href={award.docUri}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[#FB980E] hover:opacity-75 transition-opacity"
+                                      >
+                                        <Link2 size={15} />
+                                      </a>
+                                    )}
+                                  </h3>
+                                  <p className="text-[#006666] italic text-xs md:text-sm text-nowrap shrink-0">
+                                    {formatDate(award.duration?.from!)}
+                                    {award.duration?.to
+                                      ? ` – ${formatDate(award.duration.to!)}`
+                                      : ""}
                                   </p>
                                 </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
 
-                  {/* Projects */}
-                  {cvData.projects.length > 0 && (
-                      // award container
-                      <div className="px-3 mt-2">
-                        <h1 className="text-xl font-semibold text-[#44949C] mb-3">
-                          Projects
-                        </h1>
-                        {/* project cards */}
-                        <div className="flex flex-col gap-3  relative">
-                          <div className="absolute inset-y-2  h-auto w-[3px]  bg-[#FB980E] rounded-full"></div>
-                          {cvData.projects.map(
-                            (project:TypeProject, index) => {
-                              //const verificationKey = project.project_name;
-                              const isSelfAttested = true;
-                              return (
-                                <div key={index} className="flex flex-col ml-3">
-                                  <div className="flex justify-between">
-                                    {/* job role,company name  */}
-                                    <div className="max-w-xl w-full flex flex-col md:flex-row md:gap-10 md:items-center relative">
-                                      {/* bulletdot */}
-                                      <div
-                                        className={`absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 -left-[17px]`}
-                                      ></div>
-                                      <div className="flex flex-col">
-                                        <h1 className="flex gap-1 text-center items-center text-md md:text-xl font-semibold tracking-tight line-clamp-2">
-                                          {project.projectName}{" "}
-                                          {project.projectUrl && (
-                                            <a
-                                              href={project.projectUrl}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="text-[#FB980E] font-semibold text-sm"
-                                            >
-                                              <Link2 />
-                                            </a>
-                                          )}
-                                        </h1>
-                                        <ShowVerifications
-                                          isAttested={isSelfAttested}
-                                          className="ml-5 mt-1"
-                                        />
-                                      </div>
-                                    </div>
-                                    {/* duration */}
-                                    <div className="">
-                                      <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
-                                        {
-                                          <>
-                                            {formatDate(project.duration.from)} -{" "}
-                                            {formatDate(project.duration.to)}
-                                          </>
-                                        }
-                                      </p>
-                                    </div>
-                                  </div>
-                                  {/* description of work */}
-                                  <div className="mt-1">
-                                    <p className="text-base">
-                                      {project.description}
-                                    </p>
-                                    <p><strong>Skills:</strong> {project.skills}</p>
-                                  </div>
+                                {/* Row 2: Organisation */}
+                                <p className="text-sm md:text-base capitalize text-gray-600 line-clamp-1">
+                                  {award.organisation}
+                                </p>
+
+                                {/* Row 3: Verification + Status */}
+                                <div className="flex items-center gap-2">
+                                  <StatusBadge
+                                    status={award.status}
+                                    isEmailSend={award.isEmailSend}
+                                  />
                                 </div>
-                              );
-                            }
-                          )}
-                        </div>
+
+                                {/* Row 4: Description */}
+                                {award.description && (
+                                  <ul className="mt-1 flex flex-col gap-1">
+                                    {award.description
+                                      .split(".")
+                                      .filter((s) => s.trim())
+                                      .map((point, i) => (
+                                        <li
+                                          key={i}
+                                          className="flex items-start gap-2 text-sm text-gray-600"
+                                        >
+                                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-black shrink-0" />
+                                          <span className="leading-relaxed">
+                                            {point.trim()}
+                                          </span>
+                                        </li>
+                                      ))}
+                                  </ul>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
+                    </div>
+                  )}
+
+                <p className="text-sm text-[#6B7280] text-center">This is the PDF version of a Digital TruCV Profile of the Candidate. For Verification please click here: <br />
+          <a href={`https://edubuktrucv.com/cv/${id}`}
+          className="text-[#03257e] underline"
+          >{`https://edubuktrucv.com/cv/${id}`}</a>
+          </p>
                 </div>
-              ))}
+              )}
             </div>
+          </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
