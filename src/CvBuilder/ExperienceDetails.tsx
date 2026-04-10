@@ -219,7 +219,7 @@ export const ExperienceDetails = ({
 
   useEffect(() => {
     fetchExpDocs();
-  }, [step === 4, refresh]);
+  }, [refresh]);
 
   const updateHandler = async (index: number) => {
     try {

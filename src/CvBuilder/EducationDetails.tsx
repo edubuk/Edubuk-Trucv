@@ -264,7 +264,7 @@ export const EducationDetails = ({
 
   useEffect(() => {
     fetchEducationsDocs();
-  }, [step === 3, refresh]);
+  }, [refresh]);
 
   const updateHandler = async (index: number) => {
     try {

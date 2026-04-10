@@ -142,7 +142,7 @@ export const SkillDetails = ({
 
   useEffect(() => {
     fetchSkills();
-  }, [step === 5,refresh]);
+  }, [refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.skills.map((e: any) => e.id)),
