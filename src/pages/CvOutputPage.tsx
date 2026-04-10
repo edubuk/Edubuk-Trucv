@@ -202,7 +202,7 @@ const CvOutputPage = () => {
           {/* Copy Link */}
           <button
             onClick={() =>
-              copyResumeLink(`https://www.eni.edubuktrucv.com/cv/${id}`)
+              copyResumeLink(`https://edubuktrucv.com/cv/${id}`)
             }
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#03257e]/30 text-[#03257e] hover:bg-[#03257e] hover:text-white transition-all duration-200 text-sm font-medium"
           >
@@ -242,7 +242,7 @@ const CvOutputPage = () => {
         </h1>
 
         <div className="flex justify-center items-center flex-col ml-[300px]">
-          <EdubukQR url={`https://eni.edubuktrucv.com/cv/${id}`} />
+          <EdubukQR url={`https://edubuktrucv.com/cv/${id}`} />
           <div className="flex flex-col gap-0.5 justify-center items-center">
             <p className="text-lg text-[#03257e] tracking-wide">
               <span className="font-bold">TruCV</span> powered by
@@ -793,9 +793,9 @@ const CvOutputPage = () => {
                   )}
 
                 <p className="text-sm text-[#6B7280] text-center">This is the PDF version of a Digital TruCV Profile of the Candidate. For Verification please click here: <br />
-          <a href={`https://eni.edubuktrucv.com/${id}`}
+          <a href={`https://edubuktrucv.com/cv/${id}`}
           className="text-[#03257e] underline"
-          >{`https://eni.edubuktrucv.com/${id}`}</a>
+          >{`https://edubuktrucv.com/cv/${id}`}</a>
           </p>
                 </div>
               )}
