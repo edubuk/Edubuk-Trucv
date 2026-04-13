@@ -90,7 +90,7 @@ const Home:React.FC = () => {
           <p className="text-[#03257E] text-center text-2xl sm:text-3xl md:text-5xl font-bold" data-aos="fade-up">
             Your Verifiable CV<br /> on Blockchain
           </p>
-          <p className="text-[#f14419] text-center font-bold text-xl sm:text-2xl" data-aos="fade-up">
+          <p className="text-[#f14419] text-center font-bold text-[17px] sm:text-2xl" data-aos="fade-up">
             [ Academic & Professional Credentials ]
             <br />
             <span className="text-[#03257e] text-center font-bold text-xl sm:text-2xl" data-aos="fade-up">
