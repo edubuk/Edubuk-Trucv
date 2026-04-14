@@ -326,16 +326,6 @@ export const ExperienceDetails = ({
   }
 
 
-  const updateLocalStorageData = (jobRole:string)=>{
-    if(parsedExperienceData){
-      const cvData = cvDataFromStorage ? JSON.parse(cvDataFromStorage):null;
-      const updatedData = cvData?.filter((doc:any)=>
-        doc.jobRole!==jobRole
-      )
-      localStorage.setItem("experiences",JSON.stringify(updatedData))
-    }
-  }
-
   return (
     <Form {...form}>
       <form>
