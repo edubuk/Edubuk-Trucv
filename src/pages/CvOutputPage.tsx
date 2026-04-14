@@ -262,7 +262,7 @@ const CvOutputPage = () => {
             </p>
           </div>
         </div>
-        <div className="flex gap-3 md:gap-7 w-[1100px] border  border-t shadow-lg">
+        <div className="flex gap-3 md:gap-7 w-[1100px] border  border-t ">
           {/* left sidebar */}
           <div
             className="w-72 bg-[#006666] px-4 md:px-5 text-white py-6 flex flex-col gap-8"
