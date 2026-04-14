@@ -459,6 +459,49 @@ export const EducationDetails = ({
                                 <StatusBadge
                                   status={field.status}
                                   isEmailSend={field.isEmailSend}
+                      {/* Duration: startDate & endDate */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <FormField
+                          control={control}
+                          name={`educations.${index}.duration.from`}
+                          render={({ field: innerField }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="text-[#006666] size-4" />
+                                  Start date*
+                                </div>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                className={isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}
+                                type="date"
+                                  placeholder="YYYY"
+                                  {...innerField}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={control}
+                          name={`educations.${index}.duration.to`}
+                          render={({ field: innerField }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="text-[#006666] size-4" />
+                                  End date*
+                                </div>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                className={isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}
+                                disabled={field.verified}
+                                  type="date"
+                                  placeholder="YYYY"
+                                  {...innerField}
                                 />
                               )}
                             </div>
@@ -528,6 +571,47 @@ export const EducationDetails = ({
                             </div>
                           </div>
                         </div>
+                                  className={`w-full ${isMongoId(field.id) && f.value === "" ? "border-red-500" : ""}`}
+                                  {...f}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={control}
+                          name={`educations.${index}.gpa`}
+                          render={({ field: f }) => (
+                            <FormItem className="w-full sm:col-span-2">
+                              <FormLabel>
+                                <div className="flex items-center gap-1">
+                                  <SquarePercent className="text-[#006666] size-4" />
+                                  {field.level === "Secondary School" ||
+                                  field.level === "Higher Secondary School"
+                                    ? "Percentage*"
+                                    : "GPA(Grade Point Average)*"}
+                                </div>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                disabled={field.verified}
+                                  placeholder={
+                                    field.level === "Secondary School" ||
+                                    field.level === "Higher Secondary School"
+                                      ? "Percentage*"
+                                      : "GPA(Grade Point Average)*"
+                                  }
+                                  className={`w-full ${isMongoId(field.id) && f.value === "" ? "border-red-500" : ""}`}
+                                  {...f}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                         {/* Form body */}
 

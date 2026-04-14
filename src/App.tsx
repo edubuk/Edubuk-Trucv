@@ -38,6 +38,10 @@ const DocumentVerificationPage = lazy(()=>import("./components/Verification/Docu
 const DocumentVerifier = lazy(()=>import("./components/Verification/Documentverifier"))
 const MetamaskGuide = lazy(()=>import("./pages/Metamaskguide"));
 const DigilockerConnectPage = lazy(()=>import("./pages/DigiLockerConnectPage"));
+const SkillVerify = lazy(()=>import("./components/SkillVerification/VerifySkill"))
+const DigilockerConnectPage = lazy(()=>import("./pages/DigiLockerConnectPage"))
+
+
 
 function App() {
 
@@ -83,6 +87,7 @@ useEffect(() => {
               <Route path="/certificate-timer" element={<Layout><ProtectedRoute><CertificateTimerPage /></ProtectedRoute></Layout>} />
               <Route path="/setup-wallet" element={<Layout><ProtectedRoute><MetamaskGuide /></ProtectedRoute></Layout>} />
               <Route path="/dl-connect" element={<DigilockerConnectPage />} />
+
             </Routes>
           </Suspense>
       </Providers>
