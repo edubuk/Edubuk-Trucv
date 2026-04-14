@@ -231,6 +231,7 @@ export default function DigiLockerTest({
   let description =null;
   let orgId =null;
   let doctype = null;
+  
   switch (field) {
     case "Secondary School":
       issuerName = getValues(`educations.${index}.boardNameOrDegree`);
