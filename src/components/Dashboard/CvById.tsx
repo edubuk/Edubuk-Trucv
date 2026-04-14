@@ -1,11 +1,11 @@
 
-import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
 import { useUserData } from "@/context/AuthContext";
 import api from "@/lib/api";
 import { Loader2, Trash } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import CvCardGridSkeleton from "./CvCardSkeleton";
 interface CvByIdProps {
   cvData:any[]; // Expecting an array of strings as cvData
   setCvRefresh:React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,7 +37,7 @@ const CvById: React.FC<CvByIdProps> = ({ cvData,setCvRefresh,isFetching   }) => 
   }
   if(isFetching){
     return (
-      <ThreeDotLoader w={4} h={4} yPos={"center"}/>
+      <CvCardGridSkeleton />
     )
   }
   return (

@@ -36,6 +36,9 @@ import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
 import StatusBadge from "./StatusBadge";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
+import { useContract } from "@/Blockchain/hooks/useMyContract";
+import { useAccount } from "wagmi";
+import { parseContractError } from "@/Blockchain/utils/error";
 //import { useUserData } from "@/context/AuthContext";
 
 export const ExperienceDetails = ({
@@ -48,9 +51,9 @@ export const ExperienceDetails = ({
 }: IStepCard) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [refresh, setRefresh] = useState<boolean>(true);
-  const [parsedExperienceData, setParsedExperienceData] = useState<[]>();
+  const {submitDocument} = useContract();
+  const {address} = useAccount();
 
-  const cvDataFromStorage = localStorage.getItem("experiences");
 
   // const {user} = useUserData();
   const form = useForm<ExperienceFormValues>({
@@ -82,7 +85,7 @@ export const ExperienceDetails = ({
   const [isCurrentlyWorking, setIsCurrentlyWorking] = useState<boolean>(false);
   const [idx, setIdx] = useState<number>();
   const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
-
+  
   const { fields, append, remove } = useFieldArray({
     control,
     name: "experiences",
@@ -120,34 +123,64 @@ export const ExperienceDetails = ({
     });
   };
 
+
   const submitFormHandler = async (index: number) => {
-    const isValid = await form.trigger(`experiences.${index}`);
-    if (!isValid) return;
-    //console.log("error", errors);
-    console.log("form submit", getValues(`experiences.${index}`));
-    const payload = getValues(`experiences.${index}`);
-    try {
-      setIdx(index);
-      setLoadingState("Submitting");
-      const result = await api.post(`/doc/save-expDoc`, {
-        data: payload,
-      });
-      const res = await result.data;
-      if (!res.success) {
-        toast.error(res.message);
-        setLoadingState(null);
-        return;
+  const isValid = await form.trigger(`experiences.${index}`);
+  if (!isValid) return;
+
+  const payload = getValues(`experiences.${index}`);
+  console.log("payload", payload);
+  try {
+    setLoadingState("Submitting");
+    setIdx(index);
+    // ── Step 1: Blockchain Registration
+    if (payload.docHash) {
+      const id = toast.loading("Submitting on chain...");
+      try {
+        await submitDocument({
+          name       : payload.jobRole,
+          hashString : `0x${payload.docHash}` as `0x${string}`,
+          docType    : "experience",
+          tokenUri   : "",
+          currAddress: address as `0x${string}`,
+        });
+        toast.dismiss(id);
+      } catch (txError) {
+        const errMsg = parseContractError(txError);
+
+        if (errMsg === "This document has already been submitted.") {
+          // Already on chain — skip and proceed to DB save
+          toast.dismiss(id);
+          toast.custom(() => (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+              <p>Document already on chain. Retrying database save...</p>
+            </div>
+          ));
+        } else {
+          // Any other chain error — stop everything
+          toast.dismiss(id);
+          throw txError;
+        }
       }
-      toast.success(res.message);
-      setLoadingState(null);
-      setRefresh((prev) => !prev);
-      updateLocalStorageData(payload.jobRole);
-    } catch (error: any) {
-      toast.error(error.message ?? error ?? "Something went wrong");
-    } finally {
-      setLoadingState(null);
     }
-  };
+
+    // ── Step 2: Database Save
+    const { data } = await api.post(`/doc/save-expDoc`, { data: payload });
+
+    if (!data.success) {
+      toast.error(data.message);
+      return;
+    }
+
+    toast.success(data.message);
+    setRefresh((prev) => !prev);
+
+  } catch (error) {
+    toast.error(parseContractError(error));
+  } finally {
+    setLoadingState(null);
+  }
+};
 
   const fetchExpDocs = async () => {
     try {
@@ -186,10 +219,7 @@ export const ExperienceDetails = ({
 
   useEffect(() => {
     fetchExpDocs();
-    if(cvDataFromStorage){
-      setParsedExperienceData(JSON.parse(cvDataFromStorage));
-    }
-  }, [step === 4, refresh]);
+  }, [refresh]);
 
   const updateHandler = async (index: number) => {
     try {
@@ -313,8 +343,8 @@ export const ExperienceDetails = ({
           index={4}
           title="Experience Details"
           icon={Briefcase}
-          open={step === 3}
-          onToggle={() => setStep(step === 3 ? 0 : 3)}
+          open={step === 4}
+          onToggle={() => setStep(step === 4 ? 0 : 4)}
         >
           <p className="text-sm text-slate-500">
             Add professional experiences. Each entry supports proof upload and
@@ -443,9 +473,9 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                              className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               disabled={field.verified}
                               placeholder="Company Name"
-                              className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               {...innerField}
                             />
                           </FormControl>
@@ -466,9 +496,9 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-                            disabled={field.verified}
-                              placeholder="eg. Software Engineer"
                               className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              disabled={field.verified}
+                              placeholder="eg. Software Engineer"
                               {...innerField}
                             />
                           </FormControl>
@@ -489,9 +519,9 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input 
-                            className={`${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
-                            disabled={field.verified}
-                            type="date" {...innerField} />
+                              className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              disabled={field.verified}
+                              type="date" {...innerField} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -510,7 +540,7 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className={`${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               type="date"
                               {...innerField}
                               disabled={isCurrentlyWorking || field.verified}
@@ -533,8 +563,8 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-                            className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
-                            disabled={field.verified}
+                              className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              disabled={field.verified}
                               placeholder="Write your skills"
                               {...innerField}
                             />
@@ -556,9 +586,9 @@ export const ExperienceDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                            disabled={field.verified}
-                              placeholder="Description(write as paragraph format)"
                               className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              disabled={field.verified}
+                              placeholder="Description(write as paragraph format)"
                               {...innerField}
                             />
                           </FormControl>
@@ -701,14 +731,6 @@ export const ExperienceDetails = ({
                             </>
                           )}
                         />
-
-                        {/* {loading?<LoadingButton />:<Button
-                                                type="button"
-                                                onClick={() => emailHandler(index)}
-                                                className="whitespace-nowrap"
-                                            >
-                                                Send Email To Issuer
-                                            </Button>} */}
                       </div>
                     </div>
                   )}
@@ -735,7 +757,7 @@ export const ExperienceDetails = ({
                 className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
               >
                 <PlusCircle size={16} /> Add Experience
-              </button>            
+              </button>
             </div>
           </div>
           }

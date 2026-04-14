@@ -204,7 +204,7 @@ export const ProjectDetails = ({
     if(cvDataFromStorageParsed){
       setParsedProjectData(cvDataFromStorageParsed);
     }
-  }, [step === 6, refresh]);
+  }, [refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.projects.map((e: any) => e.id)),
@@ -392,8 +392,8 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Project Url"
                               className="w-full"
+                              placeholder="Project Url"
                               {...field}
                             />
                           </FormControl>
@@ -414,9 +414,10 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input 
-                            className={`${isMongoId(p.id) && innerField.value === "" ? "border-red-500" : ""}`}
-                            type="date" 
-                            {...innerField} />
+                              className={`w-full ${isMongoId(p.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              type="date" 
+                              {...innerField} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -435,9 +436,10 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input 
-                            className={`${isMongoId(p.id) && innerField.value === "" ? "border-red-500" : ""}`}
-                            type="date" 
-                            {...innerField} />
+                              className={`w-full ${isMongoId(p.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                              type="date" 
+                              {...innerField} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -456,8 +458,8 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Input
+                              className={`w-full ${isMongoId(p.id) && field.value === "" ? "border-red-500" : ""}`}
                               placeholder="Write your used skills in this project. e.g.(ReactJs,Java,NodeJs)"
-                              className={`${isMongoId(p.id) && field.value === "" ? "border-red-500" : ""}`}
                               {...field}
                             />
                           </FormControl>
@@ -478,8 +480,8 @@ export const ProjectDetails = ({
                           </FormLabel>
                           <FormControl>
                             <Textarea
+                              className={`w-full ${isMongoId(p.id) && field.value === "" ? "border-red-500" : ""}`}
                               placeholder="Description(write as paragraph format)"
-                              className={`${isMongoId(p.id) && field.value === "" ? "border-red-500" : ""}`}
                               {...field}
                             />
                           </FormControl>

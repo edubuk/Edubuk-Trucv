@@ -142,7 +142,7 @@ export const SkillDetails = ({
 
   useEffect(() => {
     fetchSkills();
-  }, [step === 5,refresh]);
+  }, [refresh]);
 
   const includedIds = useMemo(
     () => new Set(cvData.skills.map((e: any) => e.id)),
@@ -337,9 +337,9 @@ export const SkillDetails = ({
                             <FormItem>
                               <FormControl>
                                 <Input
+                                  className={`w-full ${isMongoId(s.id) && field.value === "" ? "border-red-500" : ""}`}
                                   disabled
                                   {...field}
-                                  className="w-full"
                                   placeholder="Skill name"
                                 />
                               </FormControl>
