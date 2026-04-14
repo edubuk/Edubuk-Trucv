@@ -5,7 +5,8 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import toast from "react-hot-toast";
-import { API_BASE_URL } from "../main";
+
+const API_BASE_URL = "https://edubuktrucv.com/api";
 // Create main axios instance used everywhere
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
