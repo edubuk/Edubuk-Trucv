@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ThreeDotLoader from "../Loader/ThreeDotLoader";
 
-const Hackathon = ()=>{
+const IssuedCertificates = ()=>{
     const [hackathonName,setHackathonName] = useState<string>("");
     const [currPage,setCurrPage] = useState<number>(1);
     const [hackathonData,setHackathonData] = useState<any>(null);
@@ -104,4 +104,4 @@ const Hackathon = ()=>{
     )
 }
 
-export default Hackathon;
+export default IssuedCertificates;
