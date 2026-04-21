@@ -2,9 +2,9 @@ import useHackathons from "@/hooks/useHackathons";
 import api from "@/lib/api";
 import { useEffect, useState } from "react";
 import IssuedCertificatesList from "./IssuedCertificatesList";
-import toast from "react-hot-toast";
+//import toast from "react-hot-toast";
 import { Edit } from "lucide-react";
-import RegisterHackathon from "./RegisterHackathon";
+//import RegisterHackathon from "./RegisterHackathon";
 
 type HackathonStatus = "active" | "inactive" | "completed";
 
@@ -73,7 +73,7 @@ const StatusBadge = ({ status }: { status?: HackathonStatus }) => {
 const HackathonCard = ({hackathon, deleteHandler, loading, idToDelete, getCertificates, currPage, setCurrPage, hackathonData, setHackathonData, totalPages, setTotalPages, totalCert, setTotalCert }: HackathonListProps) => {
     const [showCertificates, setShowCertificates] = useState(false);
     const [showUpdateForm, setShowUpdateForm] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false);
+    //const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(()=>{
         getCertificates(hackathon._id as string);
@@ -81,7 +81,7 @@ const HackathonCard = ({hackathon, deleteHandler, loading, idToDelete, getCertif
 
     const editPopup = () => {
         setShowUpdateForm(true);
-        setIsUpdating(true);
+        //setIsUpdating(true);
     }
 
   
@@ -129,7 +129,7 @@ const HackathonCard = ({hackathon, deleteHandler, loading, idToDelete, getCertif
         Get Certificates List
       </button>
       {showUpdateForm && <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-      <RegisterHackathon 
+      {/* <RegisterHackathon 
         heading="Update Hackathon" 
         setShowUpdateForm={setShowUpdateForm}
         buttonLabel="Update Hackathon"
@@ -143,7 +143,7 @@ const HackathonCard = ({hackathon, deleteHandler, loading, idToDelete, getCertif
         hackathonOrganization={hackathon.organization}
         emailId={hackathon.emailId || ""}
         status={hackathon.status}
-        />
+        /> */}
       </div>}
       {showCertificates && (
       <IssuedCertificatesList 
