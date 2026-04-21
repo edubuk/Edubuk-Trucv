@@ -22,7 +22,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
     try {
       setLoading(true);
       const res = await api.get("/hackathon/certification-data");
-      setCertificationData(res.data);
+      setCertificationData(res.data.certification);
       console.log("certification data", res.data);
     } catch (error) {
       console.log("Failed to fetch certification data", error);
@@ -89,7 +89,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
 
       {/* Header text */}
       <h1 className="relative z-10 text-3xl font-bold text-gray-900 text-center frost-text font-['Inter'] text-3xl font-extrabold">
-       TechSprint Campaign by GDG IIMT Meerut
+       Code Royale: The Final Iteration Hackathon
       </h1>
       {/* <h1 className="relative z-10 text-2xl font-bold text-[#03257e] text-center font-['Inter'] text-2xl font-extrabold">
         Series - 1 Certification
@@ -109,7 +109,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
         </div>
       </Alert>
       <div className="max-w-xl mx-auto mt-6 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-lg">
-        {!certificationData?.certification?.qrUrl ? (
+        {!certificationData?.certUrl ? (
           <div className="max-w-xl mx-auto mt-8 rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-7 shadow-xl">
             <div className="flex flex-col items-center text-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100">
@@ -163,10 +163,10 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
               {/* Left */}
               <div>
                 <span className="block text-base font-semibold capitalize text-gray-900">
-                  TechSprint Campaign
+                  Code Royale
                 </span>
                 <p className="mt-1 text-sm text-gray-500">
-                  Taken on March 2026
+                  Taken on April 2026
                 </p>
               </div>
 
@@ -176,7 +176,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
                   className=" relative group flex items-center gap-2 rounded-full bg-[#e8f4f8] px-3 py-2 text-sm font-medium text-[#03257e]"
                   onClick={() =>
                     handleDownload(
-                      `https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certification?.qrUrl}`,
+                      `https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certUrl}`,
                     )
                   }
                 >
@@ -209,12 +209,12 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
             <div className="mt-6 space-y-4">
               <div className="flex w-full flex-col items-center gap-3">
                 <AddCertToLinkedIn
-                  certName="Certificate of Participation - TechSprint Campaign"
-                  organizationId={80662446}
+                  certName="Certificate of Participation in Code Royale: The Final Iteration Hackathon"
+                  organizationId={109555290}
                   issueYear={2026}
-                  issueMonth={3}
-                  certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certification?.qrUrl}`}
-                  certId={Number(user?.uuid) || 80662446}
+                  issueMonth={4}
+                  certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certUrl}`}
+                  certId={Number(user?.uuid) || 109555290}
                 />
               </div>
             </div>

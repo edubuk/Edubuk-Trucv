@@ -11,13 +11,13 @@ import {
 
 import AdminUserProfilesPage from "./Admin";
 import { useUserData } from "@/context/AuthContext";
-import AccessDeniedPage from "@/pages/AccessDenied";
-import Hackathon from "./Hackathon";
 import CVData from "./CVData";
 import WhitelistIssuer from "./ManageIssuer";
 import DocumentCard from "./ManageRequestDoc";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
+import ManageHackathon from "./ManageHackathon";
+import AccessDeniedPage from "@/pages/AccessDenied";
 
 const AdminDashBoard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -169,7 +169,7 @@ const AdminDashBoard = () => {
         )}
 
         {selected === "hackathon" && (
-         <Hackathon />
+         <ManageHackathon />
         )}
 
         {selected === "cvData" && (

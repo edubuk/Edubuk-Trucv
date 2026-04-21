@@ -1,9 +1,9 @@
 import api from "@/lib/api";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import ThreeDotLoader from "../Loader/ThreeDotLoader";
 
-const Hackathon = ()=>{
+
+const IssuedCertificates = ()=>{
     const [hackathonName,setHackathonName] = useState<string>("");
     const [currPage,setCurrPage] = useState<number>(1);
     const [hackathonData,setHackathonData] = useState<any>(null);
@@ -39,16 +39,16 @@ const Hackathon = ()=>{
       setCurrPage(currPage + 1);
   }
 
-  if(isFetching)
-  {
-    return(
-        <ThreeDotLoader w={4} h={4} yPos="center"/>
-    )
-  }
+//   if(isFetching)
+//   {
+//     return(
+//         <ThreeDotLoader w={4} h={4} yPos="center"/>
+//     )
+//   }
 
     return(
         <main className="max-w-9xl mx-auto px-4 sm:px-6 py-6 space-y-4 overflow-y-auto mb-12">
-            <div className="flex items-center justify-between bg-[#03257e] p-4 rounded">
+            <div className="sticky flex items-center justify-between bg-[#03257e] p-4 rounded">
                 <div>
                     <h2 className="text-white text-xl font-semibold">Hackathon Certificate List</h2>
                 </div>
@@ -59,8 +59,25 @@ const Hackathon = ()=>{
                     <button onClick={()=>fetchHackathonCertificateList()} className="bg-white text-[#03257e] px-4 py-2 rounded">Search</button>
                 </div>
             </div>
+            {
+                isFetching&&
+                <div className="mt-3">
+                {
+                    Array.from({ length: 9 }).map((_, i) => (
+                        <div key={i} className="flex items-center shadow-md p-4 rounded mb-4 bg-white border border-gray-100 animate-pulse">
+                            <div className="flex items-center justify-between w-full text-[#03257e]">
+                                <div className="bg-gray-200 w-20 p-2 flex rounded items-center justify-center animate-pulse">
+                                    <p className="text-gray-500 w-full"></p>
+                                </div>
+                                <p>...</p>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+            }
 
-            <div className="mt-3">
+           { !isFetching && <div className="mt-3">
                 {hackathonData?.length === 0 ? (
                     <div className="text-center text-gray-500">
                         No hackathon certificates found
@@ -73,12 +90,12 @@ const Hackathon = ()=>{
                                 <a href={`https://trucvstorage.blob.core.windows.net/uploads/${cert.certUrl}`} target="_blank" rel="noopener noreferrer" className="underline">
                                     View Certificate
                                 </a>
-                                <p>{cert.txHash.slice(0,5)}...{cert.txHash.slice(-5)}</p>
+                                <p>{cert?.txHash?.slice(0,5)}...{cert?.txHash?.slice(-5)}</p>
                             </div>
                         </div>
                     ))
                 }
-            </div>
+            </div>}
             <div className="fixed bottom-1 left-0 right-0 flex justify-center items-center space-x-4 bg-white p-3 shadow-md rounded-md">
             <button
               onClick={handlePrev}
@@ -104,4 +121,4 @@ const Hackathon = ()=>{
     )
 }
 
-export default Hackathon;
+export default IssuedCertificates;

@@ -567,12 +567,12 @@ export default function CertificateStepper() {
                   View Certificate
                 </a>
                 <AddCertToLinkedIn
-                  certName="Certificate of Participation - TechSprint Campaign"
-                  organizationId={80662446}
+                  certName="Certificate of Participation in Code Royale: The Final Iteration Hackathon"
+                  organizationId={109555290}
                   issueYear={2026}
-                  issueMonth={3}
+                  issueMonth={4}
                   certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${allStepData?.uri}`}
-                  certId={Number(user?.uuid)|| 80662446}
+                  certId={Number(user?.uuid)|| 109555290}
                 />
                 <Link to="/dashboard" className="bg-[#016765] text-white cursor-pointer hover:bg-[#016765]/80 py-3 px-6 rounded-xl">
                   Go to Dashboard
