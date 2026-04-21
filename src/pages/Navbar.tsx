@@ -93,7 +93,11 @@ console.log("currentPath",currentPath);
    {
       name:"Verify",
       path:"/verify"
-    }
+    },
+    // {
+    //   name:"Hackathons",
+    //   path:"/hackathons"
+    // }
   ];
 
 
@@ -124,7 +128,7 @@ console.log("currentPath",currentPath);
                 onClick={() => handlerActive(link.name)}
                 className={`hidden lg:flex ${
                   isActive === link.name ? "text-[#f14419]" : "text-[#03257e]"
-                } hover:text-[#f14419] transition duration-200 py-2 text-[22px] font-medium`}
+                } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
               >
                 {link.name}
               </Link>
@@ -138,7 +142,7 @@ console.log("currentPath",currentPath);
                     currentPath === link.path
                       ? "text-[#f14419]"
                       : "text-[#03257e]"
-                  } hover:text-[#f14419] transition duration-200 py-2 text-[22px] font-medium`}
+                  } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
                 >
                   {link.name}
                 </Link>
@@ -154,7 +158,7 @@ console.log("currentPath",currentPath);
             currentPath === "/admin"
               ? "text-[#f14419]"
               : "text-[#03257e]"
-          } hover:text-[#f14419] transition duration-200 py-2 text-[22px] font-medium`}
+          } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
         >
           Admin
         </Link>
@@ -163,7 +167,7 @@ console.log("currentPath",currentPath);
             <div className="hidden lg:flex relative rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
               <Link
                 to="/login"
-                className="w-full bg-white py-1 text-[20px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
+                className="w-full bg-white py-1 text-[18px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
               >
                 Login
               </Link>
@@ -174,7 +178,7 @@ console.log("currentPath",currentPath);
               <button
                 onClick={handlerLogout}
                 disabled={loading}
-                className="w-full bg-white py-1 text-[20px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
+                className="w-full bg-white py-1 text-[18px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
                 style={{opacity:loading?0.7:1}}
               >
                 {loading?"Please Wait...":"Logout"}

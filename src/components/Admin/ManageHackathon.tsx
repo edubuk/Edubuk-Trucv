@@ -36,7 +36,8 @@ const ManageHackathon = () => {
           <RefreshCw size={14} />
         </button> */}
       </div>
-      {activeTab === "Register" ? <RegisterHackathon /> : activeTab === "Certificate List" ? <IssuedCertificates /> : <HackathonList />}
+      {activeTab === "Register" ? <RegisterHackathon 
+      heading="Register Hackathon" buttonLabel="Register Hackathon"/> : activeTab === "Certificate List" ? <IssuedCertificates /> : <HackathonList />}
     </div>
   );
 };

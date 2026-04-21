@@ -1,33 +1,20 @@
-import api from "@/lib/api";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+
+interface IssuedCertificatesListProps {
+    loading: boolean;
+    currPage: number;
+    setCurrPage: (page: number) => void;
+    hackathonData: any;
+    setHackathonData: (data: any) => void;
+    totalPages: number;
+    setTotalPages: (pages: number) => void;
+    totalCert: number;
+    setTotalCert: (cert: number) => void;
+    setShowCertificates: (show: boolean) => void;
+}
+
+const IssuedCertificatesList = ({loading,currPage, setCurrPage, hackathonData,totalPages, totalCert, setShowCertificates}: IssuedCertificatesListProps)=>{
 
 
-const IssuedCertificates = ()=>{
-    const [hackathonName,setHackathonName] = useState<string>("");
-    const [currPage,setCurrPage] = useState<number>(1);
-    const [hackathonData,setHackathonData] = useState<any>(null);
-    const [totalPages,setTotalPages] = useState<number>(1);
-    const [totalCert,setTotalCert] = useState<number>();
-    const [isFetching,setIsFetching] = useState(true);
-
-    const fetchHackathonCertificateList = async() => {
-        try {
-            setIsFetching(true);
-            const response = await api.get(`/admin/hackathon-certificate-list?hackathonName=${hackathonName}&page=${currPage}`);
-            console.log(response.data);
-            setHackathonData(response.data.data);
-            setTotalPages(response.data.pagination.totalPages);
-            setTotalCert(response.data.pagination.totalCertificate)
-        } catch (error:any) {
-            toast.error(error.message || error)
-        }finally{
-            setIsFetching(false);
-        }
-    }
-    useEffect(()=>{
-        fetchHackathonCertificateList();
-    },[currPage])
 
     const handlePrev = () => {
     if (currPage > 1)
@@ -39,7 +26,7 @@ const IssuedCertificates = ()=>{
       setCurrPage(currPage + 1);
   }
 
-//   if(isFetching)
+//   if(loading)
 //   {
 //     return(
 //         <ThreeDotLoader w={4} h={4} yPos="center"/>
@@ -47,21 +34,15 @@ const IssuedCertificates = ()=>{
 //   }
 
     return(
-        <main className="max-w-9xl mx-auto px-4 sm:px-6 py-6 space-y-4 overflow-y-auto mb-12">
-            <div className="sticky flex items-center justify-between bg-[#03257e] p-4 rounded">
+        <main className="fixed inset-0 z-50 bg-white backdrop-blur-sm h-auto max-w-9xl mx-auto px-4 py-2 overflow-y-auto mb-0">
+            <div className="sticky top-0 left-0 right-0 flex items-center justify-between bg-[#03257e] p-4 rounded">
                 <div>
-                    <h2 className="text-white text-xl font-semibold">Hackathon Certificate List</h2>
+                    <h2 className="text-white text-xl font-semibold w-full">Hackathon Certificate List</h2>
                 </div>
-                <div className="flex items-center gap-2">
-                    <input type="text" value={hackathonName} onChange={(e)=>setHackathonName(e.target.value)} 
-                    placeholder="Search by hackathon name"
-                    className="border border-white rounded px-2 py-2 text-black" />
-                    <button onClick={()=>fetchHackathonCertificateList()} className="bg-white text-[#03257e] px-4 py-2 rounded">Search</button>
-                </div>
+                <button onClick={() => setShowCertificates(false)} className="bg-white text-[#03257e] px-4 py-2 rounded">Close</button>
             </div>
-            {
-                isFetching&&
-                <div className="mt-3">
+
+            {loading && <div className="mt-3">
                 {
                     Array.from({ length: 9 }).map((_, i) => (
                         <div key={i} className="flex items-center shadow-md p-4 rounded mb-4 bg-white border border-gray-100 animate-pulse">
@@ -74,12 +55,11 @@ const IssuedCertificates = ()=>{
                         </div>
                     ))
                 }
-            </div>
-            }
+            </div>}
 
-           { !isFetching && <div className="mt-3">
+            {(!loading) && <div className="mt-3">
                 {hackathonData?.length === 0 ? (
-                    <div className="text-center text-gray-500">
+                    <div className="text-center text-[#f14419] h-screen flex items-center justify-center">
                         No hackathon certificates found
                     </div>
                 ):<p className="mb-1 text-[#006666] font-bold">Total Certificates: {totalCert}</p>}
@@ -96,7 +76,8 @@ const IssuedCertificates = ()=>{
                     ))
                 }
             </div>}
-            <div className="fixed bottom-1 left-0 right-0 flex justify-center items-center space-x-4 bg-white p-3 shadow-md rounded-md">
+
+            <div className="sticky bottom-0 left-0 right-0 flex justify-center items-center space-x-4 bg-white p-3 shadow-md rounded-md z-40">
             <button
               onClick={handlePrev}
               disabled={currPage === 1}
@@ -121,4 +102,4 @@ const IssuedCertificates = ()=>{
     )
 }
 
-export default IssuedCertificates;
+export default IssuedCertificatesList;

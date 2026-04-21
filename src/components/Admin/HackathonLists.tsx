@@ -1,6 +1,11 @@
 import useHackathons from "@/hooks/useHackathons";
 import api from "@/lib/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import IssuedCertificatesList from "./IssuedCertificatesList";
+import toast from "react-hot-toast";
+import { Edit } from "lucide-react";
+import RegisterHackathon from "./RegisterHackathon";
+
 type HackathonStatus = "active" | "inactive" | "completed";
 
 interface Hackathon {
@@ -14,6 +19,24 @@ interface Hackathon {
   description?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+interface HackathonListProps {
+  hackathon: Hackathon;
+  hackathonData: [];
+  setHackathonData: (data: any) => void;
+  totalPages: number;
+  setTotalPages: (pages: number) => void;
+  totalCert: number;
+  setTotalCert: (cert: number) => void;
+  isFetching: boolean;
+  setIsFetching: (fetching: boolean) => void;
+  deleteHandler: (id: string) => Promise<any>;
+  loading: boolean;
+  idToDelete: string;
+  getCertificates: (id: string) => Promise<any>;
+  currPage: number;
+  setCurrPage: (page: number) => void;
 }
 
 const SkeletonCard = () => {
@@ -47,7 +70,21 @@ const StatusBadge = ({ status }: { status?: HackathonStatus }) => {
   );
 };
 
-const HackathonCard = ({hackathon, deleteHandler, loading, idToDelete }: { hackathon: Hackathon, deleteHandler: (id: string) => Promise<any>, loading: boolean, idToDelete: string }) => {
+const HackathonCard = ({hackathon, deleteHandler, loading, idToDelete, getCertificates, currPage, setCurrPage, hackathonData, setHackathonData, totalPages, setTotalPages, totalCert, setTotalCert }: HackathonListProps) => {
+    const [showCertificates, setShowCertificates] = useState(false);
+    const [showUpdateForm, setShowUpdateForm] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+
+    useEffect(()=>{
+        getCertificates(hackathon._id as string);
+    },[currPage])
+
+    const editPopup = () => {
+        setShowUpdateForm(true);
+        setIsUpdating(true);
+    }
+
+  
   return (
     <div className="p-5 rounded-2xl shadow-md bg-white hover:shadow-lg transition duration-200 flex flex-col justify-between border border-gray-100">
       
@@ -56,11 +93,15 @@ const HackathonCard = ({hackathon, deleteHandler, loading, idToDelete }: { hacka
           <h2 className="text-lg font-semibold text-[#03257e]">
             {hackathon.hackathonName}
           </h2>
+          <div className="flex gap-2 items-center">
           <button className="text-white bg-[#f14419] px-3 py-1 rounded-full text-sm font-medium" onClick={() => deleteHandler(hackathon._id || "")}>{loading&&(idToDelete === hackathon._id) ? "Deleting..." : "Delete"}</button>
+          <Edit onClick={editPopup} className="w-5 h-5 text-[#006666] cursor-pointer" />
+          </div>
         </div>
 
         <p className="text-sm text-[#006666] font-medium">
-          {hackathon.organization}
+          {hackathon.organization} <br></br>
+          <span>{hackathon.emailId}</span>
         </p>
 
         {hackathon.description && (
@@ -79,6 +120,45 @@ const HackathonCard = ({hackathon, deleteHandler, loading, idToDelete }: { hacka
             : "No dates"}
         </span>
       </div>
+      <button 
+      className="text-white bg-[#006666] px-3 py-1 rounded-full text-sm font-medium mt-2"
+      onClick={() => {
+        setShowCertificates(true);
+        getCertificates(hackathon._id || "");
+      }}>
+        Get Certificates List
+      </button>
+      {showUpdateForm && <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+      <RegisterHackathon 
+        heading="Update Hackathon" 
+        setShowUpdateForm={setShowUpdateForm}
+        buttonLabel="Update Hackathon"
+        hackathonId={hackathon._id || ""}
+        isUpdating={isUpdating}
+        setIsUpdating={setIsUpdating}
+        hackathonName={hackathon.hackathonName}
+        hackathonDescription={hackathon.description}
+        hackathonStartDate={hackathon.startDate ? new Date(hackathon.startDate) : undefined}
+        hackathonEndDate={hackathon.endDate ? new Date(hackathon.endDate) : undefined}
+        hackathonOrganization={hackathon.organization}
+        emailId={hackathon.emailId || ""}
+        status={hackathon.status}
+        />
+      </div>}
+      {showCertificates && (
+      <IssuedCertificatesList 
+        loading={loading} 
+        currPage={currPage}
+        setCurrPage={setCurrPage}
+        hackathonData={hackathonData}
+        setHackathonData={setHackathonData}
+        totalPages={totalPages}
+        setTotalPages={setTotalPages}
+        totalCert={totalCert}
+        setTotalCert={setTotalCert}
+        setShowCertificates={setShowCertificates}
+      />
+      )}
     </div>
   );
 };
@@ -87,6 +167,11 @@ const HackathonList = () => {
     const { data, isLoading,refetch } = useHackathons();    
     const [loading, setLoading] = useState(false);
     const [idToDelete, setIdToDelete] = useState<string>("");
+    const [currPage,setCurrPage] = useState<number>(1);
+    const [hackathonData,setHackathonData] = useState<any>(null);
+    const [totalPages,setTotalPages] = useState<number>(1);
+    const [totalCert,setTotalCert] = useState<number>();
+    const [isFetching,setIsFetching] = useState(true);
     
       const deleteHackathon = async (id: string) => {
         try {
@@ -104,6 +189,25 @@ const HackathonList = () => {
         }
       };
 
+      const getCertificates = async (hackathonId: string) => {
+        try {
+          setLoading(true);
+          const response = await api.get(`/admin/get-hackathon-certificates/${hackathonId}?page=${currPage}`);
+          console.log("Response:", response);
+          if(response.data){
+            setHackathonData(response.data.data);
+            setTotalPages(response.data.pagination.totalPages);
+            setTotalCert(response.data.pagination.totalCertificate);
+            setIsFetching(false);
+          }
+        } catch (err: any) {
+          console.error("Error getting certificates:", err);
+          return null;
+        } finally {
+          setLoading(false);
+        }
+      }; 
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-[#03257e] mb-6">
@@ -116,7 +220,24 @@ const HackathonList = () => {
               <SkeletonCard key={i} />
             ))
           : data.map((hackathon, idx) => (
-              <HackathonCard key={idx} hackathon={hackathon} deleteHandler={deleteHackathon} loading={loading} idToDelete={idToDelete}/>
+              <HackathonCard 
+              key={idx} 
+              hackathon={hackathon} 
+              deleteHandler={deleteHackathon} 
+              loading={loading} 
+              idToDelete={idToDelete} 
+              currPage={currPage}
+              setCurrPage={setCurrPage}
+              getCertificates={getCertificates}
+              hackathonData={hackathonData}
+              setHackathonData={setHackathonData}
+              totalPages={totalPages}
+              setTotalPages={setTotalPages}
+              totalCert={totalCert || 0}
+              setTotalCert={setTotalCert}
+              isFetching={isFetching}
+              setIsFetching={setIsFetching}
+              />
             ))}
       </div>
 

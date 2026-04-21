@@ -28,7 +28,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
@@ -62,16 +62,34 @@ const hackathonSchema = z.object({
 
 type HackathonFormData = z.infer<typeof hackathonSchema>;
 
-const HackathonForm: React.FC = () => {
+interface HackathonFormProps {
+  hackathonId?: string;
+  heading: string;
+  buttonLabel: string;
+  setShowUpdateForm?: (show: boolean) => void;
+  isUpdating?: boolean;
+  setIsUpdating?: (isUpdating: boolean) => void | undefined;
+  hackathonName?: string;
+  emailId?: string;
+  hackathonDescription?: string;
+  hackathonStartDate?: Date;
+  hackathonEndDate?: Date;
+  hackathonOrganization?: string;
+  status?: string;
+}
+
+const HackathonForm: React.FC<HackathonFormProps> = ({heading, buttonLabel = "Register", setShowUpdateForm, hackathonId, isUpdating, setIsUpdating, hackathonName, emailId, hackathonDescription, hackathonStartDate, hackathonEndDate, hackathonOrganization, status}) => {
   const [loading, setLoading] = useState(false);
   const form = useForm<HackathonFormData>({
     resolver: zodResolver(hackathonSchema),
     defaultValues: {
-      hackathonName: '',
-      organization: '',
-      emailId: '',
-      status: 'active',
-      description: '',
+      hackathonName:hackathonName || '',
+      organization: hackathonOrganization || '',
+      emailId: emailId || '',
+      status: (status as 'active' | 'inactive' | 'completed') || 'active',
+      description: hackathonDescription || '',
+      startDate: hackathonStartDate || undefined,
+      endDate: hackathonEndDate || undefined,
     },
   });
 
@@ -92,21 +110,50 @@ const HackathonForm: React.FC = () => {
     }
   };
 
+  const handleUpdate = async (data:HackathonFormData) => {
+    try {
+        const response = await api.put(`/admin/update-hackathon-status/${hackathonId}`, {data})
+        
+        if (response.data.success) {
+          toast.success("Hackathon status updated successfully");
+        }
+    } catch (error) {
+      toast.error("Failed to update hackathon status");
+      console.log(error);
+    }
+    }
+
+    const closeUpdateForm = () => {
+      if (setIsUpdating) {
+        setIsUpdating(false);
+      }
+      if (setShowUpdateForm) {
+        setShowUpdateForm(false);
+      }
+    };
+
   return (
-    <div className="flex items-center justify-center p-2">
+    <div className="flex items-center justify-center p-2 w-full">
       <div className="w-full max-w-2xl">
         <div
           className="bg-white rounded-lg shadow-lg p-4"
           style={{ borderColor: '#03257e' }}
         >
+          <div className="flex justify-between items-center">
           <h2
             className="text-3xl font-bold mb-4 text-center text-gradient bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] bg-clip-text text-transparent"
           >
-            Register Hackathon
+            {heading}
           </h2>
+          {isUpdating&&<X 
+          size={24} 
+          className="cursor-pointer shadow-lg rounded-full p-1" 
+          onClick={closeUpdateForm}
+          />}
+          </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-2">
+            <form onSubmit={isUpdating ? form.handleSubmit(handleUpdate) : form.handleSubmit(onSubmit)} noValidate className="space-y-2">
               {/* Hackathon Name */}
               <FormField
                 control={form.control}
@@ -360,7 +407,7 @@ const HackathonForm: React.FC = () => {
                     backgroundColor: '#006666',
                   }}
                 >
-                  {loading ? 'Creating...' : 'Create Hackathon'}
+                  {loading ? isUpdating ? 'Updating...' : 'Creating...' : buttonLabel}
                 </Button>
 
                 <Button
