@@ -1,7 +1,7 @@
 import { useState } from "react";
-import RegisterHackathon from "./RegisterHackathon";
-import IssuedCertificates from "./IssuedCertificates";
-import HackathonList from "./HackathonLists";
+//import RegisterHackathon from "./RegisterHackathon";
+// import IssuedCertificates from "./IssuedCertificates";
+// import HackathonList from "./HackathonLists";
 
 
 
@@ -36,8 +36,8 @@ const ManageHackathon = () => {
           <RefreshCw size={14} />
         </button> */}
       </div>
-      {activeTab === "Register" ? <RegisterHackathon 
-      heading="Register Hackathon" buttonLabel="Register Hackathon"/> : activeTab === "Certificate List" ? <IssuedCertificates /> : <HackathonList />}
+      {/* {activeTab === "Register" ? 
+      <RegisterHackathon heading="Register Hackathon" buttonLabel="Register Hackathon"/> : activeTab === "Certificate List" ? <IssuedCertificates /> : <HackathonList />} */}
     </div>
   );
 };
