@@ -62,7 +62,7 @@ export default function CertificateStepper() {
     certId: "",
     fileHash: "",
     uri: "",
-    issuerName: "Nasscom",
+    issuerName: "AARVAK VSE&T",
     assessmentId: id,
   });
 
@@ -200,7 +200,7 @@ export default function CertificateStepper() {
       const payload = {
         url: allStepDataRef.current.uri || storedData.url,
         id: allStepDataRef.current.certId || storedData.cert_id,
-        hackathonName: "GDG-IIMT-Meerut",
+        hackathonName: "Code Royale: The Final Iteration Hackathon",
       };
       const mappingUrl: any = await fetch(
         `${API_BASE_URL}/certification/dynamicQrUrlMap`,
@@ -248,8 +248,8 @@ export default function CertificateStepper() {
         uri: allStepDataRef.current.uri || storedData.url,
         filehash: allStepDataRef.current.fileHash || storedData.fileHashWithTimeStampExt.split("_")[0],
         certificateType:"Participation",
-        issuerName: "IIMT Business Incubator Foundation",
-        hackathonName: "GDG-IIMT-Meerut",
+        issuerName: "AARVAK VSE&T",
+        hackathonName: "Code Royale: The Final Iteration Hackathon",
       };
 
       const txData = await fetch(`${API_BASE_URL}/certification/register-on-chain`, {
