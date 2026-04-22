@@ -109,7 +109,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
         </div>
       </Alert>
       <div className="max-w-xl mx-auto mt-6 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-lg">
-        {!certificationData?.certUrl ? (
+        {!certificationData?.qrUrl ? (
           <div className="max-w-xl mx-auto mt-8 rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-7 shadow-xl">
             <div className="flex flex-col items-center text-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100">
@@ -176,7 +176,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
                   className=" relative group flex items-center gap-2 rounded-full bg-[#e8f4f8] px-3 py-2 text-sm font-medium text-[#03257e]"
                   onClick={() =>
                     handleDownload(
-                      `https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certUrl}`,
+                      `https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.qrUrl}`,
                     )
                   }
                 >
@@ -213,7 +213,7 @@ const Certificate: React.FC<CertificateProps> = ({ cvData }) => {
                   organizationId={109555290}
                   issueYear={2026}
                   issueMonth={4}
-                  certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.certUrl}`}
+                  certUrl={`https://trucvstorage.blob.core.windows.net/uploads/${certificationData?.qrUrl}`}
                   certId={Number(user?.uuid) || 109555290}
                 />
               </div>
