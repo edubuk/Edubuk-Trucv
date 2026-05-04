@@ -1,6 +1,11 @@
 import Navbar from "../pages/Navbar"
 
-const Layout = ({children}: {children: React.ReactNode}) => {
+interface layoutProps {
+    children: React.ReactNode;
+    isAuthenticated?: boolean;
+}
+
+const Layout = ({children}: layoutProps) => {
     return (
         <div>
             <Navbar />

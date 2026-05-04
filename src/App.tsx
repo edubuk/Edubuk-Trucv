@@ -1,5 +1,5 @@
 import { Routes, Route} from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect} from "react";
 import ThreeDotLoader from "./components/Loader/ThreeDotLoader";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
@@ -45,13 +45,14 @@ const Hackathons = lazy(()=>import("./pages/Hackathons"));
 
 function App() {
 
+  useEffect(() => {
 
-useEffect(() => {
     AOS.init({
       duration: 1000, // animation duration in ms
       once: false,     // whether animation should happen only once
-    });
-  }, []);
+    })
+  },[])
+
 
   return (
     <div>
