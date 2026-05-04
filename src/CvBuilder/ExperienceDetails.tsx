@@ -83,6 +83,7 @@ export const ExperienceDetails = ({
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isCurrentlyWorking, setIsCurrentlyWorking] = useState<boolean>(false);
+  const [currentWorkingIndex, setCurrentWorkingIndex] = useState<number | null>(null);
   const [idx, setIdx] = useState<number>();
   const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
   
@@ -113,6 +114,7 @@ export const ExperienceDetails = ({
 
   const checkboxHandler = (index: number) => {
     setIsCurrentlyWorking(!isCurrentlyWorking);
+    setCurrentWorkingIndex(isCurrentlyWorking ? null : index);
     setValue(`experiences.${index}.duration.to`, "present");
   };
 
@@ -443,7 +445,7 @@ export const ExperienceDetails = ({
                     <input
                       type="checkbox"
                       onChange={() => checkboxHandler(index)}
-                      checked={isCurrentlyWorking}
+                      checked={(isCurrentlyWorking && index === currentWorkingIndex) || field.duration.to==="present"}
                     />
                     <p className="text-[#03257e]">
                       Are you currently working here ?

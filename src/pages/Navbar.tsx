@@ -38,7 +38,7 @@ const Navbar:React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const [loading,setLoading] = useState(false);
-console.log("currentPath",currentPath);
+  console.log("currentPath",currentPath);
 
 
 
@@ -133,7 +133,7 @@ console.log("currentPath",currentPath);
                 {link.name}
               </Link>
             ) : (
-              user && (
+              (user) && (
                 <Link
                   key={i + 1}
                   to={link.path}

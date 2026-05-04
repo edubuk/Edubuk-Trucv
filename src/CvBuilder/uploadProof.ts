@@ -76,6 +76,7 @@ export const handleProofUploaded = async ({file,setIsUploading,setUploadError,se
             if (response?.data?.success) {
                 const url = response.data.url;
                 setIsUploading(false);
+                setSelectedFileName(null);
                 return {url,docHash};
             } else {
                 // try to pick error message from response
