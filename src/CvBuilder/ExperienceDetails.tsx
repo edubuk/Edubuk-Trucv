@@ -53,7 +53,7 @@ export const ExperienceDetails = ({
   const [refresh, setRefresh] = useState<boolean>(true);
   const {submitDocument} = useContract();
   const {address} = useAccount();
-
+  
 
   // const {user} = useUserData();
   const form = useForm<ExperienceFormValues>({
@@ -82,8 +82,7 @@ export const ExperienceDetails = ({
   const { errors } = formState;
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [isCurrentlyWorking, setIsCurrentlyWorking] = useState<boolean>(false);
-  const [currentWorkingIndex, setCurrentWorkingIndex] = useState<number | null>(null);
+  const [workingState, setWorkingState] = useState<boolean[]>([]);
   const [idx, setIdx] = useState<number>();
   const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
   
@@ -113,8 +112,11 @@ export const ExperienceDetails = ({
   const removeExperience = (index: number) => remove(index);
 
   const checkboxHandler = (index: number) => {
-    setIsCurrentlyWorking(!isCurrentlyWorking);
-    setCurrentWorkingIndex(isCurrentlyWorking ? null : index);
+    setWorkingState((prev)=>{
+      const updated = [...prev];
+      updated[index]=!updated[index];
+      return updated
+    })
     setValue(`experiences.${index}.duration.to`, "present");
   };
 
@@ -209,6 +211,13 @@ export const ExperienceDetails = ({
           status: doc.status ?? "pending",
         }));
         cvData.experiences=experiences;
+        setWorkingState((prev)=>{
+          const updated = [...prev];
+          res.documents.map((doc:any,idx:number)=>{
+            updated[idx] = doc.duration.to==="present"?true:false;
+          })
+          return updated;
+        })
         // Update form values
         form.reset({ experiences });
       }
@@ -445,7 +454,7 @@ export const ExperienceDetails = ({
                     <input
                       type="checkbox"
                       onChange={() => checkboxHandler(index)}
-                      checked={(isCurrentlyWorking && index === currentWorkingIndex) || field.duration.to==="present"}
+                      checked={workingState[index]}
                     />
                     <p className="text-[#03257e]">
                       Are you currently working here ?
@@ -535,7 +544,7 @@ export const ExperienceDetails = ({
                               className={`w-full ${isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}`}
                               type="date"
                               {...innerField}
-                              disabled={isCurrentlyWorking || field.verified}
+                              disabled={workingState[index]}
                             />
                           </FormControl>
                           <FormMessage />

@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import CvCardGridSkeleton from "./CvCardSkeleton";
+import JobsBanner from "./JobsBanner";
 interface CvByIdProps {
   cvData:any[]; // Expecting an array of strings as cvData
   setCvRefresh:React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,6 +52,8 @@ const CvById: React.FC<CvByIdProps> = ({ cvData,setCvRefresh,isFetching   }) => 
   )}
 
   {cvData?.length > 0 && (
+    <div className="grid grid-cols-1">
+      <JobsBanner />
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {cvData.map((doc: any, i: number) => (
         <div
@@ -118,6 +121,7 @@ const CvById: React.FC<CvByIdProps> = ({ cvData,setCvRefresh,isFetching   }) => 
           </div>
         </div>
       ))}
+    </div>
     </div>
   )}
 </div>
