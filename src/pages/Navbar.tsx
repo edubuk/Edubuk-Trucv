@@ -50,7 +50,7 @@ const Navbar:React.FC = () => {
   const handlerLogout = async () => {
     try {
       setLoading(true);
-      const logoutData = await fetch(`${API_BASE_URL}/user/logout`,{
+      const logoutData = await fetch(`${API_BASE_URL}/api/v1/user/logout`,{
         method:"PUT",
         credentials: "include"
       })
