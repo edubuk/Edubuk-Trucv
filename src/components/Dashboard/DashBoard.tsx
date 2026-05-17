@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import CvById from "./CvById";
 import UserDocs from "./UserDocs";
 import api from "@/lib/api";
-import Certificate from "./Certificate";
+//import Certificate from "./Certificate";
 import { useUserData } from "@/context/AuthContext";
 import OnChainSubmission from "./On-ChainSubmission";
 //import DocumentNFTCard from "@/components/Dashboard/DocumentNFTCard";
@@ -211,11 +211,11 @@ const DashBoard = () => {
           />
         )}
 
-        {selected === "nft" && (
+        {/* {selected === "nft" && (
           <Certificate 
           cvData={cvData}
           />
-        )}
+        )} */}
         {selected === "onchain" && (
           <OnChainSubmission />
         )}

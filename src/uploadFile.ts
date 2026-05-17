@@ -6,7 +6,7 @@ import { API_BASE_URL } from './main';
 export const uploadFile = async(formData:any) => {
 try {
     console.log("formdata",formData);
-    const response = await axios.post(`${API_BASE_URL}/file/upload`, formData);
+    const response = await axios.post(`${API_BASE_URL}/api/v1/file/upload`, formData);
     console.log("res",response);
     return response;
 } catch (error) {
