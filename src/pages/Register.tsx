@@ -71,7 +71,7 @@ export default function RegistrationPage(): JSX.Element {
 
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/user/register`, {
+            const res = await fetch(`${API_BASE_URL}/api/v1/user/register`, {
                 method: "POST",
                 body: JSON.stringify({ email: form.email, otp: form.otp, name: form.fullName, password: form.password, phoneNumber: form.phone, address: form.address }),
                 headers: {
