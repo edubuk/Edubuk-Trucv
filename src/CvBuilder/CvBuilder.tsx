@@ -73,6 +73,7 @@ export default function CVBuilder() {
   const parseCV = async () => {
     const formData = new FormData();
     formData.append("file", cvFile as File);
+    console.log("cv file", cvFile);
     if (!cvFile) {
       toast.error("Please Upload a CV file");
       return false;
