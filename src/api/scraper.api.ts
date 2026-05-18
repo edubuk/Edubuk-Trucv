@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "react-query";
 export const useGetLinkdeinProfile = () => {
   const getLinkdeinProfile = async (profileUrl: string): Promise<any> => {
     const response = await fetch(
-      `${API_BASE_URL}/scraper/linkdein-profile-scraper?profileUrl=${profileUrl}&useAI=true`,
+      `${API_BASE_URL}/api/v1/scraper/linkdein-profile-scraper?profileUrl=${profileUrl}&useAI=true`,
       {
         method: "POST",
         credentials: "include",
@@ -44,7 +44,7 @@ export interface IImportedProfiles {
 export const useGetALLImportedProfiles = () => {
   const getAllLinkdeinProfileReq = async (): Promise<IImportedProfiles[]> => {
     const response = await fetch(
-      `${API_BASE_URL}/scraper/get-user-all-imported-linkdein-profiles`,
+      `${API_BASE_URL}/api/v1/scraper/get-user-all-imported-linkdein-profiles`,
       {
         credentials: "include",
       },
