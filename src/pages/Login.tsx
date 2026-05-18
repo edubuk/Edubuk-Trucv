@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import loginImg from "../assets/login.avif";
 import toast from "react-hot-toast";
 import { ArrowLeftSquare } from "lucide-react";
@@ -20,7 +20,7 @@ export default function LoginPage(): JSX.Element {
 
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
-
+    const [searchParams] = useSearchParams();
     const validate = (): FormErrors => {
         const e: FormErrors = {};
         if (!form.email || !form.email.includes("@") || !form.email.includes(".")) {
@@ -41,6 +41,7 @@ export default function LoginPage(): JSX.Element {
         e.preventDefault();
         const eObj = validate();
         setErrors(eObj);
+        const redirect = searchParams.get("redirect") || "/dashboard";
         if (Object.keys(eObj).length > 0) return;
 
         setLoading(true);
@@ -53,7 +54,7 @@ export default function LoginPage(): JSX.Element {
 
             if (data?.success) {
                 toast.success(data.message);
-                window.location.href = "/";
+                window.location.href = redirect;
             } else {
                 toast.error(data.message);
             }

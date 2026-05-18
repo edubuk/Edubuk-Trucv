@@ -22,7 +22,7 @@ const SkillVerification = () => {
   console.log("token",token)
   const getRequestedSkills = async()=>{
     try {
-      const data = await fetch(`${API_BASE_URL}/issuer/requested-skills/${token}`)
+      const data = await fetch(`${API_BASE_URL}/api/v1/issuer/requested-skills/${token}`)
       const res = await data.json()
       if(res.success)
       {
@@ -37,7 +37,7 @@ const SkillVerification = () => {
   }
   const handleApprove = async()=>{
     try {
-      const data = await fetch(`${API_BASE_URL}/issuer/approve-skills/${token}?userId=${skill.userId}`,{
+      const data = await fetch(`${API_BASE_URL}/api/v1/issuer/approve-skills/${token}?userId=${skill.userId}`,{
         method:"PUT",
         body:JSON.stringify({data:skill}),
         headers:{
