@@ -203,7 +203,7 @@ export default function CertificateStepper() {
         hackathonName: "Code Royale: The Final Iteration Hackathon",
       };
       const mappingUrl: any = await fetch(
-        `${API_BASE_URL}/certification/dynamicQrUrlMap`,
+        `${API_BASE_URL}/api/v1/certification/dynamicQrUrlMap`,
         {
           method: "PUT",
           credentials: "include",
@@ -252,7 +252,7 @@ export default function CertificateStepper() {
         hackathonName: "Code Royale: The Final Iteration Hackathon",
       };
 
-      const txData = await fetch(`${API_BASE_URL}/certification/register-on-chain`, {
+      const txData = await fetch(`${API_BASE_URL}/api/v1/certification/register-on-chain`, {
         method: "PUT",
         credentials: "include",
         headers: {

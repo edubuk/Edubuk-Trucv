@@ -10,7 +10,7 @@ export const useCV = () => {
   const createCV = async (
     formData: CvFormDataType
   ): Promise<Cv_resoponse_type> => {
-    const response = await fetch(`${API_BASE_URL}/cv/create`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/cv/create`, {
       method: "POST",
       credentials:"include",
       headers: {
@@ -74,7 +74,7 @@ export const useCV = () => {
 
 export const useGetCv = (id: string) => {
   const getCvRequest = async (): Promise<Cv_resoponse_type> => {
-    const response = await fetch(`${API_BASE_URL}/cv/getCvByNanoId/${id}`,{credentials:"include"});
+    const response = await fetch(`${API_BASE_URL}/api/v1/cv/getCvByNanoId/${id}`,{credentials:"include"});
     if (!response.ok) {
       throw new Error("Could not get cv!");
     }
