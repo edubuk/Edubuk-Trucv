@@ -1,11 +1,11 @@
-import { Navigate } from "react-router-dom";
+import {Navigate,useLocation } from "react-router-dom";
 import { useUserData } from "@/context/AuthContext";
 import ThreeDotLoader from "./components/Loader/ThreeDotLoader";
 // import ThreeDotLoader from "./components/Loader/ThreeDotLoader";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading} = useUserData();
-
+  const location = useLocation();
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -15,7 +15,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return user ? <>{children}</> : <Navigate to="/login" />;
+  return user ? <>{children}</> : 
+  <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname + location.search )}`}replace />;
 };
 
 export default ProtectedRoute;

@@ -15,6 +15,7 @@ import api from "@/lib/api";
 //import Certificate from "./Certificate";
 import { useUserData } from "@/context/AuthContext";
 import OnChainSubmission from "./On-ChainSubmission";
+import { useSearchParams } from "react-router-dom";
 //import DocumentNFTCard from "@/components/Dashboard/DocumentNFTCard";
 
 const DashBoard = () => {
@@ -30,10 +31,12 @@ const DashBoard = () => {
     awards: [],
   });
 
-  const [selected, setSelected] = useState<"cv" | "nft" | "docs" | "onchain">("docs");
+  //const [selected, setSelected] = useState<"cv" | "nft" | "docs" | "onchain">("docs");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selected = searchParams.get("tab") as "cv" | "docs" | "nft" | "onchain" | null || "docs";
 
   const getDocs = async () => {
-    setSelected("docs");
+    setSearchParams({ tab: "docs" });
     setSidebarOpen(false);
     try {
       setIsFetching(true);
@@ -51,7 +54,7 @@ const DashBoard = () => {
   };
 
   const userCvs = async () => {
-    setSelected("cv");
+    setSearchParams({ tab: "cv" });
     setSidebarOpen(false);
     try {
       setIsFetching(true);
@@ -65,7 +68,7 @@ const DashBoard = () => {
   };
 
   const fetchNFTsHandler = async() => {
-    setSelected("nft");
+    setSearchParams({ tab: "nft" });
     setSidebarOpen(false);
     // try {
     //   setIsFetching(true);
@@ -89,6 +92,11 @@ const DashBoard = () => {
   useEffect(() => {
     userCvs();
   }, [cvRefresh]);
+
+  const handleTabChange = (tab: "cv" | "docs" | "nft" | "onchain") => {
+    setSearchParams({ tab });
+    setSidebarOpen(false);
+  };
 
 
   const NavItem = ({
@@ -148,19 +156,19 @@ const DashBoard = () => {
             id="docs"
             label="Uploaded Documents"
             Icon={FolderOpen}
-            onClick={getDocs}
+            onClick={() => handleTabChange("docs")}
           />
           <NavItem
             id="cv"
             label="My CVs"
             Icon={FileText}
-            onClick={userCvs}
+            onClick={() => handleTabChange("cv")}
           />
           <NavItem
             id="onchain"
             label="On-Chain Submission"
             Icon={Database}
-            onClick={() => setSelected("onchain")}
+            onClick={() => handleTabChange("onchain")}
           />
           {user?.isHackathonUser && <NavItem
             id="nft"
