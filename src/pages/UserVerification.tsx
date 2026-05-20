@@ -1,58 +1,70 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useUserData } from "../context/AuthContext";
+import api from "@/lib/api";
+import toast from "react-hot-toast";
 
-type UserProfile = {
-  name: string;
-  email: string;
-  avatar?: string;
-  linkedIn?: string;
-  github?: string;
-  summary?: string;
-  experience?: number;
-  phone?: string;
-  address?: string;
-};
 
-type DocumentStats = {
-  educationVerified: number;
-  educationTotal: number;
-  experienceVerified: number;
-  experienceTotal: number;
-  certificateVerified: number;
-  certificateTotal: number;
-};
+interface VerificationStatusResponse {
+  overallStats: {
+    totalVerified: number;
+    totalDocuments: number;
+    percentage: number;
+  };
+  categories: {
+    education: CategoryStats;
+    experience: CategoryStats;
+    awards: CategoryStats;
+  };
+  lastUpdated: string;
+}
 
-const user: UserProfile = {
-  name: "Ajeet Kumar",
-  email: "ajeet@example.com",
-  avatar: "https://i.pravatar.cc/150?img=12",
-  linkedIn: "https://linkedin.com/in/ajeet",
-  github: "https://github.com/ajeet",
-  summary: "Full-stack developer with strong experience in React and Node.js.",
-  experience: 3,
-  phone: "+91 9876543210",
-};
+interface CategoryStats {
+  verified: number;
+  total: number;
+  percentage: number;
+  pending: number;
+  rejected: number;
+  selfAttested: number;
+}
 
-const documents: DocumentStats = {
-  educationVerified: 2,
-  educationTotal: 3,
-  experienceVerified: 1,
-  experienceTotal: 2,
-  certificateVerified: 4,
-  certificateTotal: 5,
-};
 
 const VerificationPage: React.FC = () => {
-  const totalVerified =
-    documents.educationVerified +
-    documents.experienceVerified +
-    documents.certificateVerified;
-  const totalDocuments =
-    documents.educationTotal +
-    documents.experienceTotal +
-    documents.certificateTotal;
-  const overallPercentage = totalDocuments
-    ? Math.round((totalVerified / totalDocuments) * 100)
-    : 0;
+
+  const { user } = useUserData();
+
+  const [verificationStatus, setVerificationStatus] = React.useState<VerificationStatusResponse | null>(null);
+
+  const userDocVerificationStatus = async()=>{
+    try {
+      const res = await api.get(`/user/${user?._id}/verification-status`)
+      if(res.data.success){
+        setVerificationStatus(res.data.data)
+      }
+    } catch (error) {
+      toast.error("Failed to fetch verification status")
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    userDocVerificationStatus()
+  }, [])
+  
+const getVerificationStatus = (percentage: number) => {
+  if (percentage === 100) {
+    return { label: "Fully Verified", color: "text-green-400" };
+  } else if (percentage >= 90) {
+    return { label: "Excellent", color: "text-green-300" };
+  } else if (percentage >= 75) {
+    return { label: "Strong", color: "text-blue-300" };
+  } else if (percentage >= 50) {
+    return { label: "Moderate", color: "text-yellow-300" };
+  } else if (percentage >= 25) {
+    return { label: "Weak", color: "text-orange-300" };
+  } else {
+    return { label: "Incomplete", color: "text-red-300" };
+  }
+};
 
   const StatCard = ({
     title,
@@ -66,6 +78,7 @@ const VerificationPage: React.FC = () => {
     icon: string;
   }) => {
     const percentage = total ? (verified / total) * 100 : 0;
+
 
     return (
       <div className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md transition-shadow">
@@ -93,7 +106,7 @@ const VerificationPage: React.FC = () => {
             }}
           />
         </div>
-        <p className="text-xs text-gray-500 mt-2">{Math.round(percentage)}% verified</p>
+        <p className="text-xs text-gray-500 mt-2">{Math.round(verified/total*100)}% verified</p>
       </div>
     );
   };
@@ -144,13 +157,19 @@ const VerificationPage: React.FC = () => {
             <div>
               <p className="text-white/80 text-sm mb-1">Overall Verification Progress</p>
               <p className="text-5xl font-bold">
-                {totalVerified}
-                <span className="text-2xl opacity-80">/{totalDocuments}</span>
+                {verificationStatus?.overallStats.totalVerified}
+                <span className="text-2xl opacity-80">/{verificationStatus?.overallStats.totalDocuments}</span>
               </p>
               <p className="text-white/80 text-sm mt-2">Documents verified</p>
             </div>
             <div className="text-right">
-              <div className="text-6xl font-bold">{overallPercentage}%</div>
+              <p className="text-center text-white/80 text-sm mb-1 bg-white/10 px-2 py-1 rounded-full">
+                Status: 
+                <span className={`ml-2 font-bold ${getVerificationStatus(verificationStatus?.overallStats.percentage || 0).color}`}>
+                  {getVerificationStatus(verificationStatus?.overallStats.percentage || 0).label}
+                </span>
+              </p>
+              <div className="text-6xl font-bold">{verificationStatus?.overallStats.percentage}%</div>
               <p className="text-white/80 text-sm mt-2">Complete</p>
             </div>
           </div>
@@ -161,9 +180,9 @@ const VerificationPage: React.FC = () => {
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <div className="flex flex-col items-center text-center mb-6">
-                {user.avatar ? (
+                {user?.userImageUrl ? (
                   <img
-                    src={user.avatar}
+                    src={user.userImageUrl}
                     alt="avatar"
                     className="w-24 h-24 rounded-full object-cover border-4 mb-4"
                     style={{ borderColor: "#006666" }}
@@ -173,26 +192,26 @@ const VerificationPage: React.FC = () => {
                     className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4"
                     style={{ backgroundColor: "#006666" }}
                   >
-                    {getInitial(user.name)}
+                    {getInitial(user?.name || "")}
                   </div>
                 )}
                 <h2 className="text-xl font-bold mb-1" style={{ color: "#03257e" }}>
-                  {user.name}
+                  {user?.name}
                 </h2>
-                <p className="text-gray-600 text-sm">{user.email}</p>
+                <p className="text-gray-600 text-sm">{user?.email}</p>
               </div>
 
               <div className="space-y-3 pt-4 border-t border-gray-100">
-                <InfoItem label="Phone" value={user.phone || ""} />
-                <InfoItem label="Experience" value={user.experience ? `${user.experience} years` : ""} />
-                <InfoItem label="LinkedIn" value={user.linkedIn || ""} link />
-                <InfoItem label="GitHub" value={user.github || ""} link />
+                <InfoItem label="Phone" value={user?.phoneNumber || ""} />
+                <InfoItem label="Experience" value={user?.yearOfExp ? `${user.yearOfExp} years` : ""} />
+                <InfoItem label="LinkedIn" value={user?.linkedInUrl || ""} link />
+                <InfoItem label="GitHub" value={user?.githubUrl || ""} link />
               </div>
 
-              {user.summary && (
+              {user?.profileSummary && (
                 <div className="mt-6 pt-4 border-t border-gray-100">
                   <p className="text-xs text-gray-500 mb-2">ABOUT</p>
-                  <p className="text-sm text-gray-700 leading-relaxed">{user.summary}</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{user.profileSummary}</p>
                 </div>
               )}
             </div>
@@ -207,20 +226,20 @@ const VerificationPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard
                   title="Education"
-                  verified={documents.educationVerified}
-                  total={documents.educationTotal}
+                  verified={verificationStatus?.categories.education.verified || 0}
+                  total={verificationStatus?.categories.education.total || 0}
                   icon="🎓"
                 />
                 <StatCard
                   title="Experience"
-                  verified={documents.experienceVerified}
-                  total={documents.experienceTotal}
+                  verified={verificationStatus?.categories.experience.verified || 0}
+                  total={verificationStatus?.categories.experience.total || 0}
                   icon="💼"
                 />
                 <StatCard
                   title="Certificates"
-                  verified={documents.certificateVerified}
-                  total={documents.certificateTotal}
+                  verified={verificationStatus?.categories.awards.verified || 0}
+                  total={verificationStatus?.categories.awards.total || 0}
                   icon="🏆"
                 />
               </div>
@@ -238,22 +257,22 @@ const VerificationPage: React.FC = () => {
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
                       style={{ backgroundColor: "#006666" }}
                     >
-                      {documents.educationVerified}
+                      {verificationStatus?.categories.education.verified}
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Educational Documents</p>
-                      <p className="text-sm text-gray-500">
-                        {documents.educationTotal - documents.educationVerified} pending
+                      <p className="text-sm text-[#f14419]">
+                        {verificationStatus?.categories.education.pending} pending
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold" style={{ color: "#006666" }}>
+                    {verificationStatus?.categories.education && <p className="text-2xl font-bold" style={{ color: "#006666" }}>
                       {Math.round(
-                        (documents.educationVerified / documents.educationTotal) * 100
+                        (verificationStatus?.categories.education.verified / verificationStatus?.categories.education.total) * 100
                       )}
                       %
-                    </p>
+                    </p>}
                   </div>
                 </div>
 
@@ -263,22 +282,22 @@ const VerificationPage: React.FC = () => {
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
                       style={{ backgroundColor: "#006666" }}
                     >
-                      {documents.experienceVerified}
+                      {verificationStatus?.categories.experience.verified}
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Experience Documents</p>
-                      <p className="text-sm text-gray-500">
-                        {documents.experienceTotal - documents.experienceVerified} pending
+                      <p className="text-sm text-[#f14419]">
+                        {verificationStatus?.categories.experience.pending} pending
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold" style={{ color: "#006666" }}>
+                    {verificationStatus?.categories.experience && <p className="text-2xl font-bold" style={{ color: "#006666" }}>
                       {Math.round(
-                        (documents.experienceVerified / documents.experienceTotal) * 100
+                        (verificationStatus?.categories.experience.verified / verificationStatus?.categories.experience.total) * 100
                       )}
                       %
-                    </p>
+                    </p>}
                   </div>
                 </div>
 
@@ -288,22 +307,22 @@ const VerificationPage: React.FC = () => {
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
                       style={{ backgroundColor: "#006666" }}
                     >
-                      {documents.certificateVerified}
+                      {verificationStatus?.categories.awards.verified}
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Awards & Certificates</p>
-                      <p className="text-sm text-gray-500">
-                        {documents.certificateTotal - documents.certificateVerified} pending
+                      <p className="text-sm text-[#f14419]">
+                        {verificationStatus?.categories.awards.pending} pending
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold" style={{ color: "#006666" }}>
+                    {verificationStatus?.categories.awards && <p className="text-2xl font-bold" style={{ color: "#006666" }}>
                       {Math.round(
-                        (documents.certificateVerified / documents.certificateTotal) * 100
+                        (verificationStatus?.categories.awards.verified / verificationStatus?.categories.awards.total) * 100
                       )}
                       %
-                    </p>
+                    </p>}
                   </div>
                 </div>
               </div>
