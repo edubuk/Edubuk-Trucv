@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import loginImg from "../assets/login.avif";
 import toast from "react-hot-toast";
-import { ArrowLeftSquare } from "lucide-react";
+import { ArrowLeftSquare, EyeIcon, EyeOffIcon } from "lucide-react";
 import api from "@/lib/api";
 
 type FormState = {
@@ -20,6 +20,7 @@ export default function LoginPage(): JSX.Element {
 
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
+    const [seePassword, setSeePassword] = useState(false);
     const [searchParams] = useSearchParams();
     const validate = (): FormErrors => {
         const e: FormErrors = {};
@@ -41,7 +42,7 @@ export default function LoginPage(): JSX.Element {
         e.preventDefault();
         const eObj = validate();
         setErrors(eObj);
-        const redirect = searchParams.get("redirect") || "/dashboard";
+        const redirect = searchParams.get("redirect") || "/";
         if (Object.keys(eObj).length > 0) return;
 
         setLoading(true);
@@ -167,13 +168,13 @@ export default function LoginPage(): JSX.Element {
                                 )}
                             </label>
 
-                            <label className="block">
+                            <label className="relative block">
                                 <span className="text-sm font-medium text-slate-700">
                                     Password*
                                 </span>
                                 <input
                                     name="password"
-                                    type="password"
+                                    type={seePassword ? "text" : "password"}
                                     value={form.password}
                                     onChange={handleChange}
                                     placeholder="Minimum 8 characters"
@@ -183,6 +184,12 @@ export default function LoginPage(): JSX.Element {
                                             : "border-slate-200 focus:ring-[#03257e]"
                                     }`}
                                 />
+                                <div
+                                    onClick={() => setSeePassword(!seePassword)}
+                                    className="absolute right-3 top-1/2 cursor-pointer"
+                                >
+                                    {seePassword ? <EyeIcon color={"#03257e"}/> : <EyeOffIcon color={"#03257e"} />}
+                                </div>
                                 {errors.password && (
                                     <p className="text-xs text-red-500 mt-1">
                                         {errors.password}

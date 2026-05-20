@@ -85,13 +85,11 @@ const DashBoard = () => {
     // }
   };
 
-  useEffect(() => {
-    getDocs();
-  }, [docRefresh]);
-
-  useEffect(() => {
-    userCvs();
-  }, [cvRefresh]);
+useEffect(() => {
+  if (selected === "docs") getDocs();
+  if (selected === "cv") userCvs();
+  if (selected === "nft") fetchNFTsHandler();
+}, [selected, docRefresh, cvRefresh]);
 
   const handleTabChange = (tab: "cv" | "docs" | "nft" | "onchain") => {
     setSearchParams({ tab });
