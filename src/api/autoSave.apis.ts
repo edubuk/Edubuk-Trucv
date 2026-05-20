@@ -63,7 +63,7 @@ export const autoSave = async (cvData: any) => {
             const skills = cvData.skills.map((skill: any) => ({
                 skillName: skill.skillName,
                 level: skill.level,
-                selfAttested: false,
+                selfAttested: true,
                 endoresBy:'',
                 endoresThrough:'',
             }));
@@ -89,7 +89,7 @@ export const autoSave = async (cvData: any) => {
                             duration: { from: data.duration.from, to: data.duration.to },
                             skills: data.skills,
                             description: data.description,
-                            selfAttested: false,
+                            selfAttested: true,
                         }
                     })
                 )
@@ -112,7 +112,7 @@ export const autoSave = async (cvData: any) => {
                             organisation:data.organisation,
                             duration: { from: data.duration.from, to: data.duration.to },
                             description:data.description,
-                            selfAttested:false,
+                            selfAttested:true,
                             isEmailSend:false,
                             verified:false,
                             status:"pending",
@@ -154,7 +154,7 @@ export const autoSaveParsedData = async (cvData: any) => {
                             gpa: doc.gpa.split("/")[0] ?? "",
                             orgId:doc.boardNameOrDegree==="CBSE"?"000027":"",
                             duration: { from: "", to: "" },
-                            selfAttested: false,
+                            selfAttested: true,
                             isEmailSend: false,
                             verified: false,
                             status: "pending",
@@ -181,7 +181,7 @@ export const autoSaveParsedData = async (cvData: any) => {
                             duration: { from: "", to: "" },
                             skills:doc.skills || "",
                             description:doc.description || "",
-                            selfAttested: false,
+                            selfAttested: true,
                             isEmailSend: false,
                             verified: false,
                             status: "pending",
@@ -201,7 +201,7 @@ export const autoSaveParsedData = async (cvData: any) => {
             const skills = cvData.skills.map((skill: any) => ({
                 skillName: skill.skillName,
                 level: skill.level?.toLowerCase(),
-                selfAttested: false,
+                selfAttested: true,
                 endoresBy:'',
                 endoresThrough:'',
             }));
@@ -224,7 +224,7 @@ export const autoSaveParsedData = async (cvData: any) => {
                     duration: { from: "", to: "" },
                     skills:doc.skills || "",
                     description: doc.description || "",
-                    selfAttested: false,
+                    selfAttested: true,
                 }
             })
             const projectResults = await api.post(`/doc/save-projects`, {
@@ -249,7 +249,7 @@ export const autoSaveParsedData = async (cvData: any) => {
                                 duration: { from: "", to: "" },
                                 description: doc.description || "",
                                 isEmailSend: false,
-                                selfAttested: false,
+                                selfAttested: true,
                                 verified: false,
                                 status: "pending",
                                 verifiedThrough: ""
