@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Zap,
   File,
+  UserCogIcon,
 } from "lucide-react";
 
 import AdminUserProfilesPage from "./Admin";
@@ -18,6 +19,7 @@ import api from "@/lib/api";
 import toast from "react-hot-toast";
 import ManageHackathon from "./ManageHackathon";
 import AccessDeniedPage from "@/pages/AccessDenied";
+import CreateUser from "./CreateUser";
 
 const AdminDashBoard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -25,7 +27,7 @@ const AdminDashBoard = () => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [requestedDoc,setRequestedDoc] = useState<[]>([]);
   const {user} = useUserData();
-  const [selected, setSelected] = useState<"users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc">("users");
+  const [selected, setSelected] = useState<"users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc"|"create-user">("users");
 
     const fetchRequestDocHandler = async() => {
     setSelected("requestedDoc");
@@ -61,7 +63,7 @@ const AdminDashBoard = () => {
     Icon,
     onClick,
   }: {
-    id:"users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc";
+    id:"users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc" | "create-user";
     label: string;
     Icon: any;
     onClick: () => void;
@@ -139,6 +141,12 @@ const AdminDashBoard = () => {
               Icon={File}
               onClick={fetchRequestDocHandler}
             />
+            <NavItem
+              id="create-user"
+              label="Create User"
+              Icon={UserCogIcon}
+              onClick={()=>setSelected("create-user")}
+            />
         </nav>
       </aside>
 
@@ -187,6 +195,9 @@ const AdminDashBoard = () => {
             />
           )
         }
+        {selected === "create-user" && (
+        <CreateUser />
+        )}
       </main>
     </div>:<AccessDeniedPage />}
     </>
