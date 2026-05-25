@@ -57,29 +57,30 @@ const Home:React.FC = () => {
         </div>
         <div className="flex justify-around items-center flex-wrap-reverse gap-10 md:gap-20 border-b-4 border-amber-300 md:h-[80vh]">
         <div className="flex justify-center items-center flex-col gap-4 pb-4" data-aos="fade-up">
-          <div className="flex justify-center items-center gap-2">
-            <div className="relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]" data-aos="fade-up">
-            <Link
-              to="/create-cv"
-              className="flex items-center gap-2 bg-[#006666] text-[20px] sm:text-[30px] px-2 py-4 font-bold rounded-lg text-white hover:bg-white hover:text-[#f14419] transition-colors duration-200"
-            >
-             Create TruCV →
-            </Link>
-          </div>
+
+        <div className="flex justify-center items-center gap-2">
+            <div className="relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-up">
+              <Link
+                to="/create-cv"
+                className="flex items-center gap-2 bg-[#006666] text-[20px] sm:text-[30px] px-2 py-4 font-bold rounded-[6px] text-white hover:bg-white hover:text-[#f14419] transition-colors duration-200"
+              >
+                Create TruCV →
+              </Link>
+            </div>
             {user ? (
-              <div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]" data-aos="fade-left">
+              <div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-left">
                 <button
-                  className="w-full bg-white text-[20px] px-6 py-4 font-bold text-center rounded-lg text-[#03257e] hover:text-[#f14419]"
+                  className="w-full bg-white text-[20px] px-6 py-4 font-bold text-center rounded-[6px] text-[#03257e] hover:text-[#f14419] transition-colors duration-200"
                   onClick={handlerLogout}
                 >
                   Logout
                 </button>
               </div>
             ) : (
-              <div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]" data-aos="fade-left">
+              <div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-left">
                 <Link
                   to="/login"
-                  className="w-full bg-white text-[20px] px-6 py-4 font-bold text-center rounded-lg text-[#03257e] hover:text-[#f14419]"
+                  className="w-full bg-white text-[20px] px-6 py-4 font-bold text-center rounded-[6px] text-[#03257e] hover:text-[#f14419] transition-colors duration-200"
                 >
                   Login
                 </Link>
