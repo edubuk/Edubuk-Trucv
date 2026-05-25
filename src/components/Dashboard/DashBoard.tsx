@@ -152,7 +152,7 @@ useEffect(() => {
         <nav className="flex flex-col gap-2">
           <NavItem
             id="docs"
-            label="Uploaded Documents"
+            label="My Documents"
             Icon={FolderOpen}
             onClick={() => handleTabChange("docs")}
           />

@@ -40,6 +40,7 @@ const MetamaskGuide = lazy(()=>import("./pages/Metamaskguide"));
 const DigilockerConnectPage = lazy(()=>import("./pages/DigiLockerConnectPage"));
 const Hackathons = lazy(()=>import("./pages/Hackathons"));
 const UserVerification = lazy(()=>import("./pages/UserVerification"));
+const DocumentVerificationGuide = lazy(()=>import("./components/DocumentVerificationGuide"));
 
 
 
@@ -91,6 +92,7 @@ function App() {
               <Route path="/dl-connect" element={<DigilockerConnectPage />} />
               <Route path="/user-verification" element={<Layout><ProtectedRoute><UserVerification /></ProtectedRoute></Layout>} />
               <Route path="/hackathons" element={<Layout><ProtectedRoute><Hackathons /></ProtectedRoute></Layout>} />
+              <Route path="/document-verification-guide" element={<DocumentVerificationGuide />} />
             </Routes>
           </Suspense>
       </Providers>
