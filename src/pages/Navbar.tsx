@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { googleLogout } from "@react-oauth/google";
 import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+//import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 
 interface LinkItem {
@@ -184,9 +184,9 @@ const Navbar:React.FC = () => {
                 {loading?"Please Wait...":"Logout"}
               </button>
             </div>
-            <div className="hidden xl:block">
+            {/* <div className="hidden xl:block">
               <ConnectButton />
-            </div>
+            </div> */}
           </>
           )}
         {/* Hamburger Menu */}

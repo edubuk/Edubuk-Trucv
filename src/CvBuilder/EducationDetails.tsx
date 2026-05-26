@@ -41,9 +41,9 @@ import { ICvData } from "./CvBuilder";
 import api from "@/lib/api";
 import StatusBadge from "./StatusBadge";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
-import { useContract } from "@/Blockchain/hooks/useMyContract";
-import { useAccount } from "wagmi";
-import { parseContractError } from "@/Blockchain/utils/error";
+//import { useContract } from "@/Blockchain/hooks/useMyContract";
+//import { useAccount } from "wagmi";
+//import { parseContractError } from "@/Blockchain/utils/error";
 
 const collegeOptions = [
   {
@@ -96,8 +96,8 @@ export const EducationDetails = ({
   >(null);
   const [openDigiLocker, setOpenDigiLocker] = useState<boolean>(false);
   const [customLevel, setCustomLevel] = useState<string>();
-  const { submitDocument } = useContract();
-  const { address } = useAccount();
+  // const { submitDocument } = useContract();
+  // const { address } = useAccount();
   const form = useForm<EducationFormValues>({
     resolver: zodResolver(EducationSchema),
     defaultValues: {
@@ -145,36 +145,36 @@ export const EducationDetails = ({
     try {
       setIdx(index);
       setLoadingState("Submitting");
-      if (payload.docHash || payload.verifiedThrough==="DigiLocker") {
-        const id = toast.loading("Submitting on chain...");
-        // "This is DigiLocker verified"->hash256
-        try {
-          await submitDocument({
-            name: payload.level,
-            hashString: payload.verifiedThrough==="DigiLocker" ? `0x${digiLockerHash}` as `0x${string}` : `0x${payload.docHash}` as `0x${string}`,
-            docType: "education",
-            tokenUri: "",
-            currAddress: address as `0x${string}`,
-          });
-          toast.dismiss(id);
-        } catch (txError) {
-          const errMsg = parseContractError(txError);
+      // if (payload.docHash || payload.verifiedThrough==="DigiLocker") {
+      //   const id = toast.loading("Submitting on chain...");
+      //   // "This is DigiLocker verified"->hash256
+      //   try {
+      //     await submitDocument({
+      //       name: payload.level,
+      //       hashString: payload.verifiedThrough==="DigiLocker" ? `0x${digiLockerHash}` as `0x${string}` : `0x${payload.docHash}` as `0x${string}`,
+      //       docType: "education",
+      //       tokenUri: "",
+      //       currAddress: address as `0x${string}`,
+      //     });
+      //     toast.dismiss(id);
+      //   } catch (txError) {
+      //     const errMsg = parseContractError(txError);
 
-          if (errMsg === "This document has already been submitted.") {
-            // Already on chain — skip and proceed to DB save
-            toast.dismiss(id);
-            toast.custom(() => (
-              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                <p>Document already on chain. Retrying database save...</p>
-              </div>
-            ));
-          } else {
-            // Any other chain error — stop everything
-            toast.dismiss(id);
-            throw txError;
-          }
-        }
-      }
+      //     if (errMsg === "This document has already been submitted.") {
+      //       // Already on chain — skip and proceed to DB save
+      //       toast.dismiss(id);
+      //       toast.custom(() => (
+      //         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+      //           <p>Document already on chain. Retrying database save...</p>
+      //         </div>
+      //       ));
+      //     } else {
+      //       // Any other chain error — stop everything
+      //       toast.dismiss(id);
+      //       throw txError;
+      //     }
+      //   }
+      // }
 
       const { data } = await api.post(`/doc/save-eduDoc`, { data: payload });
 

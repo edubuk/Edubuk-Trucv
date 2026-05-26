@@ -38,9 +38,9 @@ import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
 import StatusBadge from "./StatusBadge";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
-import { useContract } from "@/Blockchain/hooks/useMyContract";
-import { useAccount } from "wagmi";
-import { parseContractError } from "@/Blockchain/utils/error";
+// import { useContract } from "@/Blockchain/hooks/useMyContract";
+// import { useAccount } from "wagmi";
+// import { parseContractError } from "@/Blockchain/utils/error";
 
 export const AwardDetails = ({
   step,
@@ -55,8 +55,8 @@ export const AwardDetails = ({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
   const [refresh, setRefresh] = useState<boolean>(true);
-  const {submitDocument} = useContract();
-  const {address} = useAccount();
+  //const {submitDocument} = useContract();
+  //const {address} = useAccount();
   // const { user } = useUserData();
   const form = useForm<AwardFormValues>({
     resolver: zodResolver(AwardSchema),
@@ -117,35 +117,35 @@ export const AwardDetails = ({
       setIdx(index);
       setLoadingState("Submitting");
       // step-1 submitting on blockchain 
-      if (payload.docHash) {
-        const id = toast.loading("Submitting on chain...");
-        try {
-          await submitDocument({
-            name       : payload.name,
-            hashString : `0x${payload.docHash}` as `0x${string}`,
-            docType    : "award",
-            tokenUri   : "",
-            currAddress: address as `0x${string}`,
-          });
-          toast.dismiss(id);
-        } catch (txError) {
-          const errMsg = parseContractError(txError);
+      // if (payload.docHash) {
+      //   const id = toast.loading("Submitting on chain...");
+      //   try {
+      //     await submitDocument({
+      //       name       : payload.name,
+      //       hashString : `0x${payload.docHash}` as `0x${string}`,
+      //       docType    : "award",
+      //       tokenUri   : "",
+      //       currAddress: address as `0x${string}`,
+      //     });
+      //     toast.dismiss(id);
+      //   } catch (txError) {
+      //     const errMsg = parseContractError(txError);
   
-          if (errMsg === "This document has already been submitted.") {
-            // Already on chain — skip and proceed to DB save
-            toast.dismiss(id);
-            toast.custom(() => (
-              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                <p>Document already on chain. Retrying database save...</p>
-              </div>
-            ));
-          } else {
-            // Any other chain error — stop everything
-            toast.dismiss(id);
-            throw txError;
-          }
-        }
-      }
+      //     if (errMsg === "This document has already been submitted.") {
+      //       // Already on chain — skip and proceed to DB save
+      //       toast.dismiss(id);
+      //       toast.custom(() => (
+      //         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+      //           <p>Document already on chain. Retrying database save...</p>
+      //         </div>
+      //       ));
+      //     } else {
+      //       // Any other chain error — stop everything
+      //       toast.dismiss(id);
+      //       throw txError;
+      //     }
+      //   }
+      // }
 
       const { data } = await api.post(`/doc/save-awards`, { data: payload });
 
