@@ -36,9 +36,9 @@ import { isMongoId } from "@/lib/utils";
 import api from "@/lib/api";
 import StatusBadge from "./StatusBadge";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
-import { useContract } from "@/Blockchain/hooks/useMyContract";
-import { useAccount } from "wagmi";
-import { parseContractError } from "@/Blockchain/utils/error";
+//import { useContract } from "@/Blockchain/hooks/useMyContract";
+//import { useAccount } from "wagmi";
+//import { parseContractError } from "@/Blockchain/utils/error";
 //import { useUserData } from "@/context/AuthContext";
 
 export const ExperienceDetails = ({
@@ -51,8 +51,8 @@ export const ExperienceDetails = ({
 }: IStepCard) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [refresh, setRefresh] = useState<boolean>(true);
-  const {submitDocument} = useContract();
-  const {address} = useAccount();
+  //const {submitDocument} = useContract();
+  //const {address} = useAccount();
   
 
   // const {user} = useUserData();
@@ -138,35 +138,35 @@ export const ExperienceDetails = ({
     setLoadingState("Submitting");
     setIdx(index);
     // ── Step 1: Blockchain Registration
-    if (payload.docHash) {
-      const id = toast.loading("Submitting on chain...");
-      try {
-        await submitDocument({
-          name       : payload.jobRole,
-          hashString : `0x${payload.docHash}` as `0x${string}`,
-          docType    : "experience",
-          tokenUri   : "",
-          currAddress: address as `0x${string}`,
-        });
-        toast.dismiss(id);
-      } catch (txError) {
-        const errMsg = parseContractError(txError);
+    // if (payload.docHash) {
+    //   const id = toast.loading("Submitting on chain...");
+    //   try {
+    //     await submitDocument({
+    //       name       : payload.jobRole,
+    //       hashString : `0x${payload.docHash}` as `0x${string}`,
+    //       docType    : "experience",
+    //       tokenUri   : "",
+    //       currAddress: address as `0x${string}`,
+    //     });
+    //     toast.dismiss(id);
+    //   } catch (txError) {
+    //     const errMsg = parseContractError(txError);
 
-        if (errMsg === "This document has already been submitted.") {
-          // Already on chain — skip and proceed to DB save
-          toast.dismiss(id);
-          toast.custom(() => (
-            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-              <p>Document already on chain. Retrying database save...</p>
-            </div>
-          ));
-        } else {
-          // Any other chain error — stop everything
-          toast.dismiss(id);
-          throw txError;
-        }
-      }
-    }
+    //     if (errMsg === "This document has already been submitted.") {
+    //       // Already on chain — skip and proceed to DB save
+    //       toast.dismiss(id);
+    //       toast.custom(() => (
+    //         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+    //           <p>Document already on chain. Retrying database save...</p>
+    //         </div>
+    //       ));
+    //     } else {
+    //       // Any other chain error — stop everything
+    //       toast.dismiss(id);
+    //       throw txError;
+    //     }
+    //   }
+    // }
 
     // ── Step 2: Database Save
     const { data } = await api.post(`/doc/save-expDoc`, { data: payload });
@@ -180,7 +180,8 @@ export const ExperienceDetails = ({
     setRefresh((prev) => !prev);
 
   } catch (error) {
-    toast.error(parseContractError(error));
+    //toast.error(parseContractError(error));
+    toast.error("Failed to submit experience details"+(error as Error)?.message);
   } finally {
     setLoadingState(null);
   }

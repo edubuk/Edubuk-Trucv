@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { CheckCircle, XCircle, FileText, ExternalLink } from "lucide-react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/api";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
-import toast from "react-hot-toast";
-import { useContract } from "@/Blockchain/hooks/useMyContract";
+// import { ConnectButton } from "@rainbow-me/rainbowkit";
+// import { useAccount } from "wagmi";
+// import toast from "react-hot-toast";
+// import { useContract } from "@/Blockchain/hooks/useMyContract";
 import { parseContractError } from "@/Blockchain/utils/error";
 interface IDoc {
   emailId: string;
@@ -35,10 +35,10 @@ const DocumentVerificationPage: React.FC = () => {
   const [popupStatus, setPopupStatus] = useState("Initializing verification…");
   const [isProcessing, setIsProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { isConnected } = useAccount();
+  //const { isConnected } = useAccount();
   const [tab, setTab] = useState<"approve" | "reject">("approve");
-  const { approveDocument, rejectDocument } = useContract();
-  const { address } = useAccount();
+  //const { approveDocument, rejectDocument } = useContract();
+  //const { address } = useAccount();
   const fetchMetaData = async () => {
     try {
       const res = await api.get(`/issuer/fetch-requested-doc/${token}`);
@@ -67,33 +67,33 @@ const DocumentVerificationPage: React.FC = () => {
       setPopupStatus("Starting document approval…");
       setError(null);
       setStatus("processing...");
-      if (metadata?.docHash) {
-        const id = toast.loading("Submitting on chain...");
-        try {
-          await approveDocument(
-            `0x${metadata.docHash}`,
-            address as `0x${string}`,
-          );
-          toast.dismiss(id);
-        } catch (txError) {
-          const errMsg = parseContractError(txError);
-          console.log("err", errMsg);
-          if (errMsg === "This document is no longer pending.") {
-            // Already on chain — skip and proceed to DB save
-            toast.dismiss(id);
-            toast.custom(() => (
-              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                <p>Document is no longer pending on chain. Retrying database save...</p>
-              </div>
-            ));
-          } else {
-            // Any other chain error — stop everything
-            setError(errMsg);
-            toast.dismiss(id);
-            throw txError;
-          }
-        }
-      }
+      // if (metadata?.docHash) {
+      //   const id = toast.loading("Submitting on chain...");
+      //   try {
+      //     await approveDocument(
+      //       `0x${metadata.docHash}`,
+      //       address as `0x${string}`,
+      //     );
+      //     toast.dismiss(id);
+      //   } catch (txError) {
+      //     const errMsg = parseContractError(txError);
+      //     console.log("err", errMsg);
+      //     if (errMsg === "This document is no longer pending.") {
+      //       // Already on chain — skip and proceed to DB save
+      //       toast.dismiss(id);
+      //       toast.custom(() => (
+      //         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+      //           <p>Document is no longer pending on chain. Retrying database save...</p>
+      //         </div>
+      //       ));
+      //     } else {
+      //       // Any other chain error — stop everything
+      //       setError(errMsg);
+      //       toast.dismiss(id);
+      //       throw txError;
+      //     }
+      //   }
+      // }
 
       // Start approval process
       const { data } = await api.patch(`/issuer/approve/${token}`);
@@ -122,33 +122,33 @@ const DocumentVerificationPage: React.FC = () => {
       setLoading(true);
       setShowPopup(true);
       setPopupStatus("Document rejection in progress...");
-      if (metadata?.docHash) {
-        const id = toast.loading("Submitting on chain...");
-        try {
-          await rejectDocument(
-            `0x${metadata.docHash}`,
-            address as `0x${string}`,
-            "False Document",
-          );
-          toast.dismiss(id);
-        } catch (txError) {
-          const errMsg = parseContractError(txError);
+      // if (metadata?.docHash) {
+      //   const id = toast.loading("Submitting on chain...");
+      //   try {
+      //     await rejectDocument(
+      //       `0x${metadata.docHash}`,
+      //       address as `0x${string}`,
+      //       "False Document",
+      //     );
+      //     toast.dismiss(id);
+      //   } catch (txError) {
+      //     const errMsg = parseContractError(txError);
 
-          if (errMsg === "This document is no longer pending.") {
-            // Already on chain — skip and proceed to DB save
-            toast.dismiss(id);
-            toast.custom(() => (
-              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                <p>Document is no longer pending on chain. Retrying database save...</p>
-              </div>
-            ));
-          } else {
-            // Any other chain error — stop everything
-            toast.dismiss(id);
-            throw txError;
-          }
-        }
-      }
+      //     if (errMsg === "This document is no longer pending.") {
+      //       // Already on chain — skip and proceed to DB save
+      //       toast.dismiss(id);
+      //       toast.custom(() => (
+      //         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+      //           <p>Document is no longer pending on chain. Retrying database save...</p>
+      //         </div>
+      //       ));
+      //     } else {
+      //       // Any other chain error — stop everything
+      //       toast.dismiss(id);
+      //       throw txError;
+      //     }
+      //   }
+      // }
       const { data } = await api.patch(`/issuer/reject/${token}`);
       if (!data.success) {
         setError(data.message || "Document rejection failed");
@@ -174,14 +174,14 @@ const DocumentVerificationPage: React.FC = () => {
   return (
     <>
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="absolute top-4 right-4">
+        {/* <div className="absolute top-4 right-4">
           <ConnectButton />
           {!isConnected && (
             <span className="inline-flex items-center rounded-full bg-[#f14419]/10 px-2 py-0.5 text-xs font-semibold text-[#f14419]">
               Please connect your wallet to approve/reject
             </span>
           )}
-        </div>
+        </div> */}
         {metadata ? (
           <div className="w-full max-w-2xl space-y-6">
             {/* Header */}
@@ -279,9 +279,9 @@ const DocumentVerificationPage: React.FC = () => {
                   {/* Approve */}
                   <button
                     onClick={onApprove}
-                    disabled={isProcessing || !isConnected}
+                    disabled={isProcessing}
                     className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-md transition
-                ${isProcessing || !isConnected ? "bg-green-300 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
+                ${isProcessing ? "bg-green-300 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
                   >
                     <CheckCircle className="h-5 w-5" />
                     Approve Document
@@ -290,9 +290,9 @@ const DocumentVerificationPage: React.FC = () => {
                   {/* Reject */}
                   <button
                     onClick={onReject}
-                    disabled={loading || !isConnected}
+                    disabled={loading}
                     className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-md transition
-              ${loading || !isConnected ? "bg-red-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
+              ${loading ? "bg-red-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
                   >
                     <XCircle className="h-5 w-5" />
                     Reject Document
