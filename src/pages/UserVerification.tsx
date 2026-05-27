@@ -30,6 +30,8 @@ interface CategoryStats {
 
 const VerificationPage: React.FC = () => {
 
+  const [isFetching, setIsFetching] = React.useState(false);
+  const [profileData, setProfileData] = React.useState<any>(null);
   const { user } = useUserData();
 
   const [verificationStatus, setVerificationStatus] = React.useState<VerificationStatusResponse | null>(null);
@@ -48,6 +50,34 @@ const VerificationPage: React.FC = () => {
 
   useEffect(() => {
     userDocVerificationStatus()
+    if(sessionStorage.getItem("profileData")) {
+      setProfileData(JSON.parse(sessionStorage.getItem("profileData") || "{}"))
+      return
+    }
+    const userCvs = async () => {
+    try {
+      setIsFetching(true);
+      const res = await api.get("/cv/user-cvs");
+      if (res.data.success)
+      {
+        const length = res.data.data?.length || 0; 
+        const profile = await api.post("/verifier/verify-profile", {
+          trucvId: res.data.data[length - 1]?._id
+        })
+        
+        console.log("profile", profile.data.data);
+        if(profile.data.data.success){
+          sessionStorage.setItem("profileData", JSON.stringify(profile.data.data));
+          setProfileData(profile.data.data);
+        }
+      }
+    } catch {
+      toast.error("Failed to fetch user profile source");
+    } finally {
+      setIsFetching(false);
+    }
+    };
+    userCvs();
   }, [])
   
 const getVerificationStatus = (percentage: number) => {
@@ -178,44 +208,109 @@ const getVerificationStatus = (percentage: number) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Profile */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <div className="flex flex-col items-center text-center mb-6">
-                {user?.userImageUrl ? (
-                  <img
-                    src={user.userImageUrl}
-                    alt="avatar"
-                    className="w-24 h-24 rounded-full object-cover border-4 mb-4"
-                    style={{ borderColor: "#006666" }}
-                  />
-                ) : (
-                  <div
-                    className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4"
-                    style={{ backgroundColor: "#006666" }}
-                  >
-                    {getInitial(user?.name || "")}
-                  </div>
-                )}
-                <h2 className="text-xl font-bold mb-1" style={{ color: "#03257e" }}>
-                  {user?.name}
-                </h2>
-                <p className="text-gray-600 text-sm">{user?.email}</p>
-              </div>
+  {/* Main Profile Card */}
+  <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+    {/* Profile Header */}
+    <div className="flex flex-col items-center text-center mb-6">
+      {user?.userImageUrl ? (
+        <img
+          src={user.userImageUrl}
+          alt="avatar"
+          className="w-24 h-24 rounded-full object-cover border-4 mb-4 shadow-md hover:shadow-lg transition-shadow"
+          style={{ borderColor: "#006666" }}
+        />
+      ) : (
+        <div
+          className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-md"
+          style={{ backgroundColor: "#006666" }}
+        >
+          {getInitial(user?.name || "")}
+        </div>
+      )}
+      <h2 className="text-2xl font-bold mb-1" style={{ color: "#03257e" }}>
+        {user?.name}
+      </h2>
+      <p className="text-gray-500 text-sm break-all hover:text-gray-700 transition-colors">
+        {user?.email}
+      </p>
+    </div>
 
-              <div className="space-y-3 pt-4 border-t border-gray-100">
-                <InfoItem label="Phone" value={user?.phoneNumber || ""} />
-                <InfoItem label="Experience" value={user?.yearOfExp ? `${user.yearOfExp} years` : ""} />
-                <InfoItem label="LinkedIn" value={user?.linkedInUrl || ""} link />
-                <InfoItem label="GitHub" value={user?.githubUrl || ""} link />
-              </div>
+    {/* Contact & Professional Info */}
+    <div className="space-y-3 pt-4 border-t border-gray-100">
+      <InfoItem label="Phone" value={user?.phoneNumber || ""} />
+      <InfoItem 
+        label="Experience" 
+        value={user?.yearOfExp ? `${user.yearOfExp} ${user.yearOfExp === "1" ? 'year' : 'years'}` : ""} 
+      />
+      <InfoItem label="LinkedIn" value={user?.linkedInUrl || ""} link />
+      <InfoItem label="GitHub" value={user?.githubUrl || ""} link />
+    </div>
 
-              {user?.profileSummary && (
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-500 mb-2">ABOUT</p>
-                  <p className="text-sm text-gray-700 leading-relaxed">{user.profileSummary}</p>
-                </div>
-              )}
+    {/* About Section */}
+    {user?.profileSummary && (
+      <div className="mt-6 pt-4 border-t border-gray-100">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">About</p>
+        <p className="text-sm text-gray-700 leading-relaxed line-clamp-4 hover:line-clamp-none transition-all">
+          {user.profileSummary}
+        </p>
+      </div>
+    )}
+
+    {/* Verification Sources */}
+    {profileData? (
+      <div className="mt-6 pt-4 border-t border-gray-100 space-y-4">
+        <div>
+          <p className="text-sm text-center font-semibold text-[#03257e] uppercase tracking-wide mb-2 rounded-full px-3 py-1 bg-[#03257e]/10">
+            Verification Status
+          </p>
+          <p className="text-xs text-center text-[#008888] uppercase tracking-wide mb-2">
+            Note : These sources are fetched from various public sources
+          </p>
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-3 h-3 rounded-full animate-pulse"
+              style={{ backgroundColor: "#006666" }}
+            ></div>
+            <p className="text-sm font-medium text-gray-700">
+              {profileData.verification.summary}
+            </p>
+          </div>
+        </div>
+
+        {profileData.verification.sources && profileData.verification.sources.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold text-[#03257e] uppercase tracking-wide mb-2">
+              Verified Sources
+            </p>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {profileData.verification.sources.map((source: string, index: number) => (
+                <a
+                  key={index}
+                  href={source}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 hover:bg-blue-50 transition-colors group"
+                >
+                  <span className="text-gray-400 group-hover:text-blue-500 transition-colors">🔗</span>
+                  <span className="text-xs text-[#008888] group-hover:text-blue-600 truncate font-medium">
+                    {source.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
+                  </span>
+                </a>
+              ))}
             </div>
           </div>
+        )}
+      </div>
+    ): isFetching? (
+      <div className="mt-6 pt-4 border-t border-gray-100">
+        <p className="text-sm text-center text-gray-500">
+          Fetching verification data...<br />
+          It may take a few moments
+        </p>
+      </div>
+    ):null}
+  </div>
+</div>
 
           {/* Right Column - Verification Stats */}
           <div className="lg:col-span-2 space-y-6">

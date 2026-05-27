@@ -125,8 +125,6 @@ const CvById: React.FC<CvByIdProps> = ({ cvData,setCvRefresh,isFetching   }) => 
     </div>
   )}
 </div>
-
-
   );
 };
 
