@@ -1,17 +1,17 @@
-import React, {useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../assets/newLogo.png";
 import truCv from "../assets/truCV2.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import {
-  MdClose,
-} from "react-icons/md";
+import { MdClose } from "react-icons/md";
 import toast from "react-hot-toast";
 import { googleLogout } from "@react-oauth/google";
 import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
+import { Search } from "lucide-react";
+import SearchResultsPopup from "@/components/ui/SearchResultsPopup";
+import api from "@/lib/api";
 //import { ConnectButton } from "@rainbow-me/rainbowkit";
-
 
 interface LinkItem {
   path: string;
@@ -24,53 +24,55 @@ interface SidebarProps {
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handlerLogout: () => void;
   currentPath: string;
-  user:any;
-  loading:boolean;
+  user: any;
+  loading: boolean;
 }
 
+type FilterType = | "name" | "college" | "city" | "company" | "skill";
 
-
-
-const Navbar:React.FC = () => {
+const Navbar: React.FC = () => {
   const [isActive, setActive] = useState("/");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [filterType, setFilterType] = useState<FilterType>("name");
+  const [showResults, setShowResults] = useState(false);
+  const [users, setUsers] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const {user} = useUserData();
+  const { user } = useUserData();
+  const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-  const [loading,setLoading] = useState(false);
-  console.log("currentPath",currentPath);
-
-
+  const [loading, setLoading] = useState(false);
+  console.log("currentPath", currentPath);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
 
-
   const handlerLogout = async () => {
     try {
       setLoading(true);
-      const logoutData = await fetch(`${API_BASE_URL}/api/v1/user/logout`,{
-        method:"PUT",
-        credentials: "include"
-      })
+      const logoutData = await fetch(`${API_BASE_URL}/api/v1/user/logout`, {
+        method: "PUT",
+        credentials: "include",
+      });
       const logoutResult = await logoutData.json();
-      console.log("logoutResult",logoutResult);
-      if(logoutResult.success){
-        googleLogout();    // Perform Google OAuth logout and remove stored token  
+      console.log("logoutResult", logoutResult);
+      if (logoutResult.success) {
+        googleLogout(); // Perform Google OAuth logout and remove stored token
         localStorage.removeItem("googleIdToken");
         localStorage.removeItem("email");
         localStorage.removeItem("userName");
         localStorage.removeItem("userImage");
         localStorage.removeItem("tokenExpiry");
-        window.location.href="/login";
+        window.location.href = "/login";
       }
-        } catch (error) {
-            console.error("Logout failed:", error);
-            toast.error("Logout failed");
-        }finally{
-          setLoading(false);
-        }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlerActive = (linkName: string): void => {
@@ -90,9 +92,9 @@ const Navbar:React.FC = () => {
       name: "Dashboard",
       path: "/dashboard",
     },
-   {
-      name:"Verify",
-      path:"/verify"
+    {
+      name: "Verify",
+      path: "/verify",
     },
     // {
     //   name:"Hackathons",
@@ -100,99 +102,134 @@ const Navbar:React.FC = () => {
     // }
   ];
 
+  const serachUsers = async (debouncedSearch: string) => {
+    try {
+      setLoading(true);
+      const response: any = await api.get(
+        `/users-cvs/search?${filterType}=${encodeURIComponent(debouncedSearch)}`,
+      );
+      if (response.data.success) {
+        setUsers(response.data.users);
+      }
+    } catch (error: any) {
+      toast.error(error.message || error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
+  useEffect(() => {
+    if (debouncedSearch.length < 2) {
+      setUsers([]);
+      setShowResults(false);
+      return;
+    }
 
-  useEffect(()=>{
+    setShowResults(true);
+    serachUsers(debouncedSearch);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
     const tokenExpiry = localStorage.getItem("tokenExpiry");
-    if(tokenExpiry){
+    if (tokenExpiry) {
       const expiryTime = Number(tokenExpiry);
       const currentTime = Date.now() / 1000;
-      if(expiryTime < currentTime){
+      if (expiryTime < currentTime) {
         toast.error("Your session has expired. Please login again.");
         handlerLogout();
       }
     }
-  },[])
-
+  }, []);
 
   return (
-    <div className="flex justify-between items-center sm:px-3 w-full border-b-2 border-gray-200 bg-white" data-aos="fade-right">
-      <img src={logo} alt="Logo" className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 " />
-      <div className="flex gap-3 justify-between items-center">
-          {links?.map((link, i) =>
-            link.name === "Home" ? (
+    <div
+      className="flex justify-between items-center sm:px-3 w-full border-b-2 border-gray-200 bg-white"
+      data-aos="fade-right"
+    >
+      <img
+        src={logo}
+        alt="Logo"
+        className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 "
+      />
+      <div className="relative flex gap-3 justify-between items-center">
+        {links?.map((link, i) =>
+          link.name === "Home" ? (
+            <Link
+              key={i + 1}
+              to={link.path}
+              onClick={() => handlerActive(link.name)}
+              className={`hidden lg:flex ${
+                isActive === link.name ? "text-[#f14419]" : "text-[#03257e]"
+              } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
+            >
+              {link.name}
+            </Link>
+          ) : (
+            user && (
               <Link
                 key={i + 1}
                 to={link.path}
                 onClick={() => handlerActive(link.name)}
                 className={`hidden lg:flex ${
-                  isActive === link.name ? "text-[#f14419]" : "text-[#03257e]"
+                  currentPath === link.path
+                    ? "text-[#f14419]"
+                    : "text-[#03257e]"
                 } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
               >
                 {link.name}
               </Link>
-            ) : (
-              (user) && (
-                <Link
-                  key={i + 1}
-                  to={link.path}
-                  onClick={() => handlerActive(link.name)}
-                  className={`hidden lg:flex ${
-                    currentPath === link.path
-                      ? "text-[#f14419]"
-                      : "text-[#03257e]"
-                  } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
-                >
-                  {link.name}
-                </Link>
-              )
             )
-          )}
+          ),
+        )}
         {user?.roles === "admin" && (
-        <Link
-          key="admin"
-          to="/admin"
-          onClick={() => handlerActive("Admin")}
-          className={`hidden lg:flex ${
-            currentPath === "/admin"
-              ? "text-[#f14419]"
-              : "text-[#03257e]"
-          } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
-        >
-          Admin
-        </Link>
+          <Link
+            key="admin"
+            to="/admin"
+            onClick={() => handlerActive("Admin")}
+            className={`hidden lg:flex ${
+              currentPath === "/admin" ? "text-[#f14419]" : "text-[#03257e]"
+            } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
+          >
+            Admin
+          </Link>
         )}
         {!user ? (
-            <div className="hidden lg:flex relative rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
-              <Link
-                to="/login"
-                className="w-full bg-white py-1 text-[18px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
-              >
-                Login
-              </Link>
-            </div>
-          ) : (
-            <>
-           <div className="relative hidden lg:flex rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
+          <div className="hidden lg:flex relative rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
+            <Link
+              to="/login"
+              className="w-full bg-white py-1 text-[18px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
+            >
+              Login
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="relative hidden lg:flex rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
               <button
                 onClick={handlerLogout}
                 disabled={loading}
                 className="w-full bg-white py-1 text-[18px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
-                style={{opacity:loading?0.7:1}}
+                style={{ opacity: loading ? 0.7 : 1 }}
               >
-                {loading?"Please Wait...":"Logout"}
+                {loading ? "Please Wait..." : "Logout"}
               </button>
             </div>
             {/* <div className="hidden xl:block">
               <ConnectButton />
             </div> */}
           </>
-          )}
+        )}
         {/* Hamburger Menu */}
-        <div className="flex items-center justify-center gap-2 ml-2">
+        <div className="flex items-center justify-center gap-2 ml-1">
           <div
-            className={`relative flex lg:hidden flex-col items-center justify-center w-8 h-8 cursor-pointer space-y-1.5 transition-all duration-300 ease-in-out ${
+            className={`relative flex lg:hidden flex-col items-center justify-center w-8 h-8 cursor-pointer space-y-1 transition-all duration-300 ease-in-out ${
               isSidebarOpen ? "open" : ""
             }`}
             onClick={toggleSidebar}
@@ -214,11 +251,106 @@ const Navbar:React.FC = () => {
             ></span>
           </div>
         </div>
+        <div className="relative hidden">
+  <Search
+    size={14}
+    className="
+      hidden sm:block
+      absolute
+      left-28
+      top-1/2
+      -translate-y-1/2
+      text-slate-400
+      z-10
+    "
+  />
 
+  <select
+    value={filterType}
+    onChange={(e) =>
+      setFilterType(e.target.value as FilterType)
+    }
+    className="
+      absolute
+      left-2
+      top-1/2
+      -translate-y-1/2
+      h-6
+      sm:h-8
+      px-2
+      bg-transparent
+      border-r
+      border-slate-300
+      text-xs
+      sm:text-sm
+      text-[#03257e]
+      outline-none
+      cursor-pointer
+      z-10
+    "
+  >
+    <option value="name">Name</option>
+    <option value="college">College</option>
+    <option value="city">City</option>
+    <option value="company">Company</option>
+    <option value="skill">Skill</option>
+  </select>
+
+  <input
+    type="text"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    onFocus={() => {
+      if (users.length > 0) {
+        setShowResults(true);
+      }
+    }}
+    placeholder={`Search by ${filterType}...`}
+    className="
+      w-full
+      h-8 sm:h-10
+      pl-14
+      sm:pl-32
+      pr-4
+      rounded-2xl
+      border
+      border-slate-200
+      text-sm
+      sm:text-md
+      bg-white
+      text-slate-800
+      placeholder:text-slate-400
+      shadow-sm
+      outline-none
+      transition-all
+      duration-200
+      focus:border-[#03257e]
+      focus:ring-4
+      focus:ring-[#03257e]/10
+      focus:shadow-lg
+    "
+  />
+        </div>
+        {showResults && (
+          <div
+            onMouseDown={(e) => e.preventDefault()}
+            className="absolute top-full left-0 w-full z-[999]"
+          >
+            <SearchResultsPopup
+              users={users}
+              loading={loading}
+              onSelect={(user) => {
+                setShowResults(false);
+                setSearch("");
+                navigate(`/profile/${user._id}`);
+              }}
+            />
+          </div>
+        )}
       </div>
       {/* Sidebar */}
       <Sidebar
-      isOpen={isSidebarOpen}
+        isOpen={isSidebarOpen}
         links={links}
         setIsSidebarOpen={setIsSidebarOpen}
         handlerLogout={handlerLogout}
@@ -226,7 +358,11 @@ const Navbar:React.FC = () => {
         user={user}
         loading={loading}
       />
-      <img src={truCv} alt="trucv-logo" className="w-32 h-16 sm:h-24 sm:w-48 md:w-60 md:h-24"></img>
+      <img
+        src={truCv}
+        alt="trucv-logo"
+        className="w-32 h-16 sm:h-24 sm:w-48 md:w-60 md:h-24"
+      ></img>
     </div>
   );
 };
@@ -238,7 +374,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   handlerLogout,
   currentPath,
   user,
-  loading
+  loading,
 }) => {
   return (
     <div
@@ -248,8 +384,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     >
       <div className="flex flex-col space-y-4 p-4">
         <div className="flex justify-between items-center">
-        <img src={logo} alt="Logo" className="h-20 w-20" />
-        <MdClose className="size-8 cursor-pointer hover:text-[#03257e]" onClick={()=>setIsSidebarOpen(false)}/>
+          <img src={logo} alt="Logo" className="h-20 w-20" />
+          <MdClose
+            className="size-8 cursor-pointer hover:text-[#03257e]"
+            onClick={() => setIsSidebarOpen(false)}
+          />
         </div>
         {links?.map((link, i) =>
           link.name === "Home" ? (
@@ -264,34 +403,36 @@ const Sidebar: React.FC<SidebarProps> = ({
               {link.name}
             </Link>
           ) : (
-            (user) && (
+            user && (
               <Link
                 key={i + 1}
                 to={link.path}
                 onClick={() => setIsSidebarOpen(false)}
                 className={`${
-                  currentPath === link.path ? "text-[#f14419]" : "text-[#03257e]"
+                  currentPath === link.path
+                    ? "text-[#f14419]"
+                    : "text-[#03257e]"
                 } hover:text-[#f14419] transition duration-200 py-2`}
               >
                 {link.name}
               </Link>
             )
-          )
+          ),
         )}
 
         {user?.roles === "admin" && (
-        <Link
-          to="/admin"
-          onClick={() => setIsSidebarOpen(false)}
-          className={`${
-            currentPath === "/admin" ? "text-[#f14419]" : "text-[#03257e]"
-          } hover:text-[#f14419] transition duration-200 py-2`}
-        >
-          Admin
-        </Link>
+          <Link
+            to="/admin"
+            onClick={() => setIsSidebarOpen(false)}
+            className={`${
+              currentPath === "/admin" ? "text-[#f14419]" : "text-[#03257e]"
+            } hover:text-[#f14419] transition duration-200 py-2`}
+          >
+            Admin
+          </Link>
         )}
 
-        {!(user)? (
+        {!user ? (
           <Link
             to="/login"
             className="bg-[#03257e] py-2 px-4 rounded-full text-center text-white"
@@ -303,7 +444,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={handlerLogout}
               className=" w-full bg-white py-2 px-4 rounded-full text-[#03257e] hover:font-bold"
-              style={{opacity:loading?0.7:1}}
+              style={{ opacity: loading ? 0.7 : 1 }}
             >
               Logout
             </button>
