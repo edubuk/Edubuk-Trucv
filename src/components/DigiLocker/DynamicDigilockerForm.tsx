@@ -1,9 +1,9 @@
 import { useForm, useFormContext } from "react-hook-form";
 import { useState } from "react";
-import api from "@/lib/api";
 import PdfViewerModal from "./PDFViewermodel";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { API_BASE_URL } from "@/main";
 // import qs from "qs";
 
 type FieldSpec = {
@@ -64,11 +64,17 @@ export default function DynamicDigilockerForm({
       setLoading(true);
       const body = values;
       console.log("body",body)
-      const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgid}&doctype=${doctype}`,body)
+      const r: any = await fetch(`${API_BASE_URL}/api/dl/fetchDocUri?orgid=${orgid}&doctype=${doctype}`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(body)
+      } )
       console.log("response",r.data);
       if (r.data.ok) {
-        setUri(r.data.data.uri);
-        setValue(`educations.${index}.docUri`, r.data.data.uri, {
+        setUri(r.data.uri);
+        setValue(`educations.${index}.docUri`, r.data.uri, {
           shouldValidate: true,
           shouldDirty: true,
         });
@@ -90,10 +96,14 @@ export default function DynamicDigilockerForm({
 
     const fetchDoc = async()=>{
     try {
-      const response = await api.get(`/api/dl/view-doc?docUri=${uri}`);
-      if(response.data.ok){
+      const response = await fetch(`${API_BASE_URL}/api/dl/view-doc?docUri=${uri}`,
+        {
+          method:"GET",
+        }
+      );
+      if(response.ok){
         setOpen(true);
-        setPdfSource(response.data.data);
+        setPdfSource(await response.arrayBuffer());
       }
     } catch (error:any) {
       toast.error(error?.response?.data?.error?.error_description ?? error.response.data)
