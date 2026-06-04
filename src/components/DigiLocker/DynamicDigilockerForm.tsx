@@ -72,9 +72,11 @@ export default function DynamicDigilockerForm({
         body:JSON.stringify(body)
       } )
       console.log("response",r.data);
-      if (r.data.ok) {
-        setUri(r.data.uri);
-        setValue(`educations.${index}.docUri`, r.data.uri, {
+      const data = await r.json();
+      console.log("data",data);
+      if (data.ok) {
+        setUri(data.data.uri);
+        setValue(`educations.${index}.docUri`, data.data.uri, {
           shouldValidate: true,
           shouldDirty: true,
         });
@@ -85,8 +87,8 @@ export default function DynamicDigilockerForm({
       } else {
         setErrorMsg("No document found");
       }
-      if (!r.response.data.ok) {
-        setErrorMsg(r?.response?.data?.error?.error_description);
+      if (!data.ok) {
+        setErrorMsg(data?.error?.error_description);
       }
     } catch (e: any) {
       setErrorMsg(e?.response?.data?.error?.error_description);
@@ -101,12 +103,14 @@ export default function DynamicDigilockerForm({
           method:"GET",
         }
       );
-      if(response.ok){
+      const data = await response.json();
+      //console.log("data",data);
+      if(data.ok){
         setOpen(true);
-        setPdfSource(await response.arrayBuffer());
+        setPdfSource(await data.arrayBuffer());
       }
     } catch (error:any) {
-      toast.error(error?.response?.data?.error?.error_description ?? error.response.data)
+      toast.error(error.message||error)
     }
   }
 
