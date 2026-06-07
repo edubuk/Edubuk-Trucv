@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import logo from "../assets/newLogo.png";
 import truCv from "../assets/truCV2.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -28,13 +28,12 @@ interface SidebarProps {
   loading: boolean;
 }
 
-type FilterType = | "name" | "college" | "city" | "company" | "skill";
+ const placeholders = ["name", "city", "college", "company","skill"]
 
 const Navbar: React.FC = () => {
   const [isActive, setActive] = useState("/");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [filterType, setFilterType] = useState<FilterType>("name");
   const [showResults, setShowResults] = useState(false);
   const [users, setUsers] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -44,6 +43,48 @@ const Navbar: React.FC = () => {
   const currentPath = location.pathname;
   const [loading, setLoading] = useState(false);
   console.log("currentPath", currentPath);
+    const [placeholder, setPlaceholder] = useState("")
+  const indexRef = useRef<number>(0)
+  const charRef = useRef<number>(0)
+  const typingRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+
+
+    const typePlaceholder = (text:string) => {
+    charRef.current = 0
+    const type = () => {
+      if (charRef.current <= text.length) {
+        setPlaceholder(text.slice(0, charRef.current))
+        charRef.current++
+        typingRef.current = setTimeout(type, 60) // typing speed
+      } else {
+        // fully typed — wait then erase
+        typingRef.current = setTimeout(() => erasePlaceholder(text), 1500)
+      }
+    }
+    type()
+  }
+
+  const erasePlaceholder = (text:string) => {
+    let len = text.length
+    const erase = () => {
+      if (len >= 0) {
+        setPlaceholder(text.slice(0, len))
+        len--
+        typingRef.current = setTimeout(erase, 30) // erase speed faster
+      } else {
+        // move to next placeholder
+        indexRef.current = (indexRef.current + 1) % placeholders.length
+        typingRef.current = setTimeout(() => typePlaceholder(placeholders[indexRef.current]), 300)
+      }
+    }
+    erase()
+  }
+
+  useEffect(() => {
+    typePlaceholder(placeholders[0])
+    return () => clearTimeout(typingRef.current as unknown as number) // cleanup on unmount
+  }, [])
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -106,10 +147,11 @@ const Navbar: React.FC = () => {
     try {
       setLoading(true);
       const response: any = await api.get(
-        `/users-cvs/search?${filterType}=${encodeURIComponent(debouncedSearch)}`,
+        `/search/search-profiles?serachQuery=${encodeURIComponent(debouncedSearch)}`,
       );
+      console.log("response", response);
       if (response.data.success) {
-        setUsers(response.data.users);
+        setUsers(response.data.data);
       }
     } catch (error: any) {
       toast.error(error.message || error);
@@ -251,50 +293,19 @@ const Navbar: React.FC = () => {
             ></span>
           </div>
         </div>
-        <div className="relative hidden">
-  <Search
-    size={14}
-    className="
-      hidden sm:block
-      absolute
-      left-28
-      top-1/2
-      -translate-y-1/2
-      text-slate-400
-      z-10
-    "
-  />
-
-  <select
-    value={filterType}
-    onChange={(e) =>
-      setFilterType(e.target.value as FilterType)
-    }
-    className="
-      absolute
-      left-2
-      top-1/2
-      -translate-y-1/2
-      h-6
-      sm:h-8
-      px-2
-      bg-transparent
-      border-r
-      border-slate-300
-      text-xs
-      sm:text-sm
-      text-[#03257e]
-      outline-none
-      cursor-pointer
-      z-10
-    "
-  >
-    <option value="name">Name</option>
-    <option value="college">College</option>
-    <option value="city">City</option>
-    <option value="company">Company</option>
-    <option value="skill">Skill</option>
-  </select>
+        <div className="relative ">
+        <Search
+          size={14}
+          className="
+            hidden sm:block
+            absolute
+            left-2
+            top-1/2
+            -translate-y-1/2
+            text-slate-400
+            z-10
+          "
+        />
 
   <input
     type="text"
@@ -305,12 +316,11 @@ const Navbar: React.FC = () => {
         setShowResults(true);
       }
     }}
-    placeholder={`Search by ${filterType}...`}
+    placeholder={`Search by ${placeholder}`}
     className="
       w-full
       h-8 sm:h-10
-      pl-14
-      sm:pl-32
+      pl-8
       pr-4
       rounded-2xl
       border

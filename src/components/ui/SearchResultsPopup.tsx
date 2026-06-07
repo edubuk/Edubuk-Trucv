@@ -3,11 +3,9 @@ import React from "react";
 interface User {
     _id: string;
     userId:string;
-  personal:{
-  fullName: string;
-  imgUrl?: string;
-  summary?: string;
-    }
+    name: string;
+    userImage?: string;
+    profileSummary?: string;
 }
 
 interface SearchResultsPopupProps {
@@ -51,11 +49,11 @@ const SearchResultsPopup: React.FC<SearchResultsPopupProps> = ({
         <div className="p-6 text-center text-[#03257e]">Searching...</div>
       )}
 
-      {!loading && users.length === 0 && (
+      {!loading && users?.length === 0 && (
         <div className="p-6 text-center text-slate-500">No profiles found</div>
       )}
 
-      {users.length > 0 && (
+      {users?.length > 0 && (
         <div
           className="max-h-[420px] overflow-y-auto [&::-webkit-scrollbar]:hidden
     [-ms-overflow-style:none]
@@ -84,9 +82,9 @@ const SearchResultsPopup: React.FC<SearchResultsPopupProps> = ({
             >
               <img
                 src={
-                  user?.personal?.imgUrl || "https://ui-avatars.com/api/?name=User"
+                  user?.userImage || "https://ui-avatars.com/api/?name=User"
                 }
-                alt={user.personal.fullName}
+                alt={user.name}
                 className="
                   w-10
                   h-10
@@ -109,7 +107,7 @@ const SearchResultsPopup: React.FC<SearchResultsPopupProps> = ({
                     truncate
                   "
                 >
-                  {user.personal.fullName}
+                  {user.name}
                 </h3>
 
                 <p
@@ -120,7 +118,7 @@ const SearchResultsPopup: React.FC<SearchResultsPopupProps> = ({
                     leading-relaxed
                   "
                 >
-                  {truncateText(user.personal.summary || "", 15)}
+                  {truncateText(user.profileSummary || "", 15)}
                 </p>
 
                 <span

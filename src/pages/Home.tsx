@@ -8,7 +8,7 @@ import VideoSection from "../components/HomePageSections/VideoSection";
 import Footer from "./Footer";
 import StepToCreateCV from "../components/HomePageSections/StepToCreateCV";
 import WhyTrucv from "../components/HomePageSections/WhyTrucv";
-import { useState} from "react";
+import {useState} from "react";
 import ProfilePopup from "@/components/ui/Profile";
 import { Link } from "react-router-dom";
 import { useUserData } from "@/context/AuthContext";
@@ -18,9 +18,13 @@ import { API_BASE_URL } from "@/main";
 import PartnerList from "@/components/HomePageSections/PartnerList";
 //import { ConnectButton } from "@rainbow-me/rainbowkit";
 
+
+
+
 const Home:React.FC = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const {user} = useUserData();
+
 
   const handlerLogout = async () => {
     try {
@@ -62,7 +66,7 @@ const Home:React.FC = () => {
             <div className="relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-up">
               <Link
                 to="/create-cv"
-                className="flex items-center gap-2 bg-[#006666] text-[20px] sm:text-[30px] px-2 py-4 font-bold rounded-[6px] text-white hover:bg-white hover:text-[#f14419] transition-colors duration-200"
+                className="flex items-center gap-2 bg-[#006666] text-[20px] lg:text-[30px] px-2 py-4 font-bold rounded-[6px] text-white hover:bg-white hover:text-[#f14419] transition-colors duration-200"
               >
                 Create TruCV →
               </Link>
