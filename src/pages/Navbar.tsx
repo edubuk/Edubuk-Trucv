@@ -30,7 +30,7 @@ interface SidebarProps {
   loading: boolean;
 }
 
- const placeholders = ["name", "city", "college", "company","skill"]
+const placeholders = ["name", "city", "college", "company", "skill"];
 
 const Navbar: React.FC = () => {
   const [isActive, setActive] = useState("/");
@@ -43,50 +43,52 @@ const Navbar: React.FC = () => {
   const currentPath = location.pathname;
   const [loading, setLoading] = useState(false);
   //`console.log("currentPath", currentPath);
-  const [placeholder, setPlaceholder] = useState("")
-  const indexRef = useRef<number>(0)
-  const charRef = useRef<number>(0)
-  const typingRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const debouncedSearch = useDebounce(search,300);
+  const [placeholder, setPlaceholder] = useState("");
+  const indexRef = useRef<number>(0);
+  const charRef = useRef<number>(0);
+  const typingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedSearch = useDebounce(search, 300);
 
   const { users, isLoading, searchProfiles } = useSearchProfiles();
 
-
-    const typePlaceholder = (text:string) => {
-    charRef.current = 0
+  const typePlaceholder = (text: string) => {
+    charRef.current = 0;
     const type = () => {
       if (charRef.current <= text.length) {
-        setPlaceholder(text.slice(0, charRef.current))
-        charRef.current++
-        typingRef.current = setTimeout(type, 60) // typing speed
+        setPlaceholder(text.slice(0, charRef.current));
+        charRef.current++;
+        typingRef.current = setTimeout(type, 60); // typing speed
       } else {
         // fully typed — wait then erase
-        typingRef.current = setTimeout(() => erasePlaceholder(text), 1500)
+        typingRef.current = setTimeout(() => erasePlaceholder(text), 1500);
       }
-    }
-    type()
-  }
+    };
+    type();
+  };
 
-  const erasePlaceholder = (text:string) => {
-    let len = text.length
+  const erasePlaceholder = (text: string) => {
+    let len = text.length;
     const erase = () => {
       if (len >= 0) {
-        setPlaceholder(text.slice(0, len))
-        len--
-        typingRef.current = setTimeout(erase, 30) // erase speed faster
+        setPlaceholder(text.slice(0, len));
+        len--;
+        typingRef.current = setTimeout(erase, 30); // erase speed faster
       } else {
         // move to next placeholder
-        indexRef.current = (indexRef.current + 1) % placeholders.length
-        typingRef.current = setTimeout(() => typePlaceholder(placeholders[indexRef.current]), 300)
+        indexRef.current = (indexRef.current + 1) % placeholders.length;
+        typingRef.current = setTimeout(
+          () => typePlaceholder(placeholders[indexRef.current]),
+          300,
+        );
       }
-    }
-    erase()
-  }
+    };
+    erase();
+  };
 
   useEffect(() => {
-    typePlaceholder(placeholders[0])
-    return () => clearTimeout(typingRef.current as unknown as number) // cleanup on unmount
-  }, [])
+    typePlaceholder(placeholders[0]);
+    return () => clearTimeout(typingRef.current as unknown as number); // cleanup on unmount
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -144,7 +146,6 @@ const Navbar: React.FC = () => {
     //   path:"/hackathons"
     // }
   ];
-
 
   useEffect(() => {
     if (debouncedSearch.length < 2) {
@@ -271,10 +272,10 @@ const Navbar: React.FC = () => {
             ></span>
           </div>
         </div>
-        <div className="relative ">
-        <Search
-          size={14}
-          className="
+        <div className="relative hidden">
+          <Search
+            size={14}
+            className="
             hidden sm:block
             absolute
             left-2
@@ -283,41 +284,41 @@ const Navbar: React.FC = () => {
             text-slate-400
             z-10
           "
-        />
+          />
 
-  <input
-    type="text"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    onFocus={() => {
-      if (users.length > 0) {
-        setShowResults(true);
-      }
-    }}
-    placeholder={`Search by ${placeholder}`}
-    className="
-      w-full
-      h-8 sm:h-10
-      pl-8
-      pr-4
-      rounded-2xl
-      border
-      border-slate-200
-      text-sm
-      sm:text-md
-      bg-white
-      text-slate-800
-      placeholder:text-slate-400
-      shadow-sm
-      outline-none
-      transition-all
-      duration-200
-      focus:border-[#03257e]
-      focus:ring-4
-      focus:ring-[#03257e]/10
-      focus:shadow-lg
-    "
-  />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onFocus={() => {
+              if (users.length > 0) {
+                setShowResults(true);
+              }
+            }}
+            placeholder={`Search by ${placeholder}`}
+            className="
+              w-full
+              h-8 sm:h-10
+              pl-8
+              pr-4
+              rounded-2xl
+              border
+              border-slate-200
+              text-sm
+              sm:text-md
+              bg-white
+              text-slate-800
+              placeholder:text-slate-400
+              shadow-sm
+              outline-none
+              transition-all
+              duration-200
+              focus:border-[#03257e]
+              focus:ring-4
+              focus:ring-[#03257e]/10
+              focus:shadow-lg
+            "
+          />
         </div>
         {showResults && (
           <div
@@ -327,7 +328,7 @@ const Navbar: React.FC = () => {
             <SearchResultsPopup
               users={users}
               loading={isLoading}
-              onSelect={(user:SearchProfile) => {
+              onSelect={(user: SearchProfile) => {
                 setShowResults(false);
                 setSearch("");
                 navigate(`/cv/${user.userId}`);
