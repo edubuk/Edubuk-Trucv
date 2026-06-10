@@ -1,9 +1,11 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { SiHyperskill } from "react-icons/si";
 import { FaBriefcase, FaCopy, FaGithub } from "react-icons/fa";
 import { GiAchievement } from "react-icons/gi";
 import { BiSolidBriefcase } from "react-icons/bi";
-
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { FileSearch, Plus } from "lucide-react";
+import QRCode from "qrcode";
 import {
   CheckCircle,
   CircleUser,
@@ -15,17 +17,12 @@ import {
   MapPinned,
   Phone,
 } from "lucide-react";
-import { useReactToPrint } from "react-to-print";
-// import HyperText from "@/components/ui/AnimateHypertext";
+//import { useReactToPrint } from "react-to-print";
+
 import ShowVerifications from "@/components/ShowVerifications";
-//import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
-//import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useState, useRef, useEffect } from "react";
-import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
-import api from "@/lib/api";
-//import { useUserData } from "@/context/AuthContext";
-import { ICvData } from "@/CvBuilder/CvBuilder";
+
 import {
   TypeAward,
   TypeEducation,
@@ -36,7 +33,11 @@ import {
 import { MdSchool } from "react-icons/md";
 import StatusBadge from "@/CvBuilder/StatusBadge";
 import { EdubukQR } from "@/components/QrCode";
-const COLOR_TEAL = "#006666";
+import { CvPdfDocument } from "@/components/PDFDownloader/CvPdfDocument";
+import { useCvData } from "@/hooks/useCvData";
+import { CvSkeleton } from "@/components/SkeletonLoader/CvSkeleton";
+
+  const COLOR_TEAL = "#006666";
 export const formatDate = (dateString: string) => {
   if (!dateString) {
     return "";
@@ -73,26 +74,7 @@ const CvOutputPage = () => {
   const { id } = useParams();
   const [copied, setCopied] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
-
-  //const { user } = useUserData();
-  const [cvData, setCvData] = useState<ICvData>({
-    personal: {
-      fullName: "",
-      email: "",
-      phone: "",
-      city: "",
-      linkedin: "",
-      github: "",
-      summary: "",
-      imgUrl: "",
-      profession: "",
-    },
-    educations: [],
-    experiences: [],
-    skills: [],
-    projects: [],
-    awards: [],
-  });
+  const {isCvLoading, searchCvData,cvData } = useCvData();
 
   // const handlePrint = useReactToPrint({
   //   contentRef: pdfRef,
@@ -100,32 +82,31 @@ const CvOutputPage = () => {
   //   pageStyle, // inject the styles into print document
   // });
 
-  const [loading, setLoading] = useState(false);
-
-  const handlePrint = useReactToPrint({
-  contentRef: pdfRef,
-  documentTitle: "My CV",
-  pageStyle: `
-    @page {
-      size: A4;
-      margin: 10mm;
-    }
-    @media print {
-      .print-no-break {
-  break-inside: auto;
-  page-break-inside: auto;
-}
-      .print-section {
-        break-before: auto;
-        page-break-before: auto;
-      }
-      body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-    }
-  `,
-});
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
+//   const handlePrint = useReactToPrint({
+//   contentRef: pdfRef,
+//   documentTitle: "My CV",
+//   pageStyle: `
+//     @page {
+//       size: A4;
+//       margin: 10mm;
+//     }
+//     @media print {
+//       .print-no-break {
+//   break-inside: auto;
+//   page-break-inside: auto;
+// }
+//       .print-section {
+//         break-before: auto;
+//         page-break-before: auto;
+//       }
+//       body {
+//         -webkit-print-color-adjust: exact;
+//         print-color-adjust: exact;
+//       }
+//     }
+//   `,
+// });
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -141,48 +122,50 @@ const CvOutputPage = () => {
     }
     return formatedDate;
   };
-  const userCv = async () => {
-    try {
-      setLoading(true);
-      const res: any = await api.get(`/cv/user-cv/${id}`);
-      if (res.data.success) {
-        setCvData({
-          personal: res.data.data.personal,
-          educations: res.data.data.educations,
-          experiences: res.data.data.experiences,
-          skills: res.data.data.skills,
-          projects: res.data.data.projects,
-          awards: res.data.data.awards,
-        });
-      }
-      console.log("data", res.data);
-    } catch (error) {
-      toast.error("something went wrong");
-      console.log("error while fetching docs", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    userCv();
+    searchCvData(id as string);
+    console.log("cvdata", cvData);
   }, []);
 
-  if (loading) {
+  useEffect(() => {
+  if (!id) return;
+  QRCode.toDataURL(`https://edubuktrucv.com/cv/${id}`, {
+    width: 80,
+    margin: 1,
+    color: { dark: "#03257e", light: "#ffffff" },
+  }).then(setQrDataUrl);
+}, [id]);
+
+  if (isCvLoading) {
     return (
-      <div className="flex justify-center items-center h-[80vh]">
-        <h1 className="text-4xl font-bold text-[#03257e]">
-          <ThreeDotLoader w={4} h={4} yPos={"center"} />
-        </h1>
-      </div>
+      <CvSkeleton />
     );
   }
 
   if (!cvData) {
     return (
-      <div className="flex justify-center items-center">
-        <h1 className="text-4xl font-bold text-[#006666]">No CV Found</h1>
-      </div>
+
+<div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+  <div className="relative mb-6">
+    <div className="w-24 h-24 rounded-2xl bg-[#006666]/10 flex items-center justify-center">
+      <FileSearch className="w-10 h-10 text-[#006666]" strokeWidth={1.5} />
+    </div>
+    {/* subtle ring */}
+    <div className="absolute inset-0 rounded-2xl ring-1 ring-[#006666]/20" />
+  </div>
+
+  <h2 className="text-2xl font-semibold text-gray-800 mb-2">No CV Found</h2>
+  <p className="text-sm text-gray-500 max-w-xs leading-relaxed">
+    You haven't built your CV yet. Create one to showcase your verified skills
+    and credentials on the blockchain.
+  </p>
+
+  <Link to="/create-cv" className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#006666] text-white text-sm font-medium hover:bg-[#005555] transition-colors">
+    <Plus className="w-4 h-4" />
+    Build your CV
+  </Link>
+</div>
     );
   }
 
@@ -211,12 +194,25 @@ const CvOutputPage = () => {
           </button>
 
           {/* Download PDF */}
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#006666] text-white hover:bg-[#006666]/85 transition-all duration-200 text-sm font-semibold"
+          <PDFDownloadLink
+            document={
+              <CvPdfDocument
+                cvData={cvData}
+                qrDataUrl={qrDataUrl}
+                userId={id!}
+              />
+            }
+            fileName={`TruCV-${cvData.personal.fullName || id}.pdf`}
           >
-            <span>Download as PDF</span>
-          </button>
+            {({ loading }) => (
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#006666] text-white hover:bg-[#006666]/85 transition-all duration-200 text-sm font-semibold disabled:opacity-60"
+                disabled={loading}
+              >
+                {loading ? "Preparing PDF..." : "Download as PDF"}
+              </button>
+            )}
+          </PDFDownloadLink>
         </div>
       <div className="flex flex-col items-center gap-3 px-4 py-5 border-b border-gray-100">
         <div>
@@ -353,10 +349,7 @@ const CvOutputPage = () => {
 
                         {/* Status Badge */}
                         <div className="bg-white rounded-full w-fit mt-0.5">
-                          <StatusBadge
-                            status={education.status}
-                            isEmailSend={education.isEmailSend}
-                          />
+                          <StatusBadge status={education.status} />
                         </div>
                       </div>
                     ),
@@ -385,7 +378,7 @@ const CvOutputPage = () => {
               <div className="bg-[#006666] rounded-xl text-white px-6 py-4 md:max-w-3xl w-full shadow-md">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Email */}
-                  <div className="flex items-center gap-3">
+                  {cvData.personal.email && <div className="flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
                       <Mail size={15} />
                     </span>
@@ -393,10 +386,10 @@ const CvOutputPage = () => {
                       {cvData.personal.email}
                       <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
                     </span>
-                  </div>
+                  </div>}
 
                   {/* Phone */}
-                  <div className="flex items-center gap-3">
+                 {cvData.personal.phone && <div className="flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
                       <Phone size={15} />
                     </span>
@@ -404,10 +397,10 @@ const CvOutputPage = () => {
                       {cvData.personal.phone}
                       <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
                     </span>
-                  </div>
+                  </div>}
 
                   {/* Location */}
-                  <div className="flex items-center gap-3">
+                  {cvData.personal.city && <div className="flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
                       <MapPinned size={15} />
                     </span>
@@ -415,7 +408,7 @@ const CvOutputPage = () => {
                       {cvData.personal.city}
                       <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
                     </span>
-                  </div>
+                  </div>}
 
                   {/* Profession */}
                   {cvData.personal.profession && (
@@ -793,10 +786,10 @@ const CvOutputPage = () => {
                   )}
 
                 <p className="text-sm text-[#6B7280] text-center">This is the PDF version of a Digital TruCV Profile of the Candidate. For Verification please click here: <br />
-          <a href={`https://edubuktrucv.com/cv/${id}`}
-          className="text-[#03257e] underline"
-          >{`https://edubuktrucv.com/cv/${id}`}</a>
-          </p>
+                <a href={`https://edubuktrucv.com/cv/${id}`}
+                className="text-[#03257e] underline"
+                >{`https://edubuktrucv.com/cv/${id}`}</a>
+                </p>
                 </div>
               )}
             </div>

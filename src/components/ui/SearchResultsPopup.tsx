@@ -1,17 +1,10 @@
 import React from "react";
-
-interface User {
-    _id: string;
-    userId:string;
-    name: string;
-    userImage?: string;
-    profileSummary?: string;
-}
+import { SearchProfile } from "@/api/search.apis";
 
 interface SearchResultsPopupProps {
-  users: User[];
+  users: SearchProfile[];
   loading?: boolean;
-  onSelect: (user: User) => void;
+  onSelect: (user: SearchProfile) => void;
 }
 
 const truncateText = (text: string = "", maxWords: number = 12) => {
@@ -130,7 +123,7 @@ const SearchResultsPopup: React.FC<SearchResultsPopupProps> = ({
                     text-[#f14419]
                   "
                 >
-                  View Profile →
+                  View CV →
                 </span>
               </div>
             </button>

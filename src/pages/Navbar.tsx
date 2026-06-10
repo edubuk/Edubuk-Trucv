@@ -10,7 +10,9 @@ import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
 import { Search } from "lucide-react";
 import SearchResultsPopup from "@/components/ui/SearchResultsPopup";
-import api from "@/lib/api";
+import { useSearchProfiles } from "@/hooks/useSearchProfiles";
+import { useDebounce } from "@/hooks/useDebounce";
+import { type SearchProfile } from "@/api/search.apis";
 //import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface LinkItem {
@@ -33,21 +35,21 @@ interface SidebarProps {
 const Navbar: React.FC = () => {
   const [isActive, setActive] = useState("/");
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const [users, setUsers] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useUserData();
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const [loading, setLoading] = useState(false);
-  console.log("currentPath", currentPath);
-    const [placeholder, setPlaceholder] = useState("")
+  //`console.log("currentPath", currentPath);
+  const [placeholder, setPlaceholder] = useState("")
   const indexRef = useRef<number>(0)
   const charRef = useRef<number>(0)
   const typingRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const debouncedSearch = useDebounce(search,300);
 
+  const { users, isLoading, searchProfiles } = useSearchProfiles();
 
 
     const typePlaceholder = (text:string) => {
@@ -143,39 +145,15 @@ const Navbar: React.FC = () => {
     // }
   ];
 
-  const serachUsers = async (debouncedSearch: string) => {
-    try {
-      setLoading(true);
-      const response: any = await api.get(
-        `/search/search-profiles?serachQuery=${encodeURIComponent(debouncedSearch)}`,
-      );
-      console.log("response", response);
-      if (response.data.success) {
-        setUsers(response.data.data);
-      }
-    } catch (error: any) {
-      toast.error(error.message || error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
 
   useEffect(() => {
     if (debouncedSearch.length < 2) {
-      setUsers([]);
       setShowResults(false);
       return;
     }
 
     setShowResults(true);
-    serachUsers(debouncedSearch);
+    searchProfiles(debouncedSearch);
   }, [debouncedSearch]);
 
   useEffect(() => {
@@ -348,11 +326,11 @@ const Navbar: React.FC = () => {
           >
             <SearchResultsPopup
               users={users}
-              loading={loading}
-              onSelect={(user) => {
+              loading={isLoading}
+              onSelect={(user:SearchProfile) => {
                 setShowResults(false);
                 setSearch("");
-                navigate(`/profile/${user._id}`);
+                navigate(`/cv/${user.userId}`);
               }}
             />
           </div>
