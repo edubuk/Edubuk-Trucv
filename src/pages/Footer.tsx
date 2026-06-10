@@ -7,50 +7,174 @@ import social5 from '../assets/Social/social5.png'
 import social6 from '../assets/Social/social6.png'
 // import squareLogo from '@/assets/TruCV-Square.png'
 import { MdEmail, MdLocationPin, MdPhone } from "react-icons/md";
-import { FaPhone, FaRegFileAlt } from "react-icons/fa";
+import { FaRegFileAlt } from "react-icons/fa";
 import newLog from "../assets/newLogo.png"
 const Footer = () => {
   return (
-    <div className="flex flex-col bg-white sm:px-4 gap-4 border-b-8 border-[#006666] w-full" data-aos="fade-up">
-      <div className="flex flex-wrap justify-start sm:justify-between items-center gap-4 border-b-2 border-t-2 border-gray-300 pb-3 " >
-        <img src={newLog} alt="logo" className="md:w-[200px] md:h-[200px] w-[152px] h-[152px]"></img>
-        {/* <img src={squareLogo} alt="logo" className="md:w-[200px] md:h-[200px] w-[152px] h-[152px]"></img> */}
-        <div className="flex flex-col justify-center gap-4 sm:pl-12 ml-6">
-            <div className="font-semibold text-xl text-black uppercase">Contact Us:</div>
-            <div className="flex justify-start gap-2 items-center text-black"><MdEmail />Email: support@edubuk.com</div>
-            <div className="flex justify-start gap-2 items-center text-black"><MdPhone />Phone: +91 9250411261</div>
-        </div>
-        <div className="flex flex-col sm:flex-row pl-6 gap-4">
-        <div className="flex flex-col justify-center gap-4 sm:pl-12">
-            <div className="font-semibold text-xl text-black uppercase">Legals:</div>
-            <Link to="/terms-and-conditions" className="flex justify-start gap-2 items-center text-black"><FaRegFileAlt />Terms & Conditions</Link>
-            <Link to="/cancellation-policy" className="flex justify-start gap-2 items-center text-black"><FaRegFileAlt />Cancellation Policy</Link>
-        </div>
-        <div className="flex flex-col justify-center gap-4 sm:pl-12">
-            <Link to="/refund-policy" className="flex justify-start gap-2 items-center text-black"><FaRegFileAlt />Refund Policy</Link>
-            <Link to="/privacy-policy" className="flex justify-start gap-2 items-center text-black"><FaRegFileAlt />Privacy Policy</Link>
-            <Link to="/contact-us" className="flex justify-start gap-2 items-center text-black"><FaPhone />Contact Us</Link>
-        </div>
-        </div>
-        <div className="flex flex-col justify-center gap-4 pl-6 sm:pl-12">
-            <div className="font-semibold text-xl text-black uppercase">Our Offices:</div>
-            <div className="flex justify-start gap-2 items-center text-black"><MdLocationPin /> Hyderabad and Lucknow, India</div>
-            <div className="flex justify-start gap-2 items-center text-black"><MdLocationPin /> Dubai and RAK, UAE</div>
+    <div
+  className="bg-white border-t border-gray-200 border-b-8 border-[#006666]"
+  data-aos="fade-up"
+>
+  <div className="max-w-7xl mx-auto px-6 py-10">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      {/* Logo */}
+      <div className="flex flex-col items-center lg:items-start">
+        <img
+          src={newLog}
+          alt="Edubuk"
+          className="w-40 h-auto object-contain"
+        />
+
+        <p className="mt-4 text-sm text-gray-600 text-center lg:text-left">
+          Empowering trust through verified credentials and digital identity.
+        </p>
+      </div>
+
+      {/* Contact */}
+      <div>
+        <h3 className="text-lg font-bold text-[#03257e] mb-4">
+          Contact Us
+        </h3>
+
+        <div className="space-y-3 text-gray-700">
+          <div className="flex items-start gap-2">
+            <MdEmail className="mt-1 text-[#006666]" />
+            <div>
+              <p>support@edubuk.com</p>
+              <p>support.southindia@edubuk.com</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2">
+            <MdPhone className="mt-1 text-[#006666]" />
+            <div>
+              <p>+91 9250411261</p>
+              <p>+91 76966 69555</p>
+            </div>
+          </div>
         </div>
       </div>
-   
-      <div className="flex justify-center md:justify-between items-center align-middle pb-6 flex-wrap-reverse">
-        <p className="text-[#000000] w-full border-t-2 border-gray-300 sm:w-auto text-center sm:border-none pt-3">© 2025 Edubuk | All Rights Reserved</p>
-        <div className="flex justify-center items-center gap-2 w-full sm:w-auto pb-3 sm:pb-0">
-            <p className="text-[#000000] font-semibold">Follow us on:</p>
-            <a href="https://www.facebook.com/edubuk.trst/" target="_blank" rel="no-refferer"><img src={social2} alt="social logo" className="w-5 h-5" ></img></a>
-            <a href="https://www.instagram.com/edubuk_/" target="_blank" rel="no-refferer"><img src={social3} alt="social logo" className="w-5 h-5" ></img></a>
-            <a href="https://www.linkedin.com/company/edubuk-ai-web3/" target="_blank" rel="no-refferer"><img src={social4} alt="social logo" className="w-5 h-5" ></img></a>
-            <a href="https://x.com/edubuktrust" target="_blank" rel="no-refferer"><img src={social5} alt="social logo" className="w-5 h-5" ></img></a>
-            <a href="https://www.youtube.com/channel/UC4g4MH4F_JTbd1tqNS5pq1g/videos" target="_blank" rel="no-refferer"><img src={social6} alt="social logo" className="w-5 h-5" ></img></a>
+
+      {/* Legal */}
+      <div>
+        <h3 className="text-lg font-bold text-[#03257e] mb-4">
+          Legal
+        </h3>
+
+        <div className="flex flex-col gap-3">
+          <Link
+            to="/terms-and-conditions"
+            className="flex items-center gap-1 text-gray-700 hover:text-[#f14419] transition"
+          >
+            <FaRegFileAlt /> Terms & Conditions
+          </Link>
+
+          <Link
+            to="/privacy-policy"
+            className="flex items-center gap-1 text-gray-700 hover:text-[#f14419] transition"
+          >
+            <FaRegFileAlt /> Privacy Policy
+          </Link>
+
+          <Link
+            to="/refund-policy"
+            className="flex items-center gap-1 text-gray-700 hover:text-[#f14419] transition"
+          >
+            <FaRegFileAlt /> Refund Policy
+          </Link>
+
+          <Link
+            to="/cancellation-policy"
+            className="flex items-center gap-1 text-gray-700 hover:text-[#f14419] transition"
+          >
+            <FaRegFileAlt /> Cancellation Policy
+          </Link>
+
+          <Link
+            to="/contact-us"
+            className="flex items-center gap-1 text-gray-700 hover:text-[#f14419] transition"
+          >
+            <FaRegFileAlt /> Contact Us
+          </Link>
+        </div>
+      </div>
+
+      {/* Offices */}
+      <div>
+        <h3 className="text-lg font-bold text-[#03257e] mb-4">
+          Our Offices
+        </h3>
+
+        <div className="space-y-3 text-gray-700">
+          <div className="flex gap-2">
+            <MdLocationPin className="text-[#006666] mt-1" />
+            <span>Hyderabad & Lucknow, India</span>
+          </div>
+
+          <div className="flex gap-2">
+            <MdLocationPin className="text-[#006666] mt-1" />
+            <span>Dubai and RAK, UAE</span>
+          </div>
         </div>
       </div>
     </div>
+
+    {/* Bottom Bar */}
+    <div className="border-t border-gray-200 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+
+      <p className="text-sm text-gray-600 text-center">
+        © 2025 Edubuk. All Rights Reserved.
+      </p>
+
+      <div className="flex items-center gap-4">
+        <span className="font-medium text-[#03257e]">
+          Follow Us
+        </span>
+
+        <a
+          href="https://www.facebook.com/edubuk.trst/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img src={social2} alt="" className="w-5 h-5 hover:scale-110 transition" />
+        </a>
+
+        <a
+          href="https://www.instagram.com/edubuk_/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img src={social3} alt="" className="w-5 h-5 hover:scale-110 transition" />
+        </a>
+
+        <a
+          href="https://www.linkedin.com/company/edubuk-ai-web3/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img src={social4} alt="" className="w-5 h-5 hover:scale-110 transition" />
+        </a>
+
+        <a
+          href="https://x.com/edubuktrust"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img src={social5} alt="" className="w-5 h-5 hover:scale-110 transition" />
+        </a>
+
+        <a
+          href="https://www.youtube.com/channel/UC4g4MH4F_JTbd1tqNS5pq1g/videos"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img src={social6} alt="" className="w-5 h-5 hover:scale-110 transition" />
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
   );
 };
 
