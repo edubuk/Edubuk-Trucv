@@ -247,13 +247,13 @@ export const CvPanel: React.FC<{ cvData:ICvData; userId: string }> = ({ cvData, 
                 </span>
               </div>
             )}
-            {personal.phone && (
+            {personal.phoneNumber && (
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
                   <Phone size={11} className="text-white" />
                 </div>
                 <span className="text-[10px] text-white flex items-center gap-1">
-                  {personal.phone}
+                  {personal.phoneNumber}
                   <CheckCircle className="w-3 h-3 text-white/60 flex-shrink-0" />
                 </span>
               </div>
@@ -280,23 +280,23 @@ export const CvPanel: React.FC<{ cvData:ICvData; userId: string }> = ({ cvData, 
                 </span>
               </div>
             )}
-            {personal.github && (
+            {personal.githubUrl && (
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
                   <FaGithub size={11} className="text-white" />
                 </div>
-                <a href={personal.github} target="_blank" rel="noopener noreferrer"
+                <a href={personal.githubUrl} target="_blank" rel="noopener noreferrer"
                   className="text-[10px] text-white underline underline-offset-2 hover:text-orange-200 flex items-center gap-1 transition-colors">
                   GitHub <CheckCircle className="w-3 h-3 text-white/60 flex-shrink-0" />
                 </a>
               </div>
             )}
-            {personal.linkedin && (
+            {personal.linkedInUrl && (
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
                   <Linkedin size={11} className="text-white" />
                 </div>
-                <a href={personal.linkedin} target="_blank" rel="noopener noreferrer"
+                <a href={personal.linkedInUrl} target="_blank" rel="noopener noreferrer"
                   className="text-[10px] text-white underline underline-offset-2 hover:text-orange-200 flex items-center gap-1 transition-colors">
                   LinkedIn <CheckCircle className="w-3 h-3 text-white/60 flex-shrink-0" />
                 </a>

@@ -11,3 +11,11 @@ export const cvService = {ICvData:async(userId:string):Promise<CVResponse>=>{
         return data;
 }
 }
+
+//for logged in user with complete data
+export const cvService2 = {ICvData:async():Promise<CVResponse>=>{
+        const {data} = await api.get(`/cv/user-cv`)
+        console.log("data",data)
+        return data;
+}
+}

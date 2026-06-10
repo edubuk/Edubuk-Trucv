@@ -70,11 +70,12 @@ export const formatDate = (dateString: string) => {
   return `${day} ${month} ${year}`;
 };
 
-const CvOutputPage = () => {
+const CvOutputPage = ({userId}:{userId?:string}) => {
   const { id } = useParams();
+
   const [copied, setCopied] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
-  const {isCvLoading, searchCvData,cvData } = useCvData();
+  const {isCvLoading, searchCvData,cvData,searchFullCvData } = useCvData();
 
   // const handlePrint = useReactToPrint({
   //   contentRef: pdfRef,
@@ -124,13 +125,18 @@ const CvOutputPage = () => {
   };
 
   useEffect(() => {
-    searchCvData(id as string);
+    if(id){
+      searchCvData(id);
+    }else if(userId)
+    {
+      searchFullCvData();
+    }
     console.log("cvdata", cvData);
   }, []);
 
   useEffect(() => {
   if (!id) return;
-  QRCode.toDataURL(`https://edubuktrucv.com/cv/${id}`, {
+  QRCode.toDataURL(`https://edubuktrucv.com/cv/${id?id:userId}`, {
     width: 80,
     margin: 1,
     color: { dark: "#03257e", light: "#ffffff" },
@@ -185,7 +191,7 @@ const CvOutputPage = () => {
           {/* Copy Link */}
           <button
             onClick={() =>
-              copyResumeLink(`https://edubuktrucv.com/cv/${id}`)
+              copyResumeLink(`https://edubuktrucv.com/cv/${id?id:userId}`)
             }
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#03257e]/30 text-[#03257e] hover:bg-[#03257e] hover:text-white transition-all duration-200 text-sm font-medium"
           >
@@ -389,12 +395,12 @@ const CvOutputPage = () => {
                   </div>}
 
                   {/* Phone */}
-                 {cvData.personal.phone && <div className="flex items-center gap-3">
+                 {cvData.personal.phoneNumber && <div className="flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
                       <Phone size={15} />
                     </span>
                     <span className="text-sm flex items-center gap-1 tracking-wide">
-                      {cvData.personal.phone}
+                      {cvData.personal.phoneNumber}
                       <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
                     </span>
                   </div>}
@@ -428,13 +434,13 @@ const CvOutputPage = () => {
                   )}
 
                   {/* GitHub */}
-                  {cvData.personal.github && (
+                  {cvData.personal.githubUrl && (
                     <div className="flex items-center gap-3">
                       <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
                         <FaGithub size={15} />
                       </span>
                       <a
-                        href={cvData.personal.github}
+                        href={cvData.personal.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm flex items-center gap-1 tracking-wide underline underline-offset-2 hover:text-[#FB980E] transition-colors"
@@ -446,13 +452,13 @@ const CvOutputPage = () => {
                   )}
 
                   {/* LinkedIn */}
-                  {cvData.personal.linkedin && (
+                  {cvData.personal.linkedInUrl && (
                     <div className="flex items-center gap-3">
                       <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
                         <Linkedin size={15} />
                       </span>
                       <a
-                        href={cvData.personal.linkedin}
+                        href={cvData.personal.linkedInUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm flex items-center gap-1 tracking-wide underline underline-offset-2 hover:text-[#FB980E] transition-colors"
@@ -784,14 +790,14 @@ const CvOutputPage = () => {
                       </div>
                     </div>
                   )}
-
-                <p className="text-sm text-[#6B7280] text-center">This is the PDF version of a Digital TruCV Profile of the Candidate. For Verification please click here: <br />
-                <a href={`https://edubuktrucv.com/cv/${id}`}
-                className="text-[#03257e] underline"
-                >{`https://edubuktrucv.com/cv/${id}`}</a>
-                </p>
                 </div>
               )}
+
+               <p className="text-sm text-[#6B7280] text-center my-2">This is the PDF version of a Digital TruCV Profile of the Candidate. For Verification please click here: <br />
+                <a href={`https://edubuktrucv.com/cv/${id?id:userId}`}
+                className="text-[#03257e] underline"
+                >{`https://edubuktrucv.com/cv/${id?id:userId}`}</a>
+                </p>
             </div>
           </div>
           </div>

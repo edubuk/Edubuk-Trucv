@@ -19,9 +19,8 @@ import { useSearchParams } from "react-router-dom";
 //import DocumentNFTCard from "@/components/Dashboard/DocumentNFTCard";
 
 const DashBoard = () => {
-  const [cvData, setCvData] = useState([]);
+
   const [docRefresh, setDocRefresh] = useState(false);
-  const [cvRefresh, setCvRefresh] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const {user} = useUserData();
@@ -53,19 +52,6 @@ const DashBoard = () => {
     }
   };
 
-  const userCvs = async () => {
-    setSearchParams({ tab: "cv" });
-    setSidebarOpen(false);
-    try {
-      setIsFetching(true);
-      const res = await api.get("/cv/user-cvs");
-      if (res.data.success) setCvData(res.data.data);
-    } catch {
-      toast.error("Failed to fetch CVs");
-    } finally {
-      setIsFetching(false);
-    }
-  };
 
   const fetchNFTsHandler = async() => {
     setSearchParams({ tab: "nft" });
@@ -87,9 +73,8 @@ const DashBoard = () => {
 
 useEffect(() => {
   if (selected === "docs") getDocs();
-  if (selected === "cv") userCvs();
   if (selected === "nft") fetchNFTsHandler();
-}, [selected, docRefresh, cvRefresh]);
+}, [selected, docRefresh]);
 
   const handleTabChange = (tab: "cv" | "docs" | "nft" | "onchain") => {
     setSearchParams({ tab });
@@ -158,7 +143,7 @@ useEffect(() => {
           />
           <NavItem
             id="cv"
-            label="My CVs"
+            label="My CV"
             Icon={FileText}
             onClick={() => handleTabChange("cv")}
           />
@@ -201,9 +186,6 @@ useEffect(() => {
 
         {selected === "cv" && (
           <CvById
-            cvData={cvData}
-            setCvRefresh={setCvRefresh}
-            isFetching={isFetching}
           />
         )}
 
