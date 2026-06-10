@@ -790,12 +790,12 @@ export const CvPdfDocument: React.FC<CvPdfDocumentProps> = ({
                     <Text style={S.checkTxt}>✓</Text>
                   </View>
                 ) : null}
-                {personal.phone ? (
+                {personal.phoneNumber ? (
                   <View style={S.personalItem}>
                     <View style={S.personalIconBox}>
                       <Text style={S.personalIconTxt}>#</Text>
                     </View>
-                    <Text style={S.personalTxt}>{personal.phone}</Text>
+                    <Text style={S.personalTxt}>{personal.phoneNumber}</Text>
                     <Text style={S.checkTxt}>✓</Text>
                   </View>
                 ) : null}
@@ -822,24 +822,24 @@ export const CvPdfDocument: React.FC<CvPdfDocumentProps> = ({
                     <Text style={S.checkTxt}>✓</Text>
                   </View>
                 ) : null}
-                {personal.github ? (
+                {personal.githubUrl ? (
                   <View style={S.personalItem}>
                     <View style={S.personalIconBox}>
                       <Text style={S.personalIconTxt}>G</Text>
                     </View>
                     <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4}}>
-                    <Link src={personal.github} style={S.personalLinkTxt}>Github</Link>
+                    <Link src={personal.githubUrl} style={S.personalLinkTxt}>Github</Link>
                     <CircleCheck hexCode="#ffffff"/>
                     </View>
                   </View>
                 ) : null}
-                {personal.linkedin ? (
+                {personal.linkedInUrl ? (
                   <View style={S.personalItem}>
                     <View style={S.personalIconBox}>
                       <Text style={S.personalIconTxt}>in</Text>
                     </View>
                     <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4}}>
-                    <Link src={personal.linkedin} style={S.personalLinkTxt}>Github</Link>
+                    <Link src={personal.linkedInUrl} style={S.personalLinkTxt}>Github</Link>
                     <CircleCheck hexCode="#ffffff"/>
                     </View>
                   </View>

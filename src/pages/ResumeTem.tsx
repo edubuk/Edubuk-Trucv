@@ -37,10 +37,10 @@ const Resume: React.FC = () => {
       personal:{
         fullName:"",
         email:"",
-        phone:"",
+        phoneNumber:"",
         city:"",
-        linkedin:"",
-        github:"",
+        linkedInUrl:"",
+        githubUrl:"",
         summary:"",
         imgUrl:"",
         profession:""
@@ -214,7 +214,7 @@ const Resume: React.FC = () => {
                     <FaPhoneAlt className="text-sm text-[#000000]" />
                   </span>
                   <span className="text-gray-800 hover:text-[#000000] font-semibold inline-flex items-center align-middle">
-                    {cvData.personal.phone}
+                    {cvData.personal.phoneNumber}
                   </span>
                 </div>
 
@@ -232,12 +232,12 @@ const Resume: React.FC = () => {
                 </div>
 
                 {/* LinkedIn */}
-                {cvData?.personal?.linkedin && <div className="flex items-center space-x-2 px-2 leading-[1.25] align-middle">
+                {cvData?.personal?.linkedInUrl && <div className="flex items-center space-x-2 px-2 leading-[1.25] align-middle">
                   <span className="inline-flex items-center align-middle">
                     <FaLinkedin className="text-sm text-[#000000]" />
                   </span>
                   <a
-                    href={cvData?.personal?.linkedin}
+                    href={cvData?.personal?.linkedInUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-800 hover:text-[#000000] font-semibold inline-flex items-center align-middle"
@@ -247,12 +247,12 @@ const Resume: React.FC = () => {
                 </div>}
 
                 {/* GitHub */}
-                {cvData?.personal?.github && <div className="flex items-center space-x-2 px-2 leading-[1.25] align-middle">
+                {cvData?.personal?.githubUrl && <div className="flex items-center space-x-2 px-2 leading-[1.25] align-middle">
                   <span className="inline-flex items-center align-middle">
                     <FaGithub className="text-sm text-[#000000]" />
                   </span>
                   <a
-                    href={cvData?.personal?.github}
+                    href={cvData?.personal?.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-black hover:text-[#000000] font-semibold inline-flex items-center align-middle"

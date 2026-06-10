@@ -330,7 +330,7 @@ const NewCV = ({
                           <Phone size={15} />
                         </span>
                         <span className="text-sm flex items-center gap-1 tracking-wide">
-                          {cvData.personal.phone}
+                          {cvData.personal.phoneNumber}
                           <CheckCircle className="h-4 w-4 text-white bg-white/15 rounded-full p-0.5" />
                         </span>
                       </div>
@@ -364,13 +364,13 @@ const NewCV = ({
                       )}
 
                       {/* GitHub */}
-                      {cvData.personal.github && (
+                      {cvData.personal.githubUrl && (
                         <div className="flex items-center gap-3">
                           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
                             <FaGithub size={15} />
                           </span>
                           <a
-                            href={cvData.personal.github}
+                            href={cvData.personal.githubUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm flex items-center gap-1 tracking-wide underline underline-offset-2 hover:text-[#FB980E] transition-colors"
@@ -382,13 +382,13 @@ const NewCV = ({
                       )}
 
                       {/* LinkedIn */}
-                      {cvData.personal.linkedin && (
+                      {cvData.personal.linkedInUrl && (
                         <div className="flex items-center gap-3">
                           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 shrink-0">
                             <Linkedin size={15} />
                           </span>
                           <a
-                            href={cvData.personal.linkedin}
+                            href={cvData.personal.linkedInUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm flex items-center gap-1 tracking-wide underline underline-offset-2 hover:text-[#FB980E] transition-colors"
