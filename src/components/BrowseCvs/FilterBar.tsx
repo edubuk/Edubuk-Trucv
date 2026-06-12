@@ -1,6 +1,6 @@
-import { Building2, CircleUser, GraduationCap, MapPin, RefreshCw, Search, SlidersHorizontal, Users, X } from "lucide-react";
+import { Building2, CircleUser, GraduationCap, MapPin, RefreshCw, Search, SlidersHorizontal, X } from "lucide-react";
 import { SiHyperskill } from "react-icons/si";
-
+import trucvLogo from "@/assets/truCV2.png"
 
 const NAVY   = "#03257e";
 const TEAL   = "#006666";
@@ -53,12 +53,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({ filters, onChange, onSearc
   ];
 
   return (
-    <div className="bg-white border-b border-gray-100 shadow-sm">
+    <div className="bg-white border-b border-gray-100 shadow-sm h-min-[30vh]">
       {/* Brand bar */}
       <div className="px-5 py-3 flex items-center justify-between" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${TEAL} 100%)` }}>
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center">
-            <Users size={16} className="text-white" />
+          <div className="w-20 h-18 rounded-lg bg-white flex items-center justify-center">
+            {/* <Users size={16} className="text-white" /> */}
+            <img src={trucvLogo} alt="TruCV" className="w-fit h-18" />
           </div>
           <div>
             <h1 className="text-white font-bold text-base tracking-wide leading-none">

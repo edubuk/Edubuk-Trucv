@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect} from "react";
 import logo from "../assets/newLogo.png";
 import truCv from "../assets/truCV2.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ import SearchResultsPopup from "@/components/ui/SearchResultsPopup";
 import { useSearchProfiles } from "@/hooks/useSearchProfiles";
 import { useDebounce } from "@/hooks/useDebounce";
 import { type SearchProfile } from "@/api/search.apis";
+import AnimatedSearchInput from "@/components/ui/AnimatedPlaceHolder";
 //import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface LinkItem {
@@ -30,7 +31,7 @@ interface SidebarProps {
   loading: boolean;
 }
 
-const placeholders = ["name", "city", "college", "company", "skill"];
+
 
 const Navbar: React.FC = () => {
   const [isActive, setActive] = useState("/");
@@ -43,52 +44,11 @@ const Navbar: React.FC = () => {
   const currentPath = location.pathname;
   const [loading, setLoading] = useState(false);
   //`console.log("currentPath", currentPath);
-  const [placeholder, setPlaceholder] = useState("");
-  const indexRef = useRef<number>(0);
-  const charRef = useRef<number>(0);
-  const typingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const debouncedSearch = useDebounce(search, 300);
 
   const { users, isLoading, searchProfiles } = useSearchProfiles();
-
-  const typePlaceholder = (text: string) => {
-    charRef.current = 0;
-    const type = () => {
-      if (charRef.current <= text.length) {
-        setPlaceholder(text.slice(0, charRef.current));
-        charRef.current++;
-        typingRef.current = setTimeout(type, 60); // typing speed
-      } else {
-        // fully typed — wait then erase
-        typingRef.current = setTimeout(() => erasePlaceholder(text), 1500);
-      }
-    };
-    type();
-  };
-
-  const erasePlaceholder = (text: string) => {
-    let len = text.length;
-    const erase = () => {
-      if (len >= 0) {
-        setPlaceholder(text.slice(0, len));
-        len--;
-        typingRef.current = setTimeout(erase, 30); // erase speed faster
-      } else {
-        // move to next placeholder
-        indexRef.current = (indexRef.current + 1) % placeholders.length;
-        typingRef.current = setTimeout(
-          () => typePlaceholder(placeholders[indexRef.current]),
-          300,
-        );
-      }
-    };
-    erase();
-  };
-
-  useEffect(() => {
-    typePlaceholder(placeholders[0]);
-    return () => clearTimeout(typingRef.current as unknown as number); // cleanup on unmount
-  }, []);
+  
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -141,6 +101,10 @@ const Navbar: React.FC = () => {
       name: "Verify",
       path: "/verify",
     },
+    {
+      name: "Browse CV",
+      path: "/browse-cvs",
+    },
     // {
     //   name:"Hackathons",
     //   path:"/hackathons"
@@ -179,7 +143,7 @@ const Navbar: React.FC = () => {
         alt="Logo"
         className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 "
       />
-      <div className="relative flex gap-3 justify-between items-center">
+      <div className="relative flex gap-3 justify-between items-start">
         {links?.map((link, i) =>
           link.name === "Home" ? (
             <Link
@@ -272,52 +236,14 @@ const Navbar: React.FC = () => {
             ></span>
           </div>
         </div>
-        <div className="relative hidden">
+        <div className="relative sm:block hidden">
           <Search
             size={14}
-            className="
-            hidden sm:block
-            absolute
-            left-2
-            top-1/2
-            -translate-y-1/2
-            text-slate-400
-            z-10
-          "
+            className="hidden sm:block absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 z-10"
           />
-
-          <input
-            type="text"
+          <AnimatedSearchInput
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onFocus={() => {
-              if (users.length > 0) {
-                setShowResults(true);
-              }
-            }}
-            placeholder={`Search by ${placeholder}`}
-            className="
-              w-full
-              h-8 sm:h-10
-              pl-8
-              pr-4
-              rounded-2xl
-              border
-              border-slate-200
-              text-sm
-              sm:text-md
-              bg-white
-              text-slate-800
-              placeholder:text-slate-400
-              shadow-sm
-              outline-none
-              transition-all
-              duration-200
-              focus:border-[#03257e]
-              focus:ring-4
-              focus:ring-[#03257e]/10
-              focus:shadow-lg
-            "
+            onChange={setSearch}
           />
         </div>
         {showResults && (
@@ -429,10 +355,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             Login
           </Link>
         ) : (
-          <div className="relative rounded-full bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
+          <div className="relative p-0.5 rounded-full bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
             <button
               onClick={handlerLogout}
-              className=" w-full bg-white py-2 px-4 rounded-full text-[#03257e] hover:font-bold"
+              className=" w-full p-2 bg-white rounded-full text-[#03257e] hover:font-bold"
               style={{ opacity: loading ? 0.7 : 1 }}
             >
               Logout

@@ -133,18 +133,18 @@ export const CvPanel: React.FC<{ cvData:ICvData; userId: string }> = ({ cvData, 
   return (
     <div className="h-full overflow-y-auto">
       {/* CV top bar */}
-      <div className="sticky top-0 z-10 px-4 py-2.5 flex items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur-sm">
-        <p className="text-[10px] font-semibold tracking-widest uppercase" style={{ color: TEAL }}>
+      <div className="sticky top-0 z-10 px-4 py-2.5 flex items-center justif-start gap-2 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
+        <p className="text-[15px] font-semibold tracking-widest uppercase" style={{ color: TEAL }}>
           Verified Curriculum Vitae
         </p>
         <a
           href={cvUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-[10px] font-semibold px-3 py-1 rounded-full transition-all hover:opacity-80"
+          className="flex items-center gap-1.5 text-[15px] font-semibold px-3 py-1 rounded-full transition-all hover:opacity-80"
           style={{ backgroundColor: `${NAVY}12`, color: NAVY }}
         >
-          <ExternalLink size={11} /> Full View
+          <ExternalLink size={16} /> Full View And Download
         </a>
       </div>
 

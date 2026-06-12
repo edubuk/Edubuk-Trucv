@@ -32,13 +32,14 @@ export function useSearchProfiles(): UseSearchProfilesReturn {
       const result = await searchService.searchProfiles(query==="default"?"":query,page);
       setUsers(result.profiles);
       console.log({result});
-      if(result?.totalProfiles[0].count>0)
+      if(result?.totalProfiles?.[0])
       {
         console.log("total profile",result?.totalProfiles)
         setTotalProfiles(result.totalProfiles[0].count)
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Search failed";
+      console.log("err",err)
       setError(msg);
       toast.error(msg);
     } finally {

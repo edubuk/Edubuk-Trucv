@@ -224,11 +224,12 @@ const CvSearchPage: React.FC = () => {
         </div>
 
         {/* ── Right: CV Viewer ── */}
+
         <div
           ref={cvPanelRef}
-          className="flex-1 bg-white overflow-hidden"
-          style={{ minHeight: "400px" }}
+          className="flex-1 bg-white overflow-x-auto overflow-y-auto"
         >
+          <div className="w-[794px] mx-auto h-[70vh]">
           {isCvLoading ? (
             <CvSkeleton />
           ) : cvData ? (
@@ -236,6 +237,7 @@ const CvSearchPage: React.FC = () => {
           ) : (
             <EmptyCv />
           )}
+        </div>
         </div>
       </div>
     </div>
