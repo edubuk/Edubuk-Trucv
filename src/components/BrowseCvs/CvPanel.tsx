@@ -128,7 +128,7 @@ const TimelineItem = ({
 
 export const CvPanel: React.FC<{ cvData:ICvData; userId: string }> = ({ cvData, userId }) => {
   const { personal, educations, experiences, skills, projects, awards } = cvData;
-  const cvUrl = `http://localhost:5173/cv/${userId}`;
+  const cvUrl = `https://edubuktrucv.com/cv/${userId}`;
 
   return (
     <div className="h-full overflow-y-auto">
