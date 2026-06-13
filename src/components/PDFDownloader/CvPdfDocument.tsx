@@ -784,10 +784,10 @@ export const CvPdfDocument: React.FC<CvPdfDocumentProps> = ({
                     <View style={S.personalIconBox}>
                       <Text style={S.personalIconTxt}>@</Text>
                     </View>
-                    <Text style={S.personalTxt} >
-                      {personal.email}
-                    </Text>
-                    <Text style={S.checkTxt}>✓</Text>
+                    <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4}}>
+                    <Text style={S.personalTxt}>{personal.email}</Text>
+                    <CircleCheck hexCode="#ffffff"/>
+                    </View>
                   </View>
                 ) : null}
                 {personal.phoneNumber ? (
@@ -795,8 +795,10 @@ export const CvPdfDocument: React.FC<CvPdfDocumentProps> = ({
                     <View style={S.personalIconBox}>
                       <Text style={S.personalIconTxt}>#</Text>
                     </View>
+                    <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4}}>
                     <Text style={S.personalTxt}>{personal.phoneNumber}</Text>
-                    <Text style={S.checkTxt}>✓</Text>
+                    <CircleCheck hexCode="#ffffff"/>
+                    </View>
                   </View>
                 ) : null}
                 {personal.city ? (
@@ -819,7 +821,6 @@ export const CvPdfDocument: React.FC<CvPdfDocumentProps> = ({
                     <Text style={S.personalTxt}>{personal.profession}</Text>
                     <CircleCheck hexCode="#ffffff"/>
                     </View>
-                    <Text style={S.checkTxt}>✓</Text>
                   </View>
                 ) : null}
                 {personal.githubUrl ? (
@@ -828,7 +829,7 @@ export const CvPdfDocument: React.FC<CvPdfDocumentProps> = ({
                       <Text style={S.personalIconTxt}>G</Text>
                     </View>
                     <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4}}>
-                    <Link src={personal.githubUrl} style={S.personalLinkTxt}>Github</Link>
+                    <Link src={personal.githubUrl} style={S.personalTxt}>Github</Link>
                     <CircleCheck hexCode="#ffffff"/>
                     </View>
                   </View>
@@ -839,7 +840,7 @@ export const CvPdfDocument: React.FC<CvPdfDocumentProps> = ({
                       <Text style={S.personalIconTxt}>in</Text>
                     </View>
                     <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4}}>
-                    <Link src={personal.linkedInUrl} style={S.personalLinkTxt}>Github</Link>
+                    <Link src={personal.linkedInUrl} style={S.personalTxt}>LinkedIn</Link>
                     <CircleCheck hexCode="#ffffff"/>
                     </View>
                   </View>

@@ -258,6 +258,7 @@ const Navbar: React.FC = () => {
                 setShowResults(false);
                 setSearch("");
                 navigate(`/cv/${user.userId}`);
+                window.location.reload();
               }}
             />
           </div>

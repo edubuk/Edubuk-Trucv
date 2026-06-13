@@ -229,7 +229,7 @@ const CvSearchPage: React.FC = () => {
           ref={cvPanelRef}
           className="flex-1 bg-white overflow-x-auto overflow-y-auto"
         >
-          <div className="w-[794px] mx-auto h-[70vh]">
+          <div className="w-[794px] md:w-full mx-auto h-[70vh]">
           {isCvLoading ? (
             <CvSkeleton />
           ) : cvData ? (
