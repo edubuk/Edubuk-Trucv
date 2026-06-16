@@ -32,7 +32,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({ filters, onChange, onSearc
 
   const query = Object.values(updatedFilters)
     .filter((value) => value.trim() !== "")  // ← removed fields drop out here
-    .map((value) => encodeURIComponent(value.trim()))
+    .map((value) => value.trim())
     .join("+");
 
   setSearchQuery(query);  // empty string "" if all fields cleared
