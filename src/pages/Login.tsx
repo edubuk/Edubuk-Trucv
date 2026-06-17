@@ -27,9 +27,6 @@ export default function LoginPage(): JSX.Element {
         if (!form.email || !form.email.includes("@") || !form.email.includes(".")) {
             e.email = "Please enter a valid email address";
         }
-        if (form.password.length < 8) {
-            e.password = "Password must be at least 8 characters";
-        }
         return e;
     };
 

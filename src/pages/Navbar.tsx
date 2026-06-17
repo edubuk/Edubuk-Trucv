@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import logo from "../assets/newLogo.png";
 import truCv from "../assets/truCV2.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -10,7 +10,10 @@ import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
 import { Search } from "lucide-react";
 import SearchResultsPopup from "@/components/ui/SearchResultsPopup";
-import api from "@/lib/api";
+import { useSearchProfiles } from "@/hooks/useSearchProfiles";
+import { useDebounce } from "@/hooks/useDebounce";
+import { type SearchProfile } from "@/api/search.apis";
+import AnimatedSearchInput from "@/components/ui/AnimatedPlaceHolder";
 //import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface LinkItem {
@@ -28,22 +31,24 @@ interface SidebarProps {
   loading: boolean;
 }
 
-type FilterType = | "name" | "college" | "city" | "company" | "skill";
+
 
 const Navbar: React.FC = () => {
   const [isActive, setActive] = useState("/");
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [filterType, setFilterType] = useState<FilterType>("name");
   const [showResults, setShowResults] = useState(false);
-  const [users, setUsers] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useUserData();
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const [loading, setLoading] = useState(false);
-  console.log("currentPath", currentPath);
+  //`console.log("currentPath", currentPath);
+
+  const debouncedSearch = useDebounce(search, 300);
+
+  const { users, isLoading, searchProfiles } = useSearchProfiles();
+  
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -96,44 +101,24 @@ const Navbar: React.FC = () => {
       name: "Verify",
       path: "/verify",
     },
+    {
+      name: "Browse CV",
+      path: "/browse-cvs",
+    },
     // {
     //   name:"Hackathons",
     //   path:"/hackathons"
     // }
   ];
 
-  const serachUsers = async (debouncedSearch: string) => {
-    try {
-      setLoading(true);
-      const response: any = await api.get(
-        `/users-cvs/search?${filterType}=${encodeURIComponent(debouncedSearch)}`,
-      );
-      if (response.data.success) {
-        setUsers(response.data.users);
-      }
-    } catch (error: any) {
-      toast.error(error.message || error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
-
   useEffect(() => {
     if (debouncedSearch.length < 2) {
-      setUsers([]);
       setShowResults(false);
       return;
     }
 
     setShowResults(true);
-    serachUsers(debouncedSearch);
+    searchProfiles(debouncedSearch);
   }, [debouncedSearch]);
 
   useEffect(() => {
@@ -158,7 +143,7 @@ const Navbar: React.FC = () => {
         alt="Logo"
         className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 "
       />
-      <div className="relative flex gap-3 justify-between items-center">
+      <div className="relative flex gap-3 justify-between items-start">
         {links?.map((link, i) =>
           link.name === "Home" ? (
             <Link
@@ -251,85 +236,15 @@ const Navbar: React.FC = () => {
             ></span>
           </div>
         </div>
-        <div className="relative hidden">
-  <Search
-    size={14}
-    className="
-      hidden sm:block
-      absolute
-      left-28
-      top-1/2
-      -translate-y-1/2
-      text-slate-400
-      z-10
-    "
-  />
-
-  <select
-    value={filterType}
-    onChange={(e) =>
-      setFilterType(e.target.value as FilterType)
-    }
-    className="
-      absolute
-      left-2
-      top-1/2
-      -translate-y-1/2
-      h-6
-      sm:h-8
-      px-2
-      bg-transparent
-      border-r
-      border-slate-300
-      text-xs
-      sm:text-sm
-      text-[#03257e]
-      outline-none
-      cursor-pointer
-      z-10
-    "
-  >
-    <option value="name">Name</option>
-    <option value="college">College</option>
-    <option value="city">City</option>
-    <option value="company">Company</option>
-    <option value="skill">Skill</option>
-  </select>
-
-  <input
-    type="text"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    onFocus={() => {
-      if (users.length > 0) {
-        setShowResults(true);
-      }
-    }}
-    placeholder={`Search by ${filterType}...`}
-    className="
-      w-full
-      h-8 sm:h-10
-      pl-14
-      sm:pl-32
-      pr-4
-      rounded-2xl
-      border
-      border-slate-200
-      text-sm
-      sm:text-md
-      bg-white
-      text-slate-800
-      placeholder:text-slate-400
-      shadow-sm
-      outline-none
-      transition-all
-      duration-200
-      focus:border-[#03257e]
-      focus:ring-4
-      focus:ring-[#03257e]/10
-      focus:shadow-lg
-    "
-  />
+        <div className="relative sm:block hidden">
+          <Search
+            size={14}
+            className="hidden sm:block absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 z-10"
+          />
+          <AnimatedSearchInput
+            value={search}
+            onChange={setSearch}
+          />
         </div>
         {showResults && (
           <div
@@ -338,11 +253,12 @@ const Navbar: React.FC = () => {
           >
             <SearchResultsPopup
               users={users}
-              loading={loading}
-              onSelect={(user) => {
+              loading={isLoading}
+              onSelect={(user: SearchProfile) => {
                 setShowResults(false);
                 setSearch("");
-                navigate(`/profile/${user._id}`);
+                navigate(`/cv/${user.userId}`);
+                window.location.reload();
               }}
             />
           </div>
@@ -440,10 +356,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             Login
           </Link>
         ) : (
-          <div className="relative rounded-full bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
+          <div className="relative p-0.5 rounded-full bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
             <button
               onClick={handlerLogout}
-              className=" w-full bg-white py-2 px-4 rounded-full text-[#03257e] hover:font-bold"
+              className=" w-full p-2 bg-white rounded-full text-[#03257e] hover:font-bold"
               style={{ opacity: loading ? 0.7 : 1 }}
             >
               Logout

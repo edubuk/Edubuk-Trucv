@@ -978,7 +978,7 @@ export const EducationDetails = ({
                               <Button
                                 type="button"
                                 onClick={() => submitFormHandler(index)}
-                                className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+                                className="w-full text-white bg-[#008888] mt-2 hover:bg-[#006666] transition"
                               >
                                 Save
                               </Button>

@@ -8,36 +8,40 @@ import VideoSection from "../components/HomePageSections/VideoSection";
 import Footer from "./Footer";
 import StepToCreateCV from "../components/HomePageSections/StepToCreateCV";
 import WhyTrucv from "../components/HomePageSections/WhyTrucv";
-import { useState} from "react";
+import {useState} from "react";
 import ProfilePopup from "@/components/ui/Profile";
 import { Link } from "react-router-dom";
 import { useUserData } from "@/context/AuthContext";
 import { Crown } from "lucide-react";
-import toast from "react-hot-toast";
-import { API_BASE_URL } from "@/main";
+// import toast from "react-hot-toast";
+// import { API_BASE_URL } from "@/main";
 import PartnerList from "@/components/HomePageSections/PartnerList";
 //import { ConnectButton } from "@rainbow-me/rainbowkit";
+
+
+
 
 const Home:React.FC = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const {user} = useUserData();
 
-  const handlerLogout = async () => {
-    try {
-      const logoutData = await fetch(`${API_BASE_URL}/api/v1/user/logout`,{
-        method:"PUT",
-        credentials: "include"
-      })
-      const logoutResult = await logoutData.json();
-      console.log("logoutResult",logoutResult);
-      if(logoutResult.success){
-        window.location.href="/login";
-      }
-        } catch (error) {
-            console.error("Logout failed:", error);
-            toast.error("Logout failed");
-        }
-  };
+
+  // const handlerLogout = async () => {
+  //   try {
+  //     const logoutData = await fetch(`${API_BASE_URL}/api/v1/user/logout`,{
+  //       method:"PUT",
+  //       credentials: "include"
+  //     })
+  //     const logoutResult = await logoutData.json();
+  //     console.log("logoutResult",logoutResult);
+  //     if(logoutResult.success){
+  //       window.location.href="/login";
+  //     }
+  //       } catch (error) {
+  //           console.error("Logout failed:", error);
+  //           toast.error("Logout failed");
+  //       }
+  // };
 
   return (
     <div className="flex justify-center items-center flex-col gap-8 overflow-hidden">
@@ -62,19 +66,27 @@ const Home:React.FC = () => {
             <div className="relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-up">
               <Link
                 to="/create-cv"
-                className="flex items-center gap-2 bg-[#006666] text-[20px] sm:text-[30px] px-2 py-4 font-bold rounded-[6px] text-white hover:bg-white hover:text-[#f14419] transition-colors duration-200"
+                className="flex items-center gap-2 bg-[#006666] text-[15px] lg:text-[25px] px-2 py-4 font-bold rounded-[6px] text-white hover:bg-white hover:text-[#f14419] transition-colors duration-200"
               >
                 Create TruCV →
               </Link>
             </div>
-            {user ? (
-              <div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-left">
-                <button
-                  className="w-full bg-white text-[20px] px-6 py-4 font-bold text-center rounded-[6px] text-[#03257e] hover:text-[#f14419] transition-colors duration-200"
-                  onClick={handlerLogout}
+            <div className="flex relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-left">
+                <Link
+                to='/browse-cvs'
+                  className="w-full bg-white text-[15px] lg:text-[25px] px-6 py-4 font-bold text-center rounded-[6px] text-[#03257e] hover:text-[#f14419] transition-colors duration-200"
                 >
-                  Logout
-                </button>
+                  Browse CVs
+                </Link>
+              </div>
+            {/* {user ? (
+              <div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-left">
+                <Link
+                to='/browse-cvs'
+                  className="w-full bg-white text-[15px] px-6 py-4 font-bold text-center rounded-[6px] text-[#03257e] hover:text-[#f14419] transition-colors duration-200"
+                >
+                  Browse CVs
+                </Link>
               </div>
             ) : (
               <div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-left">
@@ -85,7 +97,7 @@ const Home:React.FC = () => {
                   Login
                 </Link>
               </div>
-            )}
+            )} */}
           </div>
 
           <p className="text-[#03257E] text-center text-2xl sm:text-3xl md:text-5xl font-bold" data-aos="fade-up">

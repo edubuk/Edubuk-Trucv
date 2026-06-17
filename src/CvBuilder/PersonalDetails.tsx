@@ -541,7 +541,7 @@ export const PersonalDetails = ({ step, setStep, setCvData }: IStepCard) => {
           {!submitting ? (
             <Button
               type="submit"
-              className="mt-2 w-auto w-full bg-[#006666] hover:bg-[#008888] hover:opacity-90"
+              className="mt-2 text-white w-auto w-full bg-[#006666] hover:bg-[#008888] hover:opacity-90"
             >
               {user ? "Update" : "Save"}
             </Button>

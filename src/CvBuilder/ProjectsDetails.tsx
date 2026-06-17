@@ -512,14 +512,14 @@ export const ProjectDetails = ({
             {loadingState==="Submitting"?
             <Button
               type="button"
-              className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+              className="w-full text-white bg-[#008888] mt-2 hover:bg-[#006666] transition"
             >
               Saving...
             </Button>:
             <Button
             disabled={count===0}
               type="submit"
-              className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+              className="w-full text-white bg-[#008888] mt-2 hover:bg-[#006666] transition"
             >
               {fields.length>0?"Save New Project":"Save Project"}
             </Button>

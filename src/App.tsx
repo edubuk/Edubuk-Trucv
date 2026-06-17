@@ -17,6 +17,7 @@ import CreateCv from "./pages/CreateCv";
 import CertificateTimerPage from "./components/Certification/CertificateTimerPage";
 import AdminDashBoard from "./components/Admin/AdminDashboard";
 import { Providers } from "./app/providers";
+import CvSearchPage from "./components/BrowseCvs/Cvsearchpage";
 
 
 // Lazy-loaded pages
@@ -93,6 +94,7 @@ function App() {
               <Route path="/user-verification" element={<Layout><ProtectedRoute><UserVerification /></ProtectedRoute></Layout>} />
               <Route path="/hackathons" element={<Layout><ProtectedRoute><Hackathons /></ProtectedRoute></Layout>} />
               <Route path="/document-verification-guide" element={<DocumentVerificationGuide />} />
+              <Route path="browse-cvs" element={<CvSearchPage />} />
             </Routes>
           </Suspense>
       </Providers>

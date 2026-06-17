@@ -429,7 +429,7 @@ export const SkillDetails = ({
                 <Button 
                   type="submit"
                   disabled={!isNewSkill}
-                  className="w-full bg-[#006666] hover:bg-[#008888] active:scale-[0.99] transition">
+                  className="w-full text-white bg-[#006666] hover:bg-[#008888] active:scale-[0.99] transition">
                   {fields.length > 0?"Save New Skills":"Save Skills"}
                 </Button>
                 </>
