@@ -50,4 +50,4 @@ jobs:
         run: ssh -o ConnectTimeout=10 azure-vm "echo 'SSH Connected'"
 
       - name: Run deployment script on server
-        run: ssh azure-vm "cd /home/azureuser/trucvfrontend-v2 && ./deploy.sh"
+        run: ssh azure-vm "cd /home/azureuser/TRUCV_FRONTEND && ./deploy.sh"
