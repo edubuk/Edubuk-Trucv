@@ -10,10 +10,11 @@ import { Button } from "@mui/material";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import HeaderButtons from "@/components/cvBuilder/HeaderButtonns";
-import NewCV from "./NewCV";
+//import NewCV from "./NewCV";
 import { EyeIcon, WalletIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-import { WalletSetupPopup } from "./WalletSetupGuide";
+
+//import { WalletSetupPopup } from "./WalletSetupGuide";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
 //import { dummyCvData } from "./cvDummyData";
 
@@ -26,10 +27,10 @@ export interface ICvData {
   personal: {
     fullName: string;
     email: string;
-    phone: string;
+    phoneNumber: string;
     city: string;
-    linkedin: string;
-    github: string;
+    linkedInUrl: string;
+    githubUrl: string;
     summary: string;
     imgUrl: string;
     profession: string;
@@ -48,7 +49,7 @@ export default function CVBuilder() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState<boolean>(false);
   const [showParsedModel, setShowParsedModel] = useState<boolean>(false);
-  const [showWalletSetup, setShowWalletSetup] = useState<boolean>(true);
+   //const [showWalletSetup, setShowWalletSetup] = useState<boolean>(true);
   console.log("preview cv is", previewCV);
   const [cvData, setCvData] = useState<any>({
     personal: {
@@ -110,25 +111,25 @@ export default function CVBuilder() {
     }
   };
 
-  const onCloseWalletSetup = () => {
-    setShowWalletSetup(false);
-    localStorage.setItem("showWalletSetup", "false");
-  };
+  // const onCloseWalletSetup = () => {
+  //   setShowWalletSetup(false);
+  //   localStorage.setItem("showWalletSetup", "false");
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50 p-0 sm:p-6">
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="grid grid-cols-1">
           <div className="col-span-7 p-2 sm:p-6 bg-slate-50 space-y-3">
-            {showWalletSetup && localStorage.getItem("showWalletSetup") !== "false" && <WalletSetupPopup onClose={onCloseWalletSetup} />}
-            {previewCV && <NewCV cvData={cvData} setPreviewCV={setPreviewCV} />}
+            {/* {showWalletSetup && localStorage.getItem("showWalletSetup") !== "false" && <WalletSetupPopup onClose={onCloseWalletSetup} />} */}
+            {/* {previewCV && <NewCV cvData={cvData} setPreviewCV={setPreviewCV} />} */}
             {/* <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubuk.com" className="text-[#006666] underline">support@edubuk.com</a> or <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a></p> */}
             {/* Step 1 */}
             <div className="flex justify-between items-center">
-             <button
+             <Link
+             to={`/dashboard?tab=cv`}
              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
-             onClick={()=>setPreviewCV(true)}
-             ><EyeIcon size={16}/>Preview CV</button>
+             ><EyeIcon size={16}/>Preview CV</Link>
             <Link to="/setup-wallet" className="flex items-center gap-1.5 text-[#036665] text-sm font-medium hover:underline rounded-lg border border-[#036665] px-3 py-1"><WalletIcon size={16}/>Go To Wallet Setup</Link>
              </div>
             <HeaderButtons

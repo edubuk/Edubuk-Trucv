@@ -279,7 +279,7 @@ export default function AdminUserProfilesPage() {
   return (
     <>
       {user?.roles === "admin" ?
-        <div className="min-h-screen w-full" style={{ background: "#f7f8fb" }}>
+        <div className="min-h-screen w-auto" style={{ background: "#f7f8fb" }}>
           {/* Header */}
           <header className="w-full shadow-sm" style={{ backgroundColor: COLOR_PRIMARY }}>
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between">
