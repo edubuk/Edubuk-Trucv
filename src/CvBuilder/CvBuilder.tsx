@@ -130,7 +130,7 @@ export default function CVBuilder() {
              to={`/dashboard?tab=cv`}
              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
              ><EyeIcon size={16}/>Preview CV</Link>
-            <Link to="/setup-wallet" className="flex items-center gap-1.5 text-[#036665] text-sm font-medium hover:underline rounded-lg border border-[#036665] px-3 py-1"><WalletIcon size={16}/>Go To Wallet Setup</Link>
+            {/* <Link to="/setup-wallet" className="flex items-center gap-1.5 text-[#036665] text-sm font-medium hover:underline rounded-lg border border-[#036665] px-3 py-1"><WalletIcon size={16}/>Go To Wallet Setup</Link> */}
              </div>
             <HeaderButtons
               step={step}
@@ -216,16 +216,16 @@ export default function CVBuilder() {
                   Prev Step
                 </Button>
                 <Button
-                  disabled={step === 6}
+                  disabled={step === 7}
                   onClick={() => setStep((s) => Math.min(6, (s || 1) + 1))}
                   className="px-3 py-1 rounded bg-[#03257e] text-white"
                 >
                   Next Step
                 </Button>
-                 <button
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
-                  onClick={()=>setPreviewCV(true)}
-                  ><EyeIcon size={16}/>Preview CV</button>
+                 <Link
+             to={`/dashboard?tab=cv`}
+             className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
+             ><EyeIcon size={16}/>Preview CV</Link>
               </div>
             </div>
           </div>
