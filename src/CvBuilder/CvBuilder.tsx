@@ -11,7 +11,7 @@ import api from "@/lib/api";
 import toast from "react-hot-toast";
 import HeaderButtons from "@/components/cvBuilder/HeaderButtonns";
 //import NewCV from "./NewCV";
-import { EyeIcon, WalletIcon } from "lucide-react";
+import { EyeIcon} from "lucide-react";
 import { Link } from "react-router-dom";
 
 //import { WalletSetupPopup } from "./WalletSetupGuide";
