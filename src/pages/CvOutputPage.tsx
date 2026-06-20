@@ -227,7 +227,7 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
           <span>Swipe left/right to view the full CV</span>
         </p>
       </div>
-      <div  className=" mt-2 max-w-6xl mx-auto w-full overflow-x-scroll xl:overflow-x-clip">
+      <div  className=" mt-2 max-w-6xl mx-auto w-full overflow-x-scroll">
         {/* main */}
 
         <div ref={pdfRef} className="flex flex-col gap-3 md:gap-7 w-[1100px]">

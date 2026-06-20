@@ -6,7 +6,6 @@ import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import AppPrivacyPolicy from "./pages/AppPrivacy";
-import SubscriptionPlans from "./components/Subscription/Subscription";
 import GoogleLoginModal from "./pages/Login";
 import ProtectedRoute from "./protectRoute";
 import Layout from "./Layout/Layout";
@@ -42,6 +41,7 @@ const DigilockerConnectPage = lazy(()=>import("./pages/DigiLockerConnectPage"));
 const Hackathons = lazy(()=>import("./pages/Hackathons"));
 const UserVerification = lazy(()=>import("./pages/UserVerification"));
 const DocumentVerificationGuide = lazy(()=>import("./components/DocumentVerificationGuide"));
+const BuyPoints = lazy(()=>import("./components/Dashboard/Buypoints"));
 
 
 
@@ -84,7 +84,7 @@ function App() {
               <Route path="/verify" element={<Layout><DocumentVerifier /></Layout>} />
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />
               <Route path="/admin" element={<Layout><ProtectedRoute><AdminDashBoard/></ProtectedRoute></Layout>} />
-              <Route path="/pricing" element={<ProtectedRoute><SubscriptionPlans /></ProtectedRoute>} />
+              <Route path="/pricing" element={<ProtectedRoute><BuyPoints /></ProtectedRoute>} />
               <Route path="/create-cv" element={<Layout><ProtectedRoute><CreateCv /></ProtectedRoute></Layout>} />
               <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />
               <Route path="/register" element={<Register />} />

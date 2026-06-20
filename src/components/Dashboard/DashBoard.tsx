@@ -163,7 +163,7 @@ useEffect(() => {
       </aside>
 
       {/* Content Area */}
-      <main className="flex-1 h-screen overflow-y-auto w-full p-4 sm:p-6">
+      <main className="flex-1 h-screen overflow-y-auto w-full p-1 sm:p-6">
         {/* Mobile Header */}
         <div className="flex items-center gap-3 mb-4 lg:hidden">
           <button
