@@ -8,6 +8,7 @@ import {
   Zap,
   File,
   UserCogIcon,
+  Tag,
 } from "lucide-react";
 
 import AdminUserProfilesPage from "./Admin";
@@ -20,6 +21,7 @@ import toast from "react-hot-toast";
 import ManageHackathon from "./ManageHackathon";
 import AccessDeniedPage from "@/pages/AccessDenied";
 import CreateUser from "./CreateUser";
+import CouponManager from "./CouponManager";
 
 const AdminDashBoard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -27,7 +29,7 @@ const AdminDashBoard = () => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [requestedDoc,setRequestedDoc] = useState<[]>([]);
   const {user} = useUserData();
-  const [selected, setSelected] = useState<"users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc"|"create-user">("users");
+  const [selected, setSelected] = useState<"users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc"|"create-user"|"coupon-manager">("users");
 
     const fetchRequestDocHandler = async() => {
     setSelected("requestedDoc");
@@ -63,7 +65,7 @@ const AdminDashBoard = () => {
     Icon,
     onClick,
   }: {
-    id:"users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc" | "create-user";
+    id:"users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc" | "create-user" | "coupon-manager";
     label: string;
     Icon: any;
     onClick: () => void;
@@ -147,6 +149,12 @@ const AdminDashBoard = () => {
               Icon={UserCogIcon}
               onClick={()=>setSelected("create-user")}
             />
+            <NavItem
+              id="coupon-manager"
+              label="Coupon Manager"
+              Icon={Tag}
+              onClick={()=>setSelected("coupon-manager")}
+            />
         </nav>
       </aside>
 
@@ -197,6 +205,9 @@ const AdminDashBoard = () => {
         }
         {selected === "create-user" && (
         <CreateUser />
+        )}
+        {selected === "coupon-manager" && (
+        <CouponManager />
         )}
       </main>
     </div>:<AccessDeniedPage />}
