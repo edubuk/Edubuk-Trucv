@@ -217,7 +217,7 @@ export default function CVBuilder() {
                 </Button>
                 <Button
                   disabled={step === 7}
-                  onClick={() => setStep((s) => Math.min(6, (s || 1) + 1))}
+                  onClick={() => setStep((s) => Math.min(7, (s || 1) + 1))}
                   className="px-3 py-1 rounded bg-[#03257e] text-white"
                 >
                   Next Step
