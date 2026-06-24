@@ -68,10 +68,11 @@ export default function RegistrationPage(): JSX.Element {
         const eObj = validate();
         setErrors(eObj);
         if (Object.keys(eObj).length > 0) return;
-
+        const searchParams = new URLSearchParams(window.location.search);
+       const ref = searchParams.get("ref")
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/api/v1/user/register`, {
+            const res = await fetch(`${API_BASE_URL}/api/v1/user/register?ref=${ref}`, {
                 method: "POST",
                 body: JSON.stringify({ email: form.email, otp: form.otp, name: form.fullName, password: form.password, phoneNumber: form.phone, address: form.address }),
                 headers: {
