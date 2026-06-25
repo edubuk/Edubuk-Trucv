@@ -212,12 +212,12 @@ const TrackingLink = () => {
 
         .btn-primary {
           height: 36px; padding: 0 16px;
-          background: #111827; color: #fff;
+          background: #137368; color: #fff;
           border: none; border-radius: 8px;
           font-size: 14px; cursor: pointer;
           white-space: nowrap; display: flex; align-items: center; gap: 6px;
         }
-        .btn-primary:hover { background: #1f2937; }
+        .btn-primary:hover { background: #137368; }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .form-error {
