@@ -67,7 +67,7 @@ const OurExecutives = () => {
     </a>
 
     <p className="text-sm text-gray-600 leading-relaxed">
-      10+ years experience in <br></br>Education Sector as University Professor MBA + University Topper, Women in AI APAC Finalist
+      10+ years experience in <br></br>Education Sector as University Professor MBA + University Topper, Microsoft innovative Educator, Women in AI APAC Finalist
     </p>
   </div>
 </div>
