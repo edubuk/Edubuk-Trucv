@@ -27,8 +27,6 @@ const PaymentPopup: React.FC<Props> = ({ showPopup, setShowPopup}) => {
 
   const checkOutHandler = async () => {
     try {
-      console.log("test key",import.meta.env.VITE_Rz_Key);
-      console.log("test secret",API_BASE_URL);
       setLoading(true);
       const orderRes = await axios.post(
         `${API_BASE_URL}/cv/checkout`,
@@ -45,7 +43,7 @@ const PaymentPopup: React.FC<Props> = ({ showPopup, setShowPopup}) => {
 
       if (orderRes.data.success) {
         const options = {
-          key: import.meta.env.VITE_Rz_Key,
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
           amount: amount* 100,
           currency:currType,
           name: "Edubuk (Eduprovince Technologies Private Limited)",

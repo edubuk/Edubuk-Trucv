@@ -87,7 +87,7 @@ function App() {
               <Route path="/pricing" element={<ProtectedRoute><BuyPoints /></ProtectedRoute>} />
               <Route path="/create-cv" element={<Layout><ProtectedRoute><CreateCv /></ProtectedRoute></Layout>} />
               <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />
-              <Route path="/register" element={<Register />} />
+              <Route path="/register/:partnerName" element={<Register />} />
               <Route path="/certificate-timer" element={<Layout><ProtectedRoute><CertificateTimerPage /></ProtectedRoute></Layout>} />
               <Route path="/setup-wallet" element={<Layout><ProtectedRoute><MetamaskGuide /></ProtectedRoute></Layout>} />
               <Route path="/dl-connect" element={<DigilockerConnectPage />} />

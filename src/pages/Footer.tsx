@@ -114,12 +114,12 @@ const Footer = () => {
 
               <div className="flex gap-2 items-start">
                 <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
-                <span>Hyderabad, Telangana, India</span>
+                <span>Door no 505/B-508, Sandhya Techno-1, Rangareddy, Hyderabad- 500104, Telangana</span>
               </div>
 
               <div className="flex gap-2 items-start">
                 <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
-                <span>Dubai and Ras Al Khaimah (RAK), UAE</span>
+                <span>5th Floor, RAKBANK Office, Sheikh Zayed Road, Ras Al Khaimah (RAK), UAE</span>
               </div>
             </div>
           </div>
