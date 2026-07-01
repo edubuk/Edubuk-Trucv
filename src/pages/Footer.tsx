@@ -7,7 +7,6 @@ import social6 from "../assets/Social/social6.png";
 // import squareLogo from '@/assets/TruCV-Square.png'
 import { MdEmail, MdLocationPin, MdPhone } from "react-icons/md";
 import { FaRegFileAlt } from "react-icons/fa";
-import newLog from "../assets/newLogo.png";
 const Footer = () => {
   return (
     <div
