@@ -7,7 +7,6 @@ import social6 from "../assets/Social/social6.png";
 // import squareLogo from '@/assets/TruCV-Square.png'
 import { MdEmail, MdLocationPin, MdPhone } from "react-icons/md";
 import { FaRegFileAlt } from "react-icons/fa";
-import newLog from "../assets/newLogo.png";
 const Footer = () => {
   return (
     <div
@@ -19,7 +18,7 @@ const Footer = () => {
           {/* Logo */}
           <div className="flex flex-col items-center lg:items-start">
             <img
-              src={newLog}
+              src={"/latest_edubuk_logo.png"}
               alt="Edubuk"
               className="w-40 h-auto object-contain"
             />
@@ -119,7 +118,7 @@ const Footer = () => {
 
               <div className="flex gap-2 items-start">
                 <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
-                <span>5th Floor, RAKBANK Office, Sheikh Zayed Road, Ras Al Khaimah (RAK), UAE</span>
+                <span>5th Floor, RAKBANK Office, RAK Innovation City, Sheikh Zayed Road, Ras Al Khaimah (RAK), UAE</span>
               </div>
             </div>
           </div>
@@ -128,7 +127,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-200 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-600 text-center">
-            © 2025 Edubuk. All Rights Reserved.
+            © 2026 Edubuk. All Rights Reserved.
           </p>
 
           <div className="flex items-center gap-4">
