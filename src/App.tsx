@@ -76,7 +76,6 @@ function App() {
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/pprivacy-policy" element={<AppPrivacyPolicy />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/login" element={<GoogleLoginModal />} />
               <Route path="/verify-skill/:token" element={<SkillVerify />} />
               <Route path="/verify-document/:token" element={<DocumentVerificationPage />} />
               <Route path="cv-builder" element={<Layout><CVBuilder /></Layout>}> </Route>
@@ -87,7 +86,12 @@ function App() {
               <Route path="/pricing" element={<ProtectedRoute><SubscriptionPlans /></ProtectedRoute>} />
               <Route path="/create-cv" element={<Layout><ProtectedRoute><CreateCv /></ProtectedRoute></Layout>} />
               <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />
-              <Route path="/register/:partnerName" element={<Register />} />
+              <Route path="/register/:partnerName" element={<Layout>
+                <Register />
+              </Layout> } />
+              <Route path="/login" element={<Layout>
+                <GoogleLoginModal />
+              </Layout> } />
               <Route path="/certificate-timer" element={<Layout><ProtectedRoute><CertificateTimerPage /></ProtectedRoute></Layout>} />
               <Route path="/setup-wallet" element={<Layout><ProtectedRoute><MetamaskGuide /></ProtectedRoute></Layout>} />
               <Route path="/dl-connect" element={<DigilockerConnectPage />} />
