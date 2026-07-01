@@ -7,6 +7,7 @@ import { ArrowLeftSquare, Loader2 } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import 'react-phone-input-2/lib/style.css';
 import api from "@/lib/api";
+import Footer from "./Footer";
 // interface UserLoginData {
 //     name: string;
 //     email: string;
@@ -138,8 +139,9 @@ export default function RegistrationPage(): JSX.Element {
     // };
 
     return (
+        <>
         <div className="h-auto flex items-center justify-center bg-white">
-    <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center md:px-2">
+        <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center md:px-2">
         {/* Left - illustration / marketing (desktop only) */}
         <div className="hidden md:flex flex-col gap-6 p-8 rounded-2xl">
             <div className="flex items-center gap-2">
@@ -415,7 +417,10 @@ export default function RegistrationPage(): JSX.Element {
                 </div>
             </form>
         </div>
-    </div>
-</div>
+        </div>
+        </div>
+
+        <Footer/>
+        </>
     );
 }

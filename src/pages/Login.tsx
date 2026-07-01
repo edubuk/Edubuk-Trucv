@@ -4,6 +4,7 @@ import loginImg from "../assets/login.avif";
 import toast from "react-hot-toast";
 import { ArrowLeftSquare, EyeIcon, EyeOffIcon } from "lucide-react";
 import api from "@/lib/api";
+import Footer from "./Footer";
 
 type FormState = {
     email: string;
@@ -64,6 +65,8 @@ export default function LoginPage(): JSX.Element {
     };
 
     return (
+        <>
+        
         <div className="min-h-screen lg:h-screen flex items-center justify-center bg-white px-2 md:px-4 py-3">
             <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
 
@@ -219,5 +222,8 @@ export default function LoginPage(): JSX.Element {
                 </div>
             </div>
         </div>
+
+        <Footer/>
+        </>
     );
 }
