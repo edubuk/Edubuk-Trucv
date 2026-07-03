@@ -12,7 +12,14 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import api from "@/lib/api"; // your axios/fetch wrapper — adjust import path
+import { usePayment } from "../../hooks/usePayment";
+import { useCoupon } from "../../hooks/useCoupon";
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 const COLOR_PRIMARY = "#03257e";
 const COLOR_ACCENT = "#008888";
@@ -28,14 +35,6 @@ interface IPlan {
   perMonth: string;
 }
 
-interface ICouponResult {
-  valid: boolean;
-  code: string;
-  discountType: "percent" | "flat" | "free";
-  discountAmount: number; // in rupees, already calculated for the selected plan
-  finalAmount: number; // in rupees
-  message?: string;
-}
 
 const PLANS: IPlan[] = [
   {
@@ -80,50 +79,68 @@ const FEATURES = [
   },
 ];
 
+const loadRazorpayScript = () => {
+  return new Promise<boolean>((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 export default function BuyPoints() {
   const [selectedPlan, setSelectedPlan] = useState<IPlan["id"]>("yearly");
   const [couponInput, setCouponInput] = useState("");
-  const [couponResult, setCouponResult] = useState<ICouponResult | null>(null);
-  const [couponError, setCouponError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
+
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
 
-  const activePlan = PLANS.find((p) => p.id === selectedPlan)!;
+  const { createOrder, verifyPayment,paymentError,setPaymentError } = usePayment();
+  const { validateCoupon,validateCouponData,setValidateCouponData,couponError,setCouponError } = useCoupon();
 
-  // re-validate automatically if user switches plans after applying a coupon
+  const activePlan = PLANS.find((p) => p.id === selectedPlan)!;
+  const finalPrice = validateCouponData?.coupon ? validateCouponData.coupon.finalAmount : activePlan.price;
+
   useEffect(() => {
-    if (couponResult) {
-      validateCoupon(couponResult.code);
+    if (validateCouponData) {
+      validateCouponHandler(validateCouponData.coupon.code);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPlan]);
 
-  const validateCoupon = async (codeRaw: string) => {
+  const validateCouponHandler = async (codeRaw: string) => {
     const code = codeRaw.trim().toUpperCase();
     if (!code) return;
 
     setIsValidating(true);
     setCouponError(null);
+    setPaymentError(null);
 
     try {
-      const res = await api.post("/coupons/validate", {
+      const result = await validateCoupon({
         code,
         plan: selectedPlan,
       });
 
-      if (!res.data.success) {
-        setCouponResult(null);
-        setCouponError(res.data.message || "Invalid coupon code");
+      if (!result?.success) {
+        setValidateCouponData(null);
+        setCouponError("Invalid coupon code");
         return;
       }
-
-      setCouponResult(res.data.data); // { valid, code, discountType, discountAmount, finalAmount }
     } catch (err: any) {
-      setCouponResult(null);
+      setValidateCouponData(null);
       setCouponError(
-        err?.response?.data?.message || "Could not validate coupon",
+        err?.response?.data?.message ||
+          err?.message ||
+          "Could not validate coupon"
       );
     } finally {
       setIsValidating(false);
@@ -134,77 +151,95 @@ export default function BuyPoints() {
     setCouponInput(value);
     setCouponError(null);
 
-    // clear any applied coupon as soon as the user edits the field again
-    if (couponResult) setCouponResult(null);
+    if (validateCouponData) {
+      setValidateCouponData(null);
+    }
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
     if (!value.trim()) return;
 
-    // debounce live validation as the user types
-    debounceRef.current = setTimeout(() => validateCoupon(value), 600);
+    debounceRef.current = setTimeout(() => {
+      validateCouponHandler(value);
+    }, 600);
   };
 
   const clearCoupon = () => {
     setCouponInput("");
-    setCouponResult(null);
+    setValidateCouponData(null);
     setCouponError(null);
   };
 
-  const finalPrice = couponResult ? couponResult.finalAmount : activePlan.price;
-
   const handlePurchase = async () => {
     setIsPurchasing(true);
+    setCouponError(null);
+
     try {
-      // server recalculates the price + re-validates the coupon —
-      // never trust couponResult.finalAmount for the actual charge
-      const res = await api.post("/payments/checkout", {
-        plan: selectedPlan,
-        couponCode: couponResult ? couponResult.code : undefined,
-      });
+      const orderData = await createOrder(
+        validateCouponData?.coupon.code ?? null,
+        selectedPlan
+      );
 
-      const { order, free } = res.data;
+      if (!orderData) {
+        setCouponError("Could not create payment order");
+        return;
+      }
 
-      // free coupon (e.g. "FOUNDER6") — backend already activated the
-      // subscription, no Razorpay flow needed
-      if (free) {
-        navigate("/dashboard", { state: { activated: true } });
+      const loaded = await loadRazorpayScript();
+
+      if (!loaded) {
+        setCouponError("Razorpay failed to load");
         return;
       }
 
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: order.currency,
-        order_id: order.id,
+        key: import.meta.env.VITE_RZ_KEY,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        order_id: orderData.order.id,
         name: "EBUK",
         description: `${activePlan.label} points plan`,
+
         handler: async (response: any) => {
-          await api.post("/payments/verify", {
+          const verified = await verifyPayment({
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
-            couponCode: couponResult ? couponResult.code : undefined,
+            plan: selectedPlan,
+            couponCode: validateCouponData?.coupon.code ?? null,
           });
-          navigate("/dashboard", { state: { purchased: true } });
+
+          if (!verified) {
+            setCouponError("Payment verification failed");
+            return;
+          }
+
+          navigate("/dashboard", {
+            state: { purchased: true },
+          });
         },
-        theme: { color: COLOR_ACCENT },
+
+        theme: {
+          color: COLOR_ACCENT,
+        },
       };
 
-      const razorpay = new (window as any).Razorpay(options);
+      const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (err: any) {
       setCouponError(
-        err?.response?.data?.message || "Something went wrong, try again",
+        err?.response?.data?.message || err?.message || "Something went wrong"
       );
     } finally {
       setIsPurchasing(false);
     }
   };
-
+  console.log({validateCouponData})
   return (
     <div className="min-h-screen w-full" style={{ background: "#f7f8fb" }}>
       <main className="w-full sm:max-w-4xl sm:mx-auto sm:px-6 py-6 space-y-6">
-        {/* Header banner */}
         <div className="relative">
           <div className="absolute -inset-3 rounded-xl bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] opacity-90" />
           <div className="relative bg-white border border-gray-200 rounded-xl px-6 py-8 text-center">
@@ -218,16 +253,16 @@ export default function BuyPoints() {
               Buy EBUK points
             </h1>
             <p className="text-sm text-gray-600 max-w-md mx-auto">
-              Top up your wallet to verify your education, experience and
-              award documents. Points never expire.
+              Top up your wallet to verify your education, experience and award
+              documents. Points never expire.
             </p>
           </div>
         </div>
 
-        {/* Plan cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {PLANS.map((plan) => {
             const isSelected = selectedPlan === plan.id;
+
             return (
               <button
                 key={plan.id}
@@ -274,6 +309,7 @@ export default function BuyPoints() {
                     /{plan.durationMonths === 12 ? "yr" : "6mo"}
                   </span>
                 </div>
+
                 <p className="text-xs text-gray-500 mb-4">{plan.perMonth}</p>
 
                 <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
@@ -287,7 +323,6 @@ export default function BuyPoints() {
           })}
         </div>
 
-        {/* Coupon code */}
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
             <Tag className="h-4 w-4" style={{ color: COLOR_PRIMARY }} />
@@ -303,24 +338,23 @@ export default function BuyPoints() {
                 value={couponInput}
                 onChange={(e) => handleCouponChange(e.target.value)}
                 placeholder="Enter coupon code"
-                disabled={!!couponResult}
+                disabled={!!validateCouponData?.coupon}
                 className="w-full text-sm px-3 py-2.5 rounded-lg border border-gray-300 uppercase tracking-wide placeholder:normal-case placeholder:tracking-normal focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-500"
                 style={{
-                  borderColor: couponResult
+                  borderColor: validateCouponData?.coupon
                     ? COLOR_ACCENT
                     : couponError
                       ? "#dc2626"
                       : "#d1d5db",
                 }}
               />
+
               {isValidating && (
-                <Loader2
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400"
-                />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
               )}
             </div>
 
-            {couponResult ? (
+            {validateCouponData?.coupon ? (
               <button
                 onClick={clearCoupon}
                 className="flex items-center gap-1 text-xs font-medium px-3 py-2.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50"
@@ -329,7 +363,7 @@ export default function BuyPoints() {
               </button>
             ) : (
               <button
-                onClick={() => validateCoupon(couponInput)}
+                onClick={() => validateCouponHandler(couponInput)}
                 disabled={!couponInput.trim() || isValidating}
                 className="text-xs font-medium px-4 py-2.5 rounded-lg text-white disabled:opacity-40"
                 style={{ backgroundColor: COLOR_PRIMARY }}
@@ -339,16 +373,19 @@ export default function BuyPoints() {
             )}
           </div>
 
-          {couponResult && (
-            <div className="mt-3 flex items-center gap-2 text-sm" style={{ color: "#0F6E56" }}>
+          {validateCouponData?.coupon && (
+            <div
+              className="mt-3 flex items-center gap-2 text-sm"
+              style={{ color: "#0F6E56" }}
+            >
               <CheckCircle2 className="h-4 w-4" />
-              {couponResult.discountType === "free" ? (
+              {validateCouponData.coupon.discountType === "free" ? (
                 <span className="font-medium">
                   Coupon applied — this plan is free!
                 </span>
               ) : (
                 <span className="font-medium">
-                  Coupon applied — you saved ₹{couponResult.discountAmount}
+                  Coupon applied — you saved ₹ {validateCouponData.coupon.discountAmount}
                 </span>
               )}
             </div>
@@ -357,31 +394,36 @@ export default function BuyPoints() {
           {couponError && (
             <p className="mt-3 text-sm text-red-600">{couponError}</p>
           )}
+
+          {paymentError && (
+            <p className="mt-3 text-sm text-red-600">{paymentError}</p>
+          )}
         </div>
 
-        {/* Features */}
         <div>
           <p className="text-sm font-semibold text-gray-900 mb-3 px-1">
             What you get with verification
           </p>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {FEATURES.map((f, i) => (
+            {FEATURES.map((feature, index) => (
               <div
-                key={i}
+                key={index}
                 className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-3"
               >
                 <div
                   className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: "#f7f8fb" }}
                 >
-                  {f.icon}
+                  {feature.icon}
                 </div>
+
                 <div>
                   <p className="text-sm font-semibold text-gray-900">
-                    {f.title}
+                    {feature.title}
                   </p>
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                    {f.desc}
+                    {feature.desc}
                   </p>
                 </div>
               </div>
@@ -389,13 +431,12 @@ export default function BuyPoints() {
           </div>
         </div>
 
-        {/* Sticky purchase bar */}
         <div className="bg-white border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between flex-wrap gap-4 sticky bottom-4 shadow-lg">
           <div>
             <p className="text-xs text-gray-500">You selected</p>
             <p className="text-base font-bold text-gray-900 flex items-baseline gap-2 flex-wrap">
               {activePlan.label} —{" "}
-              {couponResult ? (
+              {validateCouponData?.coupon ? (
                 <>
                   <span className="line-through text-gray-400 font-normal text-sm">
                     ₹{activePlan.price}
@@ -408,6 +449,7 @@ export default function BuyPoints() {
               for {activePlan.points} points
             </p>
           </div>
+
           <button
             onClick={handlePurchase}
             disabled={isPurchasing}
@@ -415,7 +457,7 @@ export default function BuyPoints() {
             style={{ backgroundColor: COLOR_ACCENT }}
           >
             {isPurchasing && <Loader2 className="h-4 w-4 animate-spin" />}
-            {couponResult?.discountType === "free"
+            {validateCouponData?.coupon?.discountType === "free"
               ? "Activate free plan"
               : "Proceed to payment"}
           </button>

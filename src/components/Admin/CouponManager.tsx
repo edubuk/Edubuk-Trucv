@@ -172,7 +172,7 @@ export default function CouponManager() {
     );
   }
   
-
+ console.log({listOfCouponsData});
   return (
     <div className="min-h-screen w-full" style={{ background: "#f7f8fb" }}>
       <main className="w-full sm:max-w-5xl sm:mx-auto sm:px-6 py-6 space-y-6">
