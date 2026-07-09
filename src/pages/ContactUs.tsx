@@ -92,6 +92,13 @@ const ContactUs: React.FC = () => {
 
                     <p className="text-gray-600 mt-1 leading-relaxed">
                     2nd Floor, R Square Building, Opposite SRS Mall, Vipul Khand, Gomti Nagar, Lucknow, Uttar Pradesh, India
+                      PHF 4117, Prestige High Fields,
+                      <br />
+                      ISB Road, Financial District,
+                      <br />
+                      Hyderabad - 500032,
+                      <br />
+                      Telangana, India
                     </p>
                   </div>
                 </div>
