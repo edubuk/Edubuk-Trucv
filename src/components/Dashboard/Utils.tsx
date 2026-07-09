@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
 import { Infinity as InfinityIcon, ShieldCheckIcon, TrendingUp } from "lucide-react";
 import EBUKLogo from "@/assets/ebukLogo.webp";
+import { ISubscription } from "@/api/subscription.apis";
 
 const COLOR_PRIMARY = "#03257e";
 const COLOR_ACCENT = "#008888";
 const COLOR_WARNING = "#f14419";
 
+interface SubscriptionProps {
+  subscriptionDetails: ISubscription | null;
+}
 
-export function EbukPointsBar({ balance }: { balance: number }) {
+export function EbukPointsBar({ subscriptionDetails }: SubscriptionProps) {
   return (
 <div className="relative mx-6 mt-4">
   <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] opacity-90" />
@@ -16,11 +20,12 @@ export function EbukPointsBar({ balance }: { balance: number }) {
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center"
         >
-            <img src={EBUKLogo} alt="EBUK Logo" className="h-10 w-10 rounded-full" />
+            <img src={EBUKLogo} alt="EBUK Logo" className="h-auto w-10 rounded-full" />
         </div>
         <div>
-          <p className="text-sm text-[#03257e]">EBUK points balance</p>
-          <p className="text-xl font-bold text-[#006666]">{balance} pts</p>
+          <p className="text-sm text-[#03257e]">EBUK Credits</p>
+          <p className="text-xl font-bold text-[#006666]">{subscriptionDetails?.balance ?? 0} pts</p>
+          <p className="text-xs text-gray-600">1 Document verification required 50 EBUK Credits</p>
         </div>
       </div>
       <Link
@@ -28,7 +33,7 @@ export function EbukPointsBar({ balance }: { balance: number }) {
         className="text-sm font-medium px-4 py-2.5 rounded-lg text-white"
         style={{ backgroundColor: COLOR_ACCENT }}
       >
-        Buy points
+        {subscriptionDetails?.balance && subscriptionDetails.balance > 0 ? "Buy more credits" : "Buy credits"}
       </Link>
       </div>
     </div>
