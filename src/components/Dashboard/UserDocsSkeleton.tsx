@@ -103,6 +103,32 @@ export default function UserDocsSkeleton() {
                 </div>
               </div>
             </div>
+            <div className="relative mx-6 mt-4">
+              <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] opacity-90" />
+              <div className="relative bg-white border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                    >
+                        <p className="h-10 w-10 rounded-full"></p>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Shimmer style={{ width: 120, height: 10, borderRadius: 7 }} />
+                      <Shimmer style={{ width: 120, height: 10, borderRadius: 7 }} />
+                    </div>
+                  </div>
+                  <Shimmer style={{ width:150, height:20, borderRadius: 3 }} />
+                  </div>
+                </div>
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      {Array(3).fill(0).map((_, i) => (
+        <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
+          <Shimmer style={{ width: 20, height: 20, borderRadius: 5 }} />
+          <Shimmer style={{ width: 180, height: 16, borderRadius: 7, marginTop: 8 }} />
+          <Shimmer style={{ width: "70%", height: 12, borderRadius: 6, marginTop: 6 }} />
+        </div>
+      ))}
+    </div>
 
             {/* Section body */}
             <div style={{ padding: "20px 24px 24px" }}>

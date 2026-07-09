@@ -1,6 +1,6 @@
-import { ArrowUpRight, Crown, Phone,User } from 'lucide-react';
+import { Phone,User } from 'lucide-react';
 import { MdClose } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+
 
 export default function ProfilePopup({ openProfile, setOpenProfile, user }: { openProfile: boolean, setOpenProfile: (openProfile: boolean) => void, user: any }) {
 
@@ -31,25 +31,6 @@ export default function ProfilePopup({ openProfile, setOpenProfile, user }: { op
           <p className='flex gap-1'><User /> <span className='font-bold text-[#03257e]'>{user?.name}</span></p>
           <p className='flex gap-1'><Phone /> <span className='font-bold text-[#03257e]'>{user?.phoneNumber}</span></p>
         </div>}
-        <div className="flex items-center gap-2 mt-3">
-          {user?.subscriptionPlan === "pro" ? (
-            <div>
-              <div className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                <Crown size={16} className="text-yellow-500" />
-                <p className="text-sm font-medium">Pro Member</p>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">Expires on: <span className="font-medium text-green-700">{user?.subscriptionExpiry ? new Date(user.subscriptionExpiry).toLocaleDateString() : 'Unknown'}</span></p>
-            </div>
-          ) : (
-            <Link
-              to="/pricing"
-              className="flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200 transition"
-            >
-              <ArrowUpRight size={16} />
-              <span className="text-sm font-medium">Upgrade to Pro</span>
-            </Link>
-          )}
-        </div>
 
         {/* {walletInfoData ? <div className="border-t pt-3 flex flex-col gap-3">
           <p className='flex gap-1'><Wallet /> <span className='font-bold text-[#03257e]'>{walletInfoData?.algoBalance} Algo</span></p>

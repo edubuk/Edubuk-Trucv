@@ -1,11 +1,13 @@
 import api from "@/lib/api"
 
 export interface IValidateCouponData {
-  valid: boolean;
-  code: string;
-  discountType: "percent" | "flat" | "free";
-  discountAmount: number;
-  finalAmount: number;
+  coupon: {
+    valid: boolean;
+    code: string;
+    discountType: "percent" | "flat" | "free";
+    discountAmount: number;
+    finalAmount: number;
+  };
 }
 
 export interface ICreateCouponPayload {
@@ -41,7 +43,7 @@ const createCoupon = async (
   payload: ICreateCouponPayload
 ): Promise<CouponResponse<{ message: string }>> => {
   try {
-    const { data } = await api.post("/coupon/create", payload);
+    const { data } = await api.post("/coupons/create", payload);
     return data;
   } catch (err: any) {
     return {
@@ -76,7 +78,7 @@ const updateCoupon = async (
   payload: ICreateCouponPayload
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const { data } = await api.put(`/coupon/update/${couponId}`, payload);
+    const { data } = await api.put(`/coupons/update/${couponId}`, payload);
     return data;
   } catch (err: any) {
     return {
@@ -90,7 +92,7 @@ const deleteCoupon = async (
   couponId: string
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const { data } = await api.delete(`/coupon/delete/${couponId}`);
+    const { data } = await api.delete(`/coupons/delete/${couponId}`);
     return data;
   } catch (err: any) {
     return {
@@ -101,9 +103,9 @@ const deleteCoupon = async (
 };
 
 
-const getListOfCoupons = async ():Promise<CouponResponse<{ coupons: ICoupon[] }>> => {
+const getListOfCoupons = async ():Promise<CouponResponse<{ data: ICoupon[] }>> => {
   try {
-    const { data } = await api.get("/coupon/list");
+    const { data } = await api.get("/coupons/list");
     return data;
   } catch (err: any) {
     return {

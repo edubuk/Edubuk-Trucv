@@ -45,8 +45,9 @@ interface ICouponFormState {
 }
 
 const PLAN_OPTIONS = [
-  { id: "yearly", label: "Yearly" },
-  { id: "half_yearly", label: "Half Yearly" },
+  { id: "starter", label: "Starter" },
+  { id: "professional", label: "Professional" },
+  { id: "elite", label: "Elite" },
 ];
 
 const EMPTY_FORM: ICouponFormState = {
@@ -172,7 +173,7 @@ export default function CouponManager() {
     );
   }
   
-
+ console.log({listOfCouponsData});
   return (
     <div className="min-h-screen w-full" style={{ background: "#f7f8fb" }}>
       <main className="w-full sm:max-w-5xl sm:mx-auto sm:px-6 py-6 space-y-6">

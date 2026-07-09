@@ -17,6 +17,8 @@ import CertificateTimerPage from "./components/Certification/CertificateTimerPag
 import AdminDashBoard from "./components/Admin/AdminDashboard";
 import { Providers } from "./app/providers";
 import CvSearchPage from "./components/BrowseCvs/Cvsearchpage";
+import SessionExpiredPopup from "./pages/SessionExpiredPopup";
+import { useUserData } from "./context/AuthContext";
 
 
 // Lazy-loaded pages
@@ -47,7 +49,7 @@ const BuyPoints = lazy(()=>import("./components/Dashboard/Buypoints"));
 
 
 function App() {
-
+  const {user} = useUserData();
   useEffect(() => {
 
     AOS.init({
@@ -59,6 +61,7 @@ function App() {
 
   return (
     <div>
+      <SessionExpiredPopup expiresAt={user?.exp}/>
       <Providers>
           <Suspense fallback={<div className="flex justify-center items-center text-3xl text-[#03257e] font-bold h-[80vh]" data-aos="zoom-in">Loading {""} <ThreeDotLoader w={2} h={2} yPos={'end'} /></div>}>
             <Routes>

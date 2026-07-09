@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ExternalLink,
   ShieldCheck,
@@ -16,6 +16,8 @@ import ResendEmail from "../../pages/ResendEmail";
 import UserDocsSkeleton from "./UserDocsSkeleton";
 import { Link } from "react-router-dom";
 import { EbukPointsBar, VerificationBenefits } from "./Utils";
+import { ISubscription } from "@/api/subscription.apis";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const COLOR_PRIMARY = "#03257e";
 const COLOR_ACCENT = "#008888";
@@ -237,6 +239,8 @@ export default function UserDocs({
   setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>;
   isFetching: boolean;
 }) {
+  const [subscriptionDetails,setSubscriptionDetails] = useState<ISubscription | null>(null);
+  const {getSubscription,isSubscriptionLoading} = useSubscription();
   const [openModel, setOpenModel] = useState(false);
   const [docId, setDocId] = useState<string>("");
   const { user } = useUserData();
@@ -261,9 +265,17 @@ export default function UserDocs({
     });
   };
 
-  if (isFetching) {
+    useEffect(()=>{
+    getSubscription().then((res)=>{
+      console.log("subscriptionres",res);
+      setSubscriptionDetails(res);
+    });
+  },[])
+
+  if (isFetching || isSubscriptionLoading) {
     return <UserDocsSkeleton />;
   }
+
 
   const hasEducationDocs = educationDocs?.length > 0;
   const hasExperienceDocs = experienceDocs?.length > 0;
@@ -296,7 +308,7 @@ export default function UserDocs({
                 </div>
               </div>
             </div>
-             <EbukPointsBar balance={500} />
+             <EbukPointsBar subscriptionDetails={subscriptionDetails}/>
             {/* Documents Section */}
             <div className="px-1 sm:px-6 py-6">
                <VerificationBenefits />
@@ -374,7 +386,7 @@ export default function UserDocs({
                     </span>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4">
+                  {/* <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4">
                     <p className="text-sm" style={{ color: COLOR_PRIMARY }}>
                       <span
                         style={{ color: COLOR_WARNING }}
@@ -385,7 +397,7 @@ export default function UserDocs({
                       If any document was rejected, you can submit a corrected
                       version using the "Request Verification" button.
                     </p>
-                  </div>
+                  </div> */}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {educationDocs.map((cert) => (
@@ -478,9 +490,9 @@ export default function UserDocs({
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {awardDocs.map((cert) => (
+                    {awardDocs.map((cert,index) => (
                       <DocumentCard
-                        key={cert.awardDocId}
+                        key={index+1}
                         id={cert._id}
                         title={cert.name}
                         subtitle={
