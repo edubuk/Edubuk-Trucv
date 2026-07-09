@@ -144,6 +144,8 @@ const CvSearchPage: React.FC = () => {
   const handleClear = () => {
     setFilters(DEFAULT_FILTERS);
     //setProfiles([]);
+    setPage(1);
+    setSearchQuery("");
     setTotal(0);
     //setTotalPages(0);
     setSelectedId(null);

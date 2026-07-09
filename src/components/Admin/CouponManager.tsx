@@ -45,8 +45,9 @@ interface ICouponFormState {
 }
 
 const PLAN_OPTIONS = [
-  { id: "yearly", label: "Yearly" },
-  { id: "half_yearly", label: "Half Yearly" },
+  { id: "starter", label: "Starter" },
+  { id: "professional", label: "Professional" },
+  { id: "elite", label: "Elite" },
 ];
 
 const EMPTY_FORM: ICouponFormState = {

@@ -26,33 +26,33 @@ const COLOR_ACCENT = "#008888";
 const COLOR_WARNING = "#f14419";
 
 interface IPlan {
-  id: "half_yearly" | "yearly";
+  id: "starter" | "professional" | "elite";
   label: string;
-  durationMonths: number;
   price: number;
   points: number;
   badge?: string;
-  perMonth: string;
 }
-
 
 const PLANS: IPlan[] = [
   {
-    id: "half_yearly",
-    label: "Half yearly",
-    durationMonths: 6,
-    price: 899,
-    points: 300,
-    perMonth: "₹150/month",
+    id: "starter",
+    label: "Starter",
+    price: 499,
+    points: 499,
   },
   {
-    id: "yearly",
-    label: "Yearly",
-    durationMonths: 12,
-    price: 1799,
-    points: 700,
-    badge: "Best value",
-    perMonth: "₹150/month",
+    id: "professional",
+    label: "Professional",
+    price: 999,
+    points: 1200,
+    badge: "Most Popular",
+  },
+  {
+    id: "elite",
+    label: "Elite",
+    price: 2000,
+    points: 2500,
+    badge:"Best value"
   },
 ];
 
@@ -95,7 +95,7 @@ const loadRazorpayScript = () => {
 };
 
 export default function BuyPoints() {
-  const [selectedPlan, setSelectedPlan] = useState<IPlan["id"]>("yearly");
+  const [selectedPlan, setSelectedPlan] = useState<IPlan["id"]>("starter");
   const [couponInput, setCouponInput] = useState("");
   const [isValidating, setIsValidating] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
@@ -250,11 +250,11 @@ export default function BuyPoints() {
               <Coins className="h-7 w-7" style={{ color: COLOR_PRIMARY }} />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Buy EBUK points
+              Buy EBUK Credits
             </h1>
             <p className="text-sm text-gray-600 max-w-md mx-auto">
               Top up your wallet to verify your education, experience and award
-              documents. Points never expire.
+              documents. Credits never expire.
             </p>
           </div>
         </div>
@@ -305,17 +305,12 @@ export default function BuyPoints() {
                   <span className="text-3xl font-bold text-gray-900">
                     ₹{plan.price}
                   </span>
-                  <span className="text-sm text-gray-500">
-                    /{plan.durationMonths === 12 ? "yr" : "6mo"}
-                  </span>
                 </div>
-
-                <p className="text-xs text-gray-500 mb-4">{plan.perMonth}</p>
 
                 <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                   <Coins className="h-4 w-4" style={{ color: COLOR_PRIMARY }} />
                   <span className="text-sm font-semibold text-gray-900">
-                    {plan.points} points
+                    {plan.points} credits
                   </span>
                 </div>
               </button>
@@ -394,7 +389,7 @@ export default function BuyPoints() {
           {couponError && (
             <p className="mt-3 text-sm text-red-600">{couponError}</p>
           )}
-
+       
           {paymentError && (
             <p className="mt-3 text-sm text-red-600">{paymentError}</p>
           )}

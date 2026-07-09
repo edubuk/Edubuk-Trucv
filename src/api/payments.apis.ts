@@ -4,7 +4,7 @@ export type PaymentResponse<T> =
   | { success: true; data: T; message?: string }
   | { success: false; message: string };
 
-export type PlanType = "half_yearly" | "yearly";
+export type PlanType = "starter" | "professional" | "elite";
 
 export interface ICheckout {
   order: {

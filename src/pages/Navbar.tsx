@@ -139,7 +139,7 @@ const Navbar: React.FC = () => {
       data-aos="fade-right"
     >
       <img
-        src={logo}
+        src={"/latest_edubuk_logo.png"}
         alt="Logo"
         className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 "
       />

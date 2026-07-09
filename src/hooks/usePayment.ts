@@ -27,8 +27,10 @@ export const usePayment = () => {
       }
 
       setOrderDetails(response.data);
+      console.log("response in create order",response.data)
       return response.data;
     } catch (err: any) {
+        console.log("error in checkout",err)
       setPaymentError(err.response?.data?.message || err.message || "Something went wrong");
       return null;
     } finally {

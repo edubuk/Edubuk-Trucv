@@ -43,7 +43,7 @@ const createCoupon = async (
   payload: ICreateCouponPayload
 ): Promise<CouponResponse<{ message: string }>> => {
   try {
-    const { data } = await api.post("/coupon/create", payload);
+    const { data } = await api.post("/coupons/create", payload);
     return data;
   } catch (err: any) {
     return {
