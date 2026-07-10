@@ -1,6 +1,7 @@
-import { Building2, CircleUser, GraduationCap, MapPin, RefreshCw, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowBigLeft, Building2, CircleUser, GraduationCap,MapPin, RefreshCw, Search, SlidersHorizontal, X } from "lucide-react";
 import { SiHyperskill } from "react-icons/si";
 import trucvLogo from "@/assets/truCV2.png"
+import { Link } from "react-router-dom";
 
 const NAVY   = "#03257e";
 const TEAL   = "#006666";
@@ -70,10 +71,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({ filters, onChange, onSearc
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 md:gap-5">
+          <Link to="/" className="flex justify-center items-center gap-1 text-white "><ArrowBigLeft size={20} color="white"/> Go Back</Link>
+          <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 border border-[#ffffff] rounded-full bg-[#03257e]" />
           <div className="w-2 h-2 border border-[#ffffff] rounded-full bg-[#008888]" />
           <div className="w-2 h-2 border border-[#ffffff] rounded-full bg-[#f14419]" />
+          </div>
         </div>
       </div>
 

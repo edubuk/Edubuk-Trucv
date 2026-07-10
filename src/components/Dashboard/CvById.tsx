@@ -12,7 +12,10 @@ const CvById = () => {
 
   if(isCvLoading){
     return (
+
+      <div className="flex justify-center items-center">
       <CvSkeleton />
+      </div>
     )
   }
   return (

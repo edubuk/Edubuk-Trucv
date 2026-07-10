@@ -6,9 +6,7 @@ import {
   Building2,
   Calendar,
   Delete,
-  ExternalLink,
   FileText,
-  Paperclip,
   PlusCircle,
   Replace,
   Trash2,
@@ -30,7 +28,6 @@ import { IStepCard } from "./PersonalDetails";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import SelfAttestButton from "@/components/Buttons/SelfAttest";
-import { handleProofUploaded } from "./uploadProof";
 import toast from "react-hot-toast";
 //import { useUserData } from "@/context/AuthContext";
 import LoadingButton from "@/components/LoadingButton";
@@ -49,10 +46,7 @@ export const AwardDetails = ({
   cvData,
   setCvData,
 }: IStepCard) => {
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [idx,setIdx] = useState<number>();
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
   const [refresh, setRefresh] = useState<boolean>(true);
   //const {submitDocument} = useContract();
@@ -226,27 +220,6 @@ export const AwardDetails = ({
       toast.error("something went wrong");
     }finally{setLoadingState(null)}
   };
-
-  const uploadDocHandler = async(file:File,index:number)=>{
-    if (!file) return;
-    setSelectedFileName(file.name);
-    const uploadRes = await handleProofUploaded({
-      file,
-      setIsUploading,
-      setUploadError,
-      setSelectedFileName,
-    });
-    if(!uploadRes) return;
-    const {url,docHash} = uploadRes;
-    setValue(`awards.${index}.docUri`, url, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-    setValue(`awards.${index}.docHash`, docHash, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  }
 
   const deleteHandler = async (index: number) => {
     try {
@@ -557,131 +530,6 @@ export const AwardDetails = ({
                       )}
                     />
                   </div>
-                  {!isMongoId(a.id)&&<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center mt-1">
-                    {/* Upload / proof column */}
-                    <FormField
-                      control={control}
-                      name={`awards.${index}.docUri`}
-                      render={() => (
-                        <FormItem className="flex-1">
-                          <FormLabel>
-                            <div className="flex items-start md:items-center gap-2">
-                              <Paperclip className="h-5 w-5 text-gray-700" />
-                              <div className="text-sm text-gray-700">
-                                Upload your document and send an email to the
-                                issuer for verification.
-                              </div>
-                            </div>
-                          </FormLabel>
-
-                          <FormControl>
-                            {/* Styled drop area / button */}
-                            <div className="relative w-full bg-white">
-                              <input
-                                id={`proof-file-${index}`}
-                                type="file"
-                                accept=".jpg,.jpeg,.png,.pdf"
-                                onChange={(event)=>uploadDocHandler(event.target.files?.[0]!,index)}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                aria-label={`Upload proof for experience ${
-                                  index + 1
-                                }`}
-                              />
-
-                              {/* Visible content */}
-                              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-2">
-                                {form.getValues(
-                                    `awards.${index}.docUri`
-                                  )?<div className="flex items-center gap-2">
-                                    <span className="text-green-600">
-                                      File Uploaded
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        // clear file input visually — if you need to clear the actual input element value, you can
-                                        // keep a ref to the input and set inputRef.current.value = ""
-                                        setSelectedFileName(null);
-                                        // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
-                                      }}
-                                      className="text-sm px-3 py-1 text-[#f14419] rounded-md border border-[#f14419] hover:bg-[#f14419] hover:text-white"
-                                    >
-                                      Clear
-                                    </button>
-                                  </div>:<div className="flex flex-col gap-2">
-                                  <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
-                                    <Paperclip className="h-4 w-4 text-[#171515]" />
-                                    <span className="text-sm text-gray-800">
-                                      {selectedFileName ??
-                                        "Upload File"}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-[#f14419]">
-                                    Accepted:.jpg .jpeg .png .pdf — max
-                                    5MB
-                                  </p>
-                                </div>}
-                              </div>
-                            </div>
-                          </FormControl>
-
-                          <FormMessage />
-
-                          {/* upload / error states already in your codebase */}
-                          {uploadError && (
-                            <p className="mt-2 text-sm text-red-600 font-medium">
-                              {uploadError}
-                            </p>
-                          )}
-                          {isUploading && (
-                            <p className="mt-2 text-sm text-green-600">
-                              Uploading document — please wait…
-                            </p>
-                          )}
-
-                          {/* If you have a stored URL in the form value, show a preview link */}
-                          {form.getValues(`awards.${index}.docUri`) && (
-                            <a
-                              href={form.getValues(`awards.${index}.docUri`)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="mt-3 flex w-32 justify-center items-center text-sm text-[#008888] rounded border border-[#008888] px-2 py-1 gap-1"
-                            >
-                              View proof <ExternalLink className="size-4" />
-                            </a>
-                          )}
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Issuer email + send button column */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
-                      <FormField
-                        control={control}
-                        name={`awards.${index}.issuerEmailId`}
-                        render={({ field: f }) => (
-                          <>
-                            <label
-                              htmlFor={`issuerEmail-${index}`}
-                              className="min-w-[110px] text-sm font-medium text-gray-700"
-                            >
-                              Issuer Email:
-                            </label>
-
-                            <div className="flex-1 flex gap-2 items-center">
-                              <Input
-                                id={`issuerEmail-${index}`}
-                                placeholder="Enter issuer's email address"
-                                className="w-full rounded-lg px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6334FA] focus:border-[#6334FA]"
-                                {...f}
-                              />
-                              <FormMessage />
-                            </div>
-                          </>
-                        )}
-                      />
-                    </div>
-                  </div>}
                   {loadingState === "Submitting" ? (
               (index===idx)&&<LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]"/>
             ) : (

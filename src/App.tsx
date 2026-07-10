@@ -6,7 +6,6 @@ import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import AppPrivacyPolicy from "./pages/AppPrivacy";
-import SubscriptionPlans from "./components/Subscription/Subscription";
 import GoogleLoginModal from "./pages/Login";
 import ProtectedRoute from "./protectRoute";
 import Layout from "./Layout/Layout";
@@ -18,6 +17,8 @@ import CertificateTimerPage from "./components/Certification/CertificateTimerPag
 import AdminDashBoard from "./components/Admin/AdminDashboard";
 import { Providers } from "./app/providers";
 import CvSearchPage from "./components/BrowseCvs/Cvsearchpage";
+import SessionExpiredPopup from "./pages/SessionExpiredPopup";
+import { useUserData } from "./context/AuthContext";
 
 
 // Lazy-loaded pages
@@ -42,12 +43,13 @@ const DigilockerConnectPage = lazy(()=>import("./pages/DigiLockerConnectPage"));
 const Hackathons = lazy(()=>import("./pages/Hackathons"));
 const UserVerification = lazy(()=>import("./pages/UserVerification"));
 const DocumentVerificationGuide = lazy(()=>import("./components/DocumentVerificationGuide"));
+const BuyPoints = lazy(()=>import("./components/Dashboard/Buypoints"));
 
 
 
 
 function App() {
-
+  const {user} = useUserData();
   useEffect(() => {
 
     AOS.init({
@@ -59,6 +61,7 @@ function App() {
 
   return (
     <div>
+      <SessionExpiredPopup expiresAt={user?.exp}/>
       <Providers>
           <Suspense fallback={<div className="flex justify-center items-center text-3xl text-[#03257e] font-bold h-[80vh]" data-aos="zoom-in">Loading {""} <ThreeDotLoader w={2} h={2} yPos={'end'} /></div>}>
             <Routes>
@@ -83,7 +86,7 @@ function App() {
               <Route path="/verify" element={<Layout><DocumentVerifier /></Layout>} />
               <Route path="/cv/:id" element={<Layout><CvOutputPage /></Layout>} />
               <Route path="/admin" element={<Layout><ProtectedRoute><AdminDashBoard/></ProtectedRoute></Layout>} />
-              <Route path="/pricing" element={<ProtectedRoute><SubscriptionPlans /></ProtectedRoute>} />
+              <Route path="/pricing" element={<ProtectedRoute><BuyPoints /></ProtectedRoute>} />
               <Route path="/create-cv" element={<Layout><ProtectedRoute><CreateCv /></ProtectedRoute></Layout>} />
               <Route path="/dashboard" element={<Layout><ProtectedRoute><DashBoard /></ProtectedRoute></Layout>} />
               <Route path="/register/:partnerName" element={<Layout>

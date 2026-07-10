@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ExternalLink,
   ShieldCheck,
@@ -15,10 +15,14 @@ import StatusBadge from "@/CvBuilder/StatusBadge";
 import ResendEmail from "../../pages/ResendEmail";
 import UserDocsSkeleton from "./UserDocsSkeleton";
 import { Link } from "react-router-dom";
+import { EbukPointsBar, VerificationBenefits } from "./Utils";
+import { ISubscription } from "@/api/subscription.apis";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const COLOR_PRIMARY = "#03257e";
 const COLOR_ACCENT = "#008888";
 const COLOR_WARNING = "#f14419";
+
 
 export interface IUserDoc {
   _id: string;
@@ -154,7 +158,7 @@ const DocumentCard: React.FC<{
   }
 
   return (
-    <div className="group bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-200">
+    <div className="group bg-white border border-gray-200 rounded-xl px-2 sm:px-5 py-3 sm:py-5 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-200">
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div
@@ -182,20 +186,21 @@ const DocumentCard: React.FC<{
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col  items-start justify-between gap-3">
         {!verified && (
           <button
             onClick={onVerify}
             className="text-xs font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-md"
             style={{
-              backgroundColor: COLOR_ACCENT,
+              backgroundColor: isEmailSend ? COLOR_WARNING : COLOR_ACCENT,
               color: "white",
             }}
           >
-            Request Verification
+            {`${isEmailSend ? 'Submitted' : 'Request'} for Verification`}
           </button>
         )}
-        {docUri && docUri.includes("https://") && (
+        <div className="flex items-center gap-2">
+          {docUri && docUri.includes("https://") && (
           <a
             href={docUri}
             target="_blank"
@@ -207,6 +212,15 @@ const DocumentCard: React.FC<{
             <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         )}
+        {!verified &&isEmailSend&& (
+        <button
+          onClick={() => onVerify()}
+          className="text-xs font-medium text-[#03257e] rounded-lg transition-all duration-200 hover:underline"
+        >
+          Re-Submit Verification
+        </button>
+        )}
+        </div>
       </div>
     </div>
   );
@@ -225,6 +239,8 @@ export default function UserDocs({
   setRefreshKey: React.Dispatch<React.SetStateAction<boolean>>;
   isFetching: boolean;
 }) {
+  const [subscriptionDetails,setSubscriptionDetails] = useState<ISubscription | null>(null);
+  const {getSubscription,isSubscriptionLoading} = useSubscription();
   const [openModel, setOpenModel] = useState(false);
   const [docId, setDocId] = useState<string>("");
   const { user } = useUserData();
@@ -249,9 +265,17 @@ export default function UserDocs({
     });
   };
 
-  if (isFetching) {
+    useEffect(()=>{
+    getSubscription().then((res)=>{
+      console.log("subscriptionres",res);
+      setSubscriptionDetails(res);
+    });
+  },[])
+
+  if (isFetching || isSubscriptionLoading) {
     return <UserDocsSkeleton />;
   }
+
 
   const hasEducationDocs = educationDocs?.length > 0;
   const hasExperienceDocs = experienceDocs?.length > 0;
@@ -260,7 +284,7 @@ export default function UserDocs({
 
   return (
     <div className="min-h-screen w-full" style={{ background: "#f7f8fb" }}>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <main className="w-full sm:max-w-7xl sm:mx-auto sm:px-6 py-6 space-y-6">
         {user && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             {/* User Profile Header */}
@@ -284,9 +308,10 @@ export default function UserDocs({
                 </div>
               </div>
             </div>
-
+             <EbukPointsBar subscriptionDetails={subscriptionDetails}/>
             {/* Documents Section */}
-            <div className="px-6 py-6">
+            <div className="px-1 sm:px-6 py-6">
+               <VerificationBenefits />
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                   <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -361,7 +386,7 @@ export default function UserDocs({
                     </span>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4">
+                  {/* <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4">
                     <p className="text-sm" style={{ color: COLOR_PRIMARY }}>
                       <span
                         style={{ color: COLOR_WARNING }}
@@ -372,7 +397,7 @@ export default function UserDocs({
                       If any document was rejected, you can submit a corrected
                       version using the "Request Verification" button.
                     </p>
-                  </div>
+                  </div> */}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {educationDocs.map((cert) => (
@@ -465,9 +490,9 @@ export default function UserDocs({
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {awardDocs.map((cert) => (
+                    {awardDocs.map((cert,index) => (
                       <DocumentCard
-                        key={cert.awardDocId}
+                        key={index+1}
                         id={cert._id}
                         title={cert.name}
                         subtitle={
@@ -509,3 +534,6 @@ export default function UserDocs({
     </div>
   );
 }
+
+
+

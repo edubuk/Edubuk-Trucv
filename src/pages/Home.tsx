@@ -72,12 +72,12 @@ const Home:React.FC = () => {
               </Link>
             </div>
             <div className="flex relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-left">
-                <Link
-                to='/browse-cvs'
+                <a
+                href='https://edubuktrucv.com/browse-cvs'
                   className="w-full bg-white text-[15px] lg:text-[25px] px-6 py-4 font-bold text-center rounded-[6px] text-[#03257e] hover:text-[#f14419] transition-colors duration-200"
                 >
                   Browse CVs
-                </Link>
+                </a>
               </div>
             {/* {user ? (
               <div className="flex lg:hidden relative rounded-lg p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] shadow-lg hover:shadow-xl transition-shadow duration-200" data-aos="fade-left">

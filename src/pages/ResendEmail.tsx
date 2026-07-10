@@ -13,6 +13,7 @@ import { ExternalLink, Paperclip, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useSubscription } from "@/hooks/useSubscription";
 //import { useAccount } from "wagmi";
 const ResendEmail = ({
   openModel,
@@ -37,6 +38,7 @@ const ResendEmail = ({
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [loading,setLoading] = useState<boolean | null>(null);
+    const {getSubscription} = useSubscription();
     // const {submitDocument} = useContract();
     // const {address} = useAccount();
     //console.log("docId",docId);
@@ -143,6 +145,7 @@ const ResendEmail = ({
                 });
                 setRefreshKey((prev)=>!prev)
                 setOpenModel(false)
+                getSubscription();
             }
         } catch (error) {
             toast.error("something went wrong");
