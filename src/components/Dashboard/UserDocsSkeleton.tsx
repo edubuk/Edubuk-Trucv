@@ -120,7 +120,7 @@ export default function UserDocsSkeleton() {
                   <Shimmer style={{ width:150, height:20, borderRadius: 3 }} />
                   </div>
                 </div>
-             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 m-6">
       {Array(3).fill(0).map((_, i) => (
         <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
           <Shimmer style={{ width: 20, height: 20, borderRadius: 5 }} />

@@ -24,7 +24,7 @@ export function EbukPointsBar({ subscriptionDetails }: SubscriptionProps) {
         </div>
         <div>
           <p className="text-sm text-[#03257e]">EBUK Credits</p>
-          <p className="text-xl font-bold text-[#006666]">{subscriptionDetails?.balance ?? 0} pts</p>
+          <p className="text-xl font-bold text-[#006666]">{subscriptionDetails?.balance ?? 0} Credits</p>
           <p className="text-xs text-gray-600">1 Document verification required 50 EBUK Credits</p>
         </div>
       </div>
