@@ -120,7 +120,7 @@ export default function LoginPage(): JSX.Element {
                             <p className="text-slate-400">
                                 New here?{" "}
                                 <Link
-                                    to="/register"
+                                    to="/register/me"
                                     className="font-bold text-[#03257e] hover:underline"
                                 >
                                     Create an account
