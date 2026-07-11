@@ -135,13 +135,13 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
   }, []);
 
   useEffect(() => {
-  if (!id) return;
-  QRCode.toDataURL(`https://edubuktrucv.com/cv/${id?id:userId}`, {
+
+  QRCode.toDataURL(`https://edubuktrucv.com/cv/${id??userId}`, {
     width: 80,
     margin: 1,
     color: { dark: "#03257e", light: "#ffffff" },
   }).then(setQrDataUrl);
-}, [id]);
+}, [id||userId]);
 
   if (isCvLoading) {
     return (
@@ -205,7 +205,7 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
               <CvPdfDocument
                 cvData={cvData}
                 qrDataUrl={qrDataUrl}
-                userId={id!}
+                userId={id!=undefined?id:userId!}
               />
             }
             fileName={`TruCV-${cvData.personal.fullName || id}.pdf`}
