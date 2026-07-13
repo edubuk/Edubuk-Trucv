@@ -10,7 +10,6 @@ export interface UseSubscriptionReturn {
 export const useSubscription = (): UseSubscriptionReturn => {
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(false);
   const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
-
   const getSubscription = useCallback(async (): Promise<ISubscription | null> => {
     setIsSubscriptionLoading(true);
     setSubscriptionError(null);
@@ -21,7 +20,7 @@ export const useSubscription = (): UseSubscriptionReturn => {
       return subscription;
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Failed to fetch subscription";
+        error instanceof Error ? error?.message : "Failed to fetch subscription";
       setSubscriptionError(message);
       return null;
     } finally {

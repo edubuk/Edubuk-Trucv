@@ -524,6 +524,7 @@ export default function UserDocs({
       </main>
 
       <ResendEmail
+        subscriptionDetails={subscriptionDetails}
         openModel={openModel}
         setOpenModel={setOpenModel}
         docId={docId}
