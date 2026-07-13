@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useSubscription } from "@/hooks/useSubscription";
+import { ISubscription } from "@/api/subscription.apis";
 //import { useAccount } from "wagmi";
 const ResendEmail = ({
   openModel,
@@ -21,7 +22,8 @@ const ResendEmail = ({
   docId,
   setDocId,
   info,
-  setRefreshKey 
+  setRefreshKey,
+  subscriptionDetails
 }: {
   openModel: boolean;
   setOpenModel: (value: boolean) => void;
@@ -33,7 +35,8 @@ const ResendEmail = ({
     docType:string
   };
   setRefreshKey:React.Dispatch<React.SetStateAction<boolean>>
-    }) => {
+  subscriptionDetails:ISubscription | null
+}) => {
     const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
@@ -246,7 +249,7 @@ const ResendEmail = ({
                             </span>
                           </div>
 
-                          <p className="text-xs text-[#f14419]">
+                          <p className="text-xs text-[#006666]">
                             Accepted: .jpg, .jpeg, .png, .pdf — max 5MB
                           </p>
                         </div>
@@ -309,14 +312,18 @@ const ResendEmail = ({
                 </div>
               )}
             />
-
+            {
+              (subscriptionDetails==null || subscriptionDetails?.balance < 50)&&
+              <p className="text-[#f14419] text-sm text-center border border-dashed border-[#f14419] p-2 rounded-full">Insufficient credits to send email for verification</p>
+              
+            }
             <Button
-              type="submit"
-              className="w-full md:w-auto"
-            >
-              {loading ? <LoadingButton /> : "Send Email To Issuer"}
-            </Button>
-
+                  type="submit"
+                  className="w-full text-[#03257e]"
+                  disabled={(subscriptionDetails==null || subscriptionDetails?.balance < 50)}
+                >
+                  {loading ? <LoadingButton /> : "Send Email To Issuer"}
+                </Button>
           </div>
 
         </form>

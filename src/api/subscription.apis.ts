@@ -33,7 +33,6 @@ export const fetchSubscription = async (): Promise<ISubscription> => {
   if (!data.success) {
     throw new Error(data.message || "Failed to fetch subscription");
   }
-  
   return data.data;
 
 };
