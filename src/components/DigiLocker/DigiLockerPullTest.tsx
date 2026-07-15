@@ -295,7 +295,7 @@ export default function DigiLockerTest({
       if (res.ok) {
         const data = await res.json();
         console.log("response",data);
-        setDlFormFields(data);
+        setDlFormFields(data.data);
       }
     } catch (error:any) {
       setErrorMsg(error?.response?.data?.error?.error_description??error?.message??error);
