@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { StepCard } from "./StepCard";
 import {
   Award,
@@ -10,6 +10,9 @@ import {
   PlusCircle,
   Replace,
   Trash2,
+  ChevronDown,
+  ChevronUp,
+  Pencil,
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -44,11 +47,11 @@ export const AwardDetails = ({
   setStep,
   uid,
   cvData,
-  setCvData,
 }: IStepCard) => {
   const [idx,setIdx] = useState<number>();
   const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
   const [refresh, setRefresh] = useState<boolean>(true);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   //const {submitDocument} = useContract();
   //const {address} = useAccount();
   // const { user } = useUserData();
@@ -93,6 +96,7 @@ export const AwardDetails = ({
       status: "pending",
       verifiedThrough: "",
     });
+    setExpandedCard(fields.length);
   }
 
   const removeAward = (index: number) => remove(index);
@@ -243,37 +247,6 @@ export const AwardDetails = ({
     }
   };
 
-  const includedIds = useMemo(
-    () => new Set(cvData.educations.map((e: any) => e.id)),
-    [cvData]
-  );
-
-  function buildEducationPayload(index: number) {
-    // grab the whole education row from RHF form values
-    const row = getValues(`awards.${index}`) || {};
-    // ensure a stable id — prefer existing ID from the form if present
-    const id = row.id || uid("exp");
-    return { ...row, id };
-  }
-
-  function handleToggleInclude(index: number) {
-    const payload = buildEducationPayload(index);
-
-    setCvData((prev: any) => {
-      const exists = prev.awards.some((e: any) => e.id === payload.id);
-      if (exists) {
-        // remove
-        return {
-          ...prev,
-          awards: prev.awards.filter((e: any) => e.id !== payload.id),
-        };
-      } else {
-        // add (append)
-        return { ...prev, awards: [...prev.awards, payload] };
-      }
-    });
-  }
-
 
 
   return (
@@ -294,43 +267,21 @@ export const AwardDetails = ({
           <div className="mt-4 space-y-4">
             {fields.map((a, index) => (
               <>
-              {!isMongoId(a.id) &&<div className="flex items-center justify-center border-dashed border-[#03257e] border-b">
-                      <span className="relative top-4 bg-white p-1 text-md text-center text-[#03257e]">Save New Document</span>
-                    </div>}
-                {isMongoId(a.id) && (
-                  <div className="flex justify-start items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="border-[#008888] h-4 w-4"
-                      // checked if this row's id exists in cvData.educations
-                      checked={
-                        includedIds.has(a.id) ||
-                        cvData.awards.some(
-                          (e: any) =>
-                            e.id ===
-                            (form.getValues(`awards.${index}.id`) || a.id)
-                        )
-                      }
-                      onChange={() => handleToggleInclude(index)}
-                      aria-label={`Include education ${index + 1} in CV`}
-                    />
-                    <p className="text-[#008888]">
-                      Select to include this data in your resume
-                    </p>
-                  </div>
-                )}
-                  <div key={a.rhfKey} className="border p-4 rounded bg-white">
-                  <div className="flex justify-between flex-wrap items-center mb-2">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-                      <div className="text-sm font-medium">Organisation</div>
-                      <div className="text-xs flex gap-1 items-center text-slate-500 break-all">
-                        {a.id}
+                  <div key={a.rhfKey} className={`overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md ${isMongoId(a.id) ? "border-slate-200" : "border-[#008888]/50 ring-2 ring-[#008888]/10"}`}>
+                  <div className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3.5 hover:bg-slate-50/70 md:px-5" onClick={() => setExpandedCard(expandedCard === index ? null : index)} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setExpandedCard(expandedCard === index ? null : index); }}>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-slate-950"><Award size={16} className="text-[#006666]" /><span className="truncate">{a.name || `Untitled ${a.level.toLowerCase()}`}</span><span className={`rounded-full px-2 py-0.5 text-[11px] ${isMongoId(a.id) ? "bg-blue-50 text-blue-700" : "bg-emerald-50 text-emerald-700"}`}>{isMongoId(a.id) ? "Added" : "New draft"}</span></div>
+                      <div className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
+                        <span className="truncate">{a.organisation || "Organisation not added yet"}</span>
                         {isMongoId(a.id) &&
                         <StatusBadge status={a.status} isEmailSend={a.isEmailSend}/>
                         }
                       </div>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition hover:border-[#006666]/40 hover:text-[#006666]"><Pencil size={14} />{expandedCard === index ? "Close" : "Edit"}{expandedCard === index ? <ChevronUp size={15} /> : <ChevronDown size={15} />}</span>
+                  </div>
+                  {expandedCard === index && <>
+                    <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-5">
                       <FormField
                         control={control}
                         name={`awards.${index}.selfAttested`}
@@ -350,26 +301,14 @@ export const AwardDetails = ({
                           </FormItem>
                         )}
                       />
-                      <div className="flex items-center gap-1">
-                        {isMongoId(a.id) ? (
-                          <Button
-                            type="button"
-                            disabled={a.verified || loadingState==="Updating"}
-                            onClick={() => updateHandler(index)}
-                            className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
-                          >
-                            <Replace size={18} />{" "}
-                            {loadingState === "Updating" && idx === index
-                              ? "Updating..."
-                              : "Update"}
-                          </Button>
-                        ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {!isMongoId(a.id) && (
                           <button
                             type="button"
                             onClick={() => removeAward(index)}
-                            className="mt-2 px-1 sm:py-1 sm:px-3 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50"
                           >
-                            <Trash2 size={14} /> Remove
+                            <Trash2 size={14} /> Discard draft
                           </button>
                         )}
                         {isMongoId(a.id) && (
@@ -377,18 +316,17 @@ export const AwardDetails = ({
                             disabled={a.verified || loadingState==="Deleting"}
                             type="button"
                             onClick={() => deleteHandler(index)}
-                            className="mt-2 px-1 sm:py-1 sm:px-3 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
+                            className="h-9 rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50"
                           >
                             <Delete size={18} />
                             {loadingState === "Deleting" && idx === index
                               ? "Deleting..."
-                              : "Delete"}
+                              : "Delete item"}
                           </Button>
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                  <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 md:p-5">
                     <div>
                       <label className="">Select your relevant field*</label>
                       <select
@@ -464,14 +402,12 @@ export const AwardDetails = ({
                           <FormLabel>
                             <div className="flex items-center gap-1">
                               <Calendar className="text-[#006666] size-4" />
-                              {a.level === "Course"
-                                ? "From (eg. 10/11/2015)*"
-                                : "Date of achievement*"}
+                              {a.level === "Course" ? "From" : "Date of achievement"} <span className="font-normal text-slate-400">(optional)</span>
                             </div>
                           </FormLabel>
                           <FormControl>
                             <Input 
-                              className={`w-full ${isMongoId(a.id) && field.value === "" ? "border-red-500" : ""}`}
+                              className="w-full"
                               disabled={a.verified}
                               type="date" 
                               {...field} 
@@ -490,12 +426,12 @@ export const AwardDetails = ({
                             <FormLabel>
                               <div className="flex items-center gap-1">
                                 <Calendar className="text-[#006666] size-4" />
-                                To (eg. 10/11/2018)*
-                              </div>
-                            </FormLabel>
-                            <FormControl>
-                              <Input 
-                                className={`w-full ${isMongoId(a.id) && innerField.value === "" ? "border-red-500" : ""}`}
+                                To <span className="font-normal text-slate-400">(optional)</span>
+                            </div>
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                                className="w-full"
                                 disabled={a.verified}
                                 type="date" 
                                 {...innerField} 
@@ -530,25 +466,36 @@ export const AwardDetails = ({
                       )}
                     />
                   </div>
-                  {loadingState === "Submitting" ? (
-              (index===idx)&&<LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]"/>
-            ) : (
-              !isMongoId(a.id)&&<Button
-                type="button"
-                onClick={()=>submitFormHandler(index)}
-                className="w-full text-white  bg-[#008888] mt-2 hover:bg-[#006666] transition"
-              >
-                Save
-              </Button>
-            )}
+                  {isMongoId(a.id) ? (
+                    <Button
+                      type="button"
+                      disabled={a.verified || loadingState === "Updating"}
+                      onClick={() => updateHandler(index)}
+                      className="mt-2 w-full bg-[#006666] text-white transition hover:bg-[#005555]"
+                    >
+                      <Replace size={16} className="mr-2" />
+                      {loadingState === "Updating" && idx === index ? "Updating..." : "Update details"}
+                    </Button>
+                  ) : loadingState === "Submitting" && index === idx ? (
+                    <LoadingButton className="mt-2 w-full bg-[#008888] hover:bg-[#006666]" />
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={() => submitFormHandler(index)}
+                      className="mt-2 w-full bg-[#008888] text-white transition hover:bg-[#006666]"
+                    >
+                      Save
+                    </Button>
+                  )}
+                  </>}
                 </div>
               </>
             ))}
 
-            <div className="flex justify-start items-center gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
               <button
                 onClick={addAward}
-                className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#03257e]/20 bg-[#03257e]/5 px-4 py-2.5 text-sm font-medium text-[#03257e] shadow-sm transition hover:bg-[#03257e]/10 sm:w-auto"
               >
                 <PlusCircle size={16} /> Add Award/Certificate
               </button>

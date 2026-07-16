@@ -6,12 +6,11 @@ import { SkillDetails } from "./SkillsDetails";
 import { ProjectDetails } from "./ProjectsDetails";
 import { AwardDetails } from "./AwardDetails";
 import { v4 as uuidv4 } from "uuid";
-import { Button } from "@mui/material";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import HeaderButtons from "@/components/cvBuilder/HeaderButtonns";
 //import NewCV from "./NewCV";
-import { EyeIcon} from "lucide-react";
+import { ArrowLeft, ArrowRight, EyeIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 //import { WalletSetupPopup } from "./WalletSetupGuide";
@@ -202,29 +201,35 @@ export default function CVBuilder() {
 
             {/* <ProfileSummary step={step} setStep={setStep} uid={uid} docId = {docId}/> */}
 
-            <div className="pt-4 border-t mt-6 flex items-center justify-between">
-              <div className="text-sm text-slate-500">
-                {step ? `Open: Step ${step} of 7` : "No step open"}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  disabled={step === 1}
+            <div className="mt-6 border-t border-slate-200 pt-4">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-end">
+                <button
+                  type="button"
+                  disabled={step <= 1}
                   onClick={() => setStep((s) => Math.max(1, (s || 1) - 1))}
-                  className="px-3 py-1 rounded border"
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold leading-5 text-slate-700 shadow-sm transition hover:border-[#006666] hover:text-[#006666] disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none sm:w-auto sm:min-w-[130px] sm:gap-2 sm:px-4 sm:text-sm"
                 >
-                  Prev Step
-                </Button>
-                <Button
-                  disabled={step === 7}
+                  <ArrowLeft className="size-4 shrink-0" />
+                  <span>Previous step</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={step >= 7}
                   onClick={() => setStep((s) => Math.min(7, (s || 1) + 1))}
-                  className="px-3 py-1 rounded bg-[#03257e] text-white"
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-[#03257e] px-3 py-2 text-xs font-semibold leading-5 text-white shadow-sm transition hover:bg-[#006666] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none sm:w-auto sm:min-w-[130px] sm:gap-2 sm:px-4 sm:text-sm"
                 >
-                  Next Step
-                </Button>
-                 <Link
-             to={`/dashboard?tab=cv`}
-             className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
-             ><EyeIcon size={16}/>Preview CV</Link>
+                  <span>Next step</span>
+                  <ArrowRight className="size-4 shrink-0" />
+                </button>
+
+                <Link
+                  to="/dashboard?tab=cv"
+                  className="col-span-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#006666]/20 bg-[#f2fbf9] px-4 py-2 text-xs font-semibold leading-5 text-[#006666] shadow-sm transition hover:border-[#006666] hover:bg-[#006666] hover:text-white sm:w-auto sm:text-sm"
+                >
+                  <EyeIcon className="size-4 shrink-0" />
+                  <span>Preview CV</span>
+                </Link>
               </div>
             </div>
           </div>

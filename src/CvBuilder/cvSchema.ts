@@ -13,8 +13,8 @@ export const personalDetailsSchema = z.object({
   // Accept either a valid url OR empty string (so your form can keep "" as default)
   linkedin: z.union([z.string().url({ message: "Invalid url" }), z.literal("")]),
   github: z.union([z.string().url({ message: "Invalid url" }), z.literal("")]),
-  imageUrl: z.string().min(1, { message: "Image is required" }),
-  profileSummary:z.string().min(1,{message:"Profile summary is required"}).optional(),
+  imageUrl: z.string().optional().or(z.literal("")),
+  profileSummary:z.string().optional().or(z.literal("")),
   // Require the checkbox to be checked
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
 });
@@ -98,8 +98,8 @@ export const ExperienceItemSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
   jobRole: z.string().min(1, "Position is required"),
   duration: z.object({
-    from:z.string().min(1,"start date is required"),
-    to:z.string().min(1,"end date is required")
+    from:z.string(),
+    to:z.string()
   }),
   skills:z.string().min(1,"skill is required").refine((s)=>s.includes(","),"Separate multiple skills using commas (e.g., React, Node.js)"),
   description: z.string().min(1, "Description is required"),
@@ -148,20 +148,12 @@ export const ProjectItemSchema = z.object({
   projectName: z.string().min(1, "Project name is required"),
   projectUrl: z.string().url().optional().or(z.literal("")),
   duration: z.object({
-    from:z.string().min(1,"start date is required"),
-    to:z.string().min(1,"end date is required")
+    from:z.string(),
+    to:z.string()
   }),
   skills:z.string().min(1,"skill is required").refine((s)=>s.includes(","),"Separate multiple skills using commas (e.g., React, Node.js)"),
   description: z.string().min(1, "Description is required"),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
-}).superRefine((data,ctx)=>{
-  if(data.duration.from && data.duration.to)
-  {
-    if(data.duration.from > data.duration.to)
-    {
-      ctx.addIssue({message:"Start date should be less than end date",path:["duration","from"],code: z.ZodIssueCode.custom})
-    }
-  }
 });
 
 export const ProjectSchema = z.object({
@@ -177,8 +169,8 @@ export const AwardItemSchema = z.object({
   name: z.string().min(1, "Award name is required"),
   organisation: z.string().min(1,"organisation name is required"),
   duration: z.object({
-    from:z.string().optional(),
-    to:z.string().optional()
+    from:z.string(),
+    to:z.string()
   }),
   description: z.string().min(1,"description is required"),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
@@ -190,21 +182,6 @@ export const AwardItemSchema = z.object({
   status:z.enum(["pending","verified","rejected","inProgress"]),
   verifiedThrough:z.string().optional(),
 }).superRefine((data,ctx)=>{
-  if(data.level==="Award" || data.level==="Certificate")
-  {
-    if(!data.duration.from){
-      ctx.addIssue({path:["duration","from"],message:"Date of achievement required",code: z.ZodIssueCode.custom,})
-    }
-  }
-  if(data.level==="Course")
-  {
-    if(!data.duration.from){
-      ctx.addIssue({path:["duration","from"],message:"Date is required",code: z.ZodIssueCode.custom,})
-    }
-    if(!data.duration.to){
-      ctx.addIssue({path:["duration","to"],message:"Date is required",code: z.ZodIssueCode.custom,})
-    }
-  }
   if(data.docUri)
   {
     if(!data.issuerEmailId)
@@ -217,13 +194,6 @@ export const AwardItemSchema = z.object({
     if(!data.docUri)
     {
       ctx.addIssue({message:"Document Uri required",path:["docUri"],code: z.ZodIssueCode.custom})
-    }
-  }
-  if(data.duration.from && data.duration.to)
-  {
-    if(data.duration.from > data.duration.to)
-    {
-      ctx.addIssue({message:"Start date should be less than end date",path:["duration","from"],code: z.ZodIssueCode.custom})
     }
   }
 });
@@ -247,6 +217,7 @@ export type ProfileSummaryItem = z.infer<typeof ProfileSummarySchema>
 export const SKillItemSchema = z.object({
   id: z.string().uuid().or(z.string().min(1, "ID is required")),
   skillName:z.string().min(1,"Skill name is required"),
+  endorserProfile:z.string().optional(),
   level:z.enum(["beginner","intermediate","advanced","expert"],{required_error:"Level is required"}),
   selfAttested: z.boolean().refine(v=>v===true,{message:"All data should be self attested"}),
   endoresBy:z.string().optional(),

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { StepCard } from "./StepCard";
 import {
   Briefcase,
@@ -10,6 +10,8 @@ import {
   PlusCircle,
   Replace,
   Trash2,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { ExperienceSchema, ExperienceFormValues } from "./cvSchema";
 import {
@@ -43,10 +45,10 @@ export const ExperienceDetails = ({
   setStep,
   uid,
   docId,
-  setCvData,
   cvData,
 }: IStepCard) => {
   const [refresh, setRefresh] = useState<boolean>(true);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   //const {submitDocument} = useContract();
   //const {address} = useAccount();
   
@@ -101,6 +103,7 @@ export const ExperienceDetails = ({
       verified: false,
       status: "pending",
     });
+    setExpandedCard(fields.length);
   };
 
   const removeExperience = (index: number) => remove(index);
@@ -280,37 +283,6 @@ export const ExperienceDetails = ({
   };
 
 
-  const includedIds = useMemo(
-    () => new Set(cvData.educations.map((e: any) => e.id)),
-    [cvData]
-  );
-
-  function buildEducationPayload(index: number) {
-    // grab the whole education row from RHF form values
-    const row = getValues(`experiences.${index}`) || {};
-    // ensure a stable id — prefer existing ID from the form if present
-    const id = row.id || uid("edu");
-    return { ...row, id };
-  }
-
-  function handleToggleInclude(index: number) {
-    const payload = buildEducationPayload(index);
-
-    setCvData((prev: any) => {
-      const exists = prev.experiences.some((e: any) => e.id === payload.id);
-      if (exists) {
-        // remove
-        return {
-          ...prev,
-          experiences: prev.experiences.filter((e: any) => e.id !== payload.id),
-        };
-      } else {
-        // add (append)
-        return { ...prev, experiences: [...prev.experiences, payload] };
-      }
-    });
-  }
-
 
   return (
     <Form {...form}>
@@ -322,120 +294,67 @@ export const ExperienceDetails = ({
           open={step === 4}
           onToggle={() => setStep(step === 4 ? 0 : 4)}
         >
-          <p className="text-sm text-slate-500">
-            Add professional experiences. Each entry supports proof upload and
-            self-attestation.
+          <p className="text-sm leading-6 text-slate-500">
+            Manage professional experience records with clearer actions for
+            saving new roles, updating saved data, selecting resume entries, and
+            deleting outdated documents.
           </p>
           {refresh?<ThreeDotLoader w={3} h={3} yPos="center"/>:
           <div className="mt-4 space-y-4">
             {fields.map((field, index) => (
               <>
-              {!isMongoId(field.id) &&<div className="flex items-center justify-center border-dashed border-[#03257e] border-b">
-                <span className="relative top-4 bg-white p-1 text-md text-center text-[#03257e]">Save New Document</span>
-              </div>}
-                {isMongoId(field.id) && (
-                  <div className="flex justify-start items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="border-[#008888] h-4 w-4"
-                      // checked if this row's id exists in cvData.educations
-                      checked={
-                        includedIds.has(field.id) ||
-                        cvData.experiences.some(
-                          (e: any) =>
-                            e.id ===
-                            (form.getValues(`experiences.${index}.id`) ||
-                              field.id)
-                        )
-                      }
-                      onChange={() => handleToggleInclude(index)}
-                      aria-label={`Include education ${index + 1} in CV`}
-                    />
-                    <p className="text-[#008888]">
-                      Select to include this data in your resume
-                    </p>
-                  </div>
-                )}
-                <div key={field.rhfKey} className="border p-4 rounded bg-white">
-                  <div className="flex justify-between flex-wrap items-center mb-2">
+                <div key={field.rhfKey} className={`overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md ${isMongoId(field.id) ? "border-slate-200" : "border-[#008888]/50 ring-2 ring-[#008888]/10"}`}>
+                  <div
+                    className="flex cursor-pointer justify-between flex-wrap items-center gap-3 bg-white px-4 py-3.5 md:px-5 hover:bg-slate-50/70 transition-colors"
+                    onClick={() => setExpandedCard(expandedCard === index ? null : index)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") setExpandedCard(expandedCard === index ? null : index);
+                    }}
+                  >
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-                      <div className="text-sm font-medium">Organisation</div>
-                      <div className="text-xs flex gap-1 items-center text-slate-500 break-all">
-                        {field.id}
+                      <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#006666]/10 text-[#006666]"><Briefcase size={17} /></span>
+                        {field.jobRole || "Experience entry"}
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] ${isMongoId(field.id) ? "bg-blue-50 text-blue-700" : "bg-emerald-50 text-emerald-700"}`}>
+                          {isMongoId(field.id) ? "Added" : "New draft"}
+                        </span>
+                      </div>
+                      <div className="text-xs flex gap-1 items-center text-slate-500">
+                        {field.companyName || "Company details not added yet"}
                         {isMongoId(field.id) &&
                         <StatusBadge status={field.status} isEmailSend={field.isEmailSend}/>
                           }
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-2">
-                      <FormField
-                        control={control}
-                        name={`experiences.${index}.selfAttested`}
-                        render={() => (
-                          <FormItem>
-                            <FormControl>
-                              <SelfAttestButton
-                                isAttested={
-                                  form.watch(
-                                    `experiences.${index}.selfAttested`
-                                  ) as boolean
-                                }
-                                onClick={() => handleSelfAttest(index)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="flex items-center gap-1">
-                        {isMongoId(field.id) ? (
-                          <Button
-                            type="button"
-                            disabled={field.verified}
-                            onClick={() => updateHandler(index)}
-                            className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/90 active:scale-[0.99] transition"
-                          >
-                            <Replace size={18} />{" "}
-                            {loadingState === "Updating" && idx === index
-                              ? "Updating..."
-                              : "Update"}
-                          </Button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => removeExperience(index)}
-                            className="mt-2 px-1 sm:py-1 sm:px-3 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
-                          >
-                            <Trash2 size={14} /> Remove
-                          </button>
-                        )}
-                        {isMongoId(field.id) && (
-                          <Button
-                            disabled={field.verified}
-                            type="button"
-                            onClick={() => deleteHandler(index)}
-                            className="mt-2 px-1 sm:py-1 sm:px-3 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
-                          >
-                            <Delete size={18} /> 
-                            {loadingState === "Deleting" && idx === index
-                              ? "Deleting..."
-                              : "Delete"}
-                          </Button>
-                        )}
-                      </div>
+                      <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition hover:border-[#006666]/40 hover:text-[#006666]" aria-label={expandedCard === index ? "Hide details" : "Edit experience details"}>
+                        <Replace size={14} /> {expandedCard === index ? "Close" : "Edit"} {expandedCard === index ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex justify-start items-center gap-1">
+                  {expandedCard === index && <>
+                  <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-5">
+                    <FormField control={control} name={`experiences.${index}.selfAttested`} render={() => <FormItem><FormControl><SelfAttestButton isAttested={form.watch(`experiences.${index}.selfAttested`) as boolean} onClick={() => handleSelfAttest(index)} /></FormControl><FormMessage /></FormItem>} />
+                    <div className="flex flex-wrap gap-2">
+                      {isMongoId(field.id) ? (
+                        <Button disabled={field.verified || loadingState === "Deleting"} type="button" onClick={() => deleteHandler(index)} className="h-9 rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50"><Delete size={15} className="mr-1.5" />{loadingState === "Deleting" && idx === index ? "Deleting..." : "Delete"}</Button>
+                      ) : <button type="button" onClick={() => removeExperience(index)} className="inline-flex items-center rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-50"><Trash2 size={16} className="mr-1.5" />Discard new draft</button>}
+                    </div>
+                  </div>
+                  <div className="mx-4 mt-4 flex justify-start items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 md:mx-5">
                     <input
                       type="checkbox"
                       onChange={() => checkboxHandler(index)}
                       checked={workingState[index]}
+                      className="h-4 w-4 accent-[#008888]"
                     />
-                    <p className="text-[#03257e]">
+                    <p>
                       Are you currently working here ?
                     </p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 md:p-5">
                     <FormField
                       control={control}
                       name={`experiences.${index}.companyName`}
@@ -573,27 +492,36 @@ export const ExperienceDetails = ({
                       )}
                     />
                   </div>
-                  {loadingState==="Submitting"
-                    ? index === idx && (
-                        <LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]" />
-                      )
-                    : !isMongoId(field.id) && (
-                        <Button
-                          onClick={() => submitFormHandler(index)}
-                          type="button"
-                          className="w-full text-white bg-[#008888] mt-2 hover:bg-[#006666] transition"
-                        >
-                          Save
-                        </Button>
-                      )}
+                  {isMongoId(field.id) ? (
+                    <Button
+                      type="button"
+                      disabled={field.verified || loadingState === "Updating"}
+                      onClick={() => updateHandler(index)}
+                      className="mt-2 w-full rounded-lg bg-[#006666] text-white transition hover:bg-[#005555]"
+                    >
+                      <Replace size={16} className="mr-2" />
+                      {loadingState === "Updating" && idx === index ? "Updating..." : "Update experience"}
+                    </Button>
+                  ) : loadingState === "Submitting" && index === idx ? (
+                    <LoadingButton className="mt-2 w-full bg-[#008888] hover:bg-[#006666]" />
+                  ) : (
+                    <Button
+                      onClick={() => submitFormHandler(index)}
+                      type="button"
+                      className="mt-2 w-full rounded-lg bg-[#008888] text-white transition hover:bg-[#006666]"
+                    >
+                      Save new experience
+                    </Button>
+                  )}
+                  </>}
                 </div>
               </>
             ))}
 
-            <div className="flex justify-start items-center gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
               <button
                 onClick={addExperience}
-                className="flex items-center shadow-lg border-[#03257e] text-[#03257e] gap-2 px-3 py-1 rounded border"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#03257e]/20 bg-[#03257e]/5 px-4 py-2.5 text-sm font-medium text-[#03257e] shadow-sm transition hover:bg-[#03257e]/10 sm:w-auto"
               >
                 <PlusCircle size={16} /> Add Experience
               </button>
