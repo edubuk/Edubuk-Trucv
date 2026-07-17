@@ -1,12 +1,13 @@
+
 import { Link } from "react-router-dom";
 import social2 from "../assets/Social/social2.png";
 import social3 from "../assets/Social/social3.png";
 import social4 from "../assets/Social/social4.png";
 import social5 from "../assets/Social/social5.png";
 import social6 from "../assets/Social/social6.png";
-// import squareLogo from '@/assets/TruCV-Square.png'
-import { MdEmail, MdLocationPin, MdPhone } from "react-icons/md";
+import { MdEmail, MdPhone, MdLocationPin } from "react-icons/md";
 import { FaRegFileAlt } from "react-icons/fa";
+
 const Footer = () => {
   return (
     <div
@@ -18,7 +19,7 @@ const Footer = () => {
           {/* Logo */}
           <div className="flex flex-col items-center lg:items-start">
             <img
-              src={"/latest_edubuk_logo.png"}
+              src="/latest_edubuk_logo.png"
               alt="Edubuk"
               className="w-40 h-auto object-contain"
             />
@@ -102,23 +103,54 @@ const Footer = () => {
               Our Offices
             </h3>
 
-            <div className="space-y-3 text-gray-700">
-              <div className="flex gap-2 items-start">
-                <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
-                <span>
-                  2nd Floor, R Square Building, Opposite SRS Mall, Vipul Khand,
-                  Gomti Nagar, Lucknow, Uttar Pradesh, India
-                </span>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h4 className="font-semibold text-[#03257e] mb-2">
+                  India
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex gap-2 items-start">
+                    <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
+                    <span>
+                      2nd Floor, R Square Building, Opposite SRS Mall, Vipul
+                      Khand, Gomti Nagar, Lucknow, Uttar Pradesh, India
+                    </span>
+                  </div>
+
+                  <div className="flex gap-2 items-start">
+                    <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
+                    <span>
+                      Door no 505/B-508, Sandhya Techno-1, Rangareddy,
+                      Hyderabad- 500104, Telangana
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex gap-2 items-start">
-                <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
-                <span>Door no 505/B-508, Sandhya Techno-1, Rangareddy, Hyderabad- 500104, Telangana</span>
+              <div>
+                <h4 className="font-semibold text-[#03257e] mb-2">
+                  UAE
+                </h4>
+                <div className="flex gap-2 items-start">
+                  <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
+                  <span>
+                    5th Floor, RAKBANK Office, RAK Innovation City, Sheikh
+                    Zayed Road, Ras Al Khaimah (RAK), UAE
+                  </span>
+                </div>
               </div>
 
-              <div className="flex gap-2 items-start">
-                <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
-                <span>5th Floor, RAKBANK Office, RAK Innovation City, Sheikh Zayed Road, Ras Al Khaimah (RAK), UAE</span>
+              <div>
+                <h4 className="font-semibold text-[#03257e] mb-2">
+                  Singapore 
+                </h4>
+                <div className="flex gap-2 items-start">
+                  <MdLocationPin className="text-[#006666] mt-1 flex-shrink-0 text-xl" />
+                  <span>
+                    77, High Street, #07-08 High Street Plaza, Singapore -
+                    179433
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -169,11 +201,7 @@ const Footer = () => {
               />
             </a>
 
-            <a
-              href="https://x.com/edubuktrust"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href="https://x.com/edubuktrust" target="_blank" rel="noreferrer">
               <img
                 src={social5}
                 alt=""

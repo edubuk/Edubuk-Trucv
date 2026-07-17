@@ -511,8 +511,7 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
                               style={{ color: COLOR_TEAL }}
                             >
                               <CheckCircle className="h-3 w-3" />
-                              {skill.endoresBy.slice(0, 2)}...
-                              {skill.endoresBy.slice(-4)}
+                              {skill?.endorserProfile??skill.endoresBy}
                             </span>
                           )}
                         </div>

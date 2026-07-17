@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { StepCard } from "./StepCard";
 import {
   Briefcase,
+  CheckCircle2,
   Github,
-  Image,
   Info,
   Linkedin,
+  LockKeyhole,
   Mail,
   MapPin,
-  Phone,
   PlusCircle,
+  UploadCloud,
   User,
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -214,340 +215,308 @@ export const PersonalDetails = ({ step, setStep, setCvData }: IStepCard) => {
           open={step === 2}
           onToggle={() => setStep(step === 2 ? 0 : 2)}
         >
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-500">
-              Fill the information that will appear in your CV header.<br></br>
-              <span className="text-[#f14419]">
-                Last data updated{" "}
-                {user?.updatedAt && new Date(user?.updatedAt).toLocaleString()}
-              </span>
-            </p>
-            {/* Pass state and handler into SelfAttestButton so it changes RHF value */}
-            <FormField
-              control={form.control}
-              name="selfAttested"
-              render={() => (
-                <FormItem className="col-span-1 md:col-span-2 flex items-center gap-3">
-                  <div>
-                    <SelfAttestButton
-                      isAttested={!!selfAttested}
-                      onClick={() => {
-                        // toggle to true for your requirement; if you want toggle, use !field.value
-                        form.setValue("selfAttested", true, {
-                          shouldValidate: true,
-                          shouldDirty: true,
-                        });
-                      }}
-                    />
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div className="flex flex-col gap-1 text-sm">
-              <label>Select Your Profession</label>
-              <select
-                value={profession}
-                onChange={(e) => setProfession(e.target.value as any)}
-                className={`border bg-gray-100 h-9 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#006666] ${
-                  profession === "other" ? "text-red-500" : "text-[#03257e]"
-                }`}
-              >
-                <option value="student">Student</option>
-                <option value="employee">Employee</option>
-                <option value="entrepreneur">Entrepreneur</option>
-                <option value="freelance">Freelance</option>
-                {customProfession && (
-                  <option value={customProfession?.trim()}>
-                    {customProfession}
-                  </option>
+          <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex flex-col gap-4 border-b border-slate-100 bg-gradient-to-r from-[#f5f9ff] to-[#f2fbf9] p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-2xl">
+                <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+                  Your personal details
+                </h2>
+                <p className="mt-1.5 text-sm leading-6 text-slate-600">
+                  Keep the information shown on your CV clear and up to date.
+                </p>
+                {user?.updatedAt && (
+                  <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                    <CheckCircle2 className="size-3.5 text-[#008888]" />
+                    Last updated {new Date(user.updatedAt).toLocaleString()}
+                  </p>
                 )}
-                {user?.profession && (
-                  <option value={user.profession}>
-                    {user.profession}
-                  </option>
-                )}
-                <option value="other">Add Other Profession</option>
-              </select>
+              </div>
 
-              {profession === "other" && (
-                <div className="flex gap-2 mt-1">
-                  <input
-                    type="text"
-                    value={customProfession}
-                    onChange={(e: any) => setCustomProfession(e.target.value)}
-                    placeholder="Enter your profession"
-                    className="border text-[#000000] bg-gray-100 h-9 rounded w-full px-2 focus:outline-none focus:ring-1 focus:ring-[#000000]"
-                  />
-                  <button
-                    type="button"
-                    className="flex gap-1 items-center bg-[#000000] text-white px-2 py-1 rounded-lg hover:bg-[#005555]"
-                    onClick={addCustomProfession}
-                    >
-                    <PlusCircle size={18}/>Add
-                    </button>
-                </div>
-              )}
+              <FormField
+                control={form.control}
+                name="selfAttested"
+                render={() => (
+                  <FormItem className={`min-w-0 rounded-xl border p-3 lg:min-w-[360px] ${selfAttested ? "border-emerald-200 bg-emerald-50/80" : "border-amber-200 bg-amber-50/80"}`}>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <div className={`flex size-9 shrink-0 items-center justify-center rounded-lg bg-white ${selfAttested ? "text-emerald-700" : "text-amber-700"}`}>
+                        {selfAttested ? <CheckCircle2 className="size-5" /> : <LockKeyhole className="size-5" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-slate-900">
+                          {selfAttested ? "Details self-attested" : "Attestation required"}
+                        </p>
+                        <p className="mt-0.5 text-xs leading-5 text-slate-600">
+                          Confirm that all information is accurate.
+                        </p>
+                        <FormMessage className="mt-1" />
+                      </div>
+                      <div className="shrink-0">
+                        <SelfAttestButton
+                          isAttested={!!selfAttested}
+                          className="m-0 h-9 rounded-lg bg-white px-3 text-xs shadow-none"
+                          onClick={() => {
+                            form.setValue("selfAttested", true, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
             </div>
 
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <User className="text-[#006666] size-4" />
-                      Full name
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter full name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <Mail className="text-[#006666] size-4" />
-                      Email
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Enter email"
-                      {...field}
-                      disabled
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="text-[#006666] size-4" />
-                      Location
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Your current location"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <Phone className="text-[#006666] size-4" /> Phone number
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <PhoneInput
-                      country="in"
-                      value={field.value}
-                      onChange={(phone) => field.onChange(phone)}
-                      placeholder="Phone Number"
-                      // Outer wrapper styles (acts like your input's border + focus ring)
-                      containerClass={`mt-2 w-full rounded-lg border px-0 focus-within:ring-2 ${
-                        false
-                          ? "border-red-200 focus-within:ring-red-300"
-                          : "border-slate-200 focus-within:ring-[#03257e]"
-                      }`}
-                      inputClass="!w-full !bg-transparent !text-[#006666] !placeholder-slate-400 !pl-10 !py-2 !focus:outline-none !border-0 !shadow-none"
-                      buttonClass="!border-0 !shadow-none"
-                      dropdownClass="!text-black"
-                      inputProps={{
-                        name: "phone",
-                        required: true,
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="linkedin"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <Linkedin className="text-[#0a66c2] size-4" />
-                      LinkedIn Profile URL
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Your linkedin url"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="github"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <Github className="text-[#171515] size-4" />
-                      Github Profile URL
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Your github profile"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="yearOfExp"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <Briefcase className="text-[#171515] size-4" />
-                      Year of Experience
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Year of Experience"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="profileSummary"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <Info className="text-[#171515] size-4" />
-                      Profile Summary
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Profile Summary" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* imageUrl is stored as a string URL in the schema. We validate file locally and then upload and set imageUrl */}
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={() => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    <div className="flex items-center gap-1">
-                      <Image className="text-[#171515] size-4" />
-                      Upload Image
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <input
-                      type="file"
-                      accept=".jpg, .jpeg, .png"
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        const validation = validateImageFile(file);
-                        if (!validation.isValid) {
-                          alert(validation.error);
-                          event.currentTarget.value = "";
-                          return;
-                        }
-                        // Do not call field.onChange(file) because schema expects imageUrl string.
-                        // Instead upload file and set the resulting URL into form.imageUrl
-                        uploadImageToDB(file);
-                      }}
-                      className="block w-full"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                  {imageError && (
-                    <p className="text-sm text-red-500 font-semibold">
-                      {imageError}
-                    </p>
+            <div className="p-4 sm:p-6">
+              <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={() => (
+                    <FormItem className="space-y-3">
+                      <FormControl>
+                        <label className="group flex min-h-[220px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-center transition hover:border-[#008888] hover:bg-[#f2fbf9] focus-within:ring-2 focus-within:ring-[#008888]/30">
+                          <input
+                            type="file"
+                            accept=".jpg, .jpeg, .png"
+                            className="sr-only"
+                            onChange={(event) => {
+                              const file = event.target.files?.[0];
+                              const validation = validateImageFile(file);
+                              if (!validation.isValid) {
+                                setImageError(validation.error || "Invalid image");
+                                event.currentTarget.value = "";
+                                return;
+                              }
+                              uploadImageToDB(file);
+                            }}
+                          />
+                          {imagePreview || user?.userImageUrl ? (
+                            <div className="relative h-[220px] w-full">
+                              <img
+                                src={imagePreview || user?.userImageUrl}
+                                alt="Profile preview"
+                                loading="lazy"
+                                className="h-full w-full object-cover"
+                              />
+                              <div className="absolute inset-x-3 bottom-3 rounded-xl bg-slate-950/70 px-3 py-2 text-xs font-semibold text-white backdrop-blur-sm">
+                                Click to replace photo
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="px-5">
+                              <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-white text-[#03257e] shadow-sm ring-1 ring-slate-200">
+                                <UploadCloud className="size-7" />
+                              </div>
+                              <p className="mt-4 text-sm font-semibold text-slate-800">Upload profile photo</p>
+                              <p className="mt-1 text-xs leading-5 text-slate-500">JPG or PNG, up to 5 MB</p>
+                              <span className="mt-3 inline-flex rounded-lg bg-[#03257e] px-3 py-2 text-xs font-semibold text-white transition group-hover:bg-[#006666]">
+                                Choose image
+                              </span>
+                            </div>
+                          )}
+                        </label>
+                      </FormControl>
+                      <FormMessage />
+                      {imageError && <p className="text-xs font-medium text-red-600">{imageError}</p>}
+                      {isImageUploading && <p className="text-xs font-medium text-[#006666]">Uploading your photo…</p>}
+                    </FormItem>
                   )}
-                  {isImageUploading && (
-                    <p className="text-sm text-green-500">
-                      Uploading image please wait
-                    </p>
+                />
+
+                <div className="grid content-start gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-semibold text-slate-700">Full name</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                            <Input className="h-11 rounded-xl border-slate-200 bg-slate-50 pl-10 shadow-none focus-visible:ring-[#008888]" placeholder="e.g. Aditi Sharma" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-2">
+                    <label htmlFor="profession" className="text-xs font-semibold text-slate-700">Profession</label>
+                    <div className="relative">
+                      <Briefcase className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                      <select
+                        id="profession"
+                        value={profession}
+                        onChange={(e) => setProfession(e.target.value)}
+                        className={`h-11 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-8 text-sm outline-none transition focus:border-[#008888] focus:ring-1 focus:ring-[#008888] ${profession === "other" ? "text-amber-700" : "text-slate-800"}`}
+                      >
+                        <option value="student">Student</option>
+                        <option value="employee">Employee</option>
+                        <option value="entrepreneur">Entrepreneur</option>
+                        <option value="freelance">Freelance</option>
+                        {customProfession && <option value={customProfession.trim()}>{customProfession}</option>}
+                        {user?.profession && user.profession !== customProfession?.trim() && (
+                          <option value={user.profession}>{user.profession}</option>
+                        )}
+                        <option value="other">Add another profession</option>
+                      </select>
+                    </div>
+                    {profession === "other" && (
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          value={customProfession ?? ""}
+                          onChange={(e) => setCustomProfession(e.target.value)}
+                          placeholder="Enter your profession"
+                          className="h-10 rounded-xl border-slate-200 bg-white shadow-none focus-visible:ring-[#008888]"
+                        />
+                        <Button type="button" onClick={addCustomProfession} className="h-10 rounded-xl bg-slate-900 px-3 hover:bg-[#03257e]">
+                          <PlusCircle className="mr-1.5 size-4" /> Add
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="yearOfExp"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel className="text-xs font-semibold text-slate-700">Years of experience</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Briefcase className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                            <Input type="text" placeholder="e.g. 3 years" className="h-11 rounded-xl border-slate-200 bg-slate-50 pl-10 shadow-none focus-visible:ring-[#008888]" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5 text-xs font-semibold text-slate-700">Email <LockKeyhole className="size-3 text-slate-400" /></FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                          <Input type="email" placeholder="name@example.com" className="h-11 rounded-xl border-slate-200 bg-slate-100 pl-10 shadow-none" {...field} disabled />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                  {(imagePreview || user?.userImageUrl) && (
-                    <>
-                      <img
-                        src={imagePreview || user?.userImageUrl}
-                        alt="previewImage"
-                        loading="lazy"
-                        className="h-48 w-cover object-cover rounded-lg shadow-lg"
-                      />
-                    </>
+                />
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-semibold text-slate-700">Phone number</FormLabel>
+                      <FormControl>
+                        <PhoneInput
+                          country="in"
+                          value={field.value}
+                          onChange={(phone) => field.onChange(phone)}
+                          placeholder="Phone number"
+                          containerClass="!mt-0 !h-11 !w-full !rounded-xl !border !border-slate-200 !bg-slate-50 focus-within:!border-[#008888] focus-within:!ring-1 focus-within:!ring-[#008888]"
+                          inputClass="!h-full !w-full !rounded-xl !border-0 !bg-transparent !pl-12 !text-sm !text-slate-800 !shadow-none !outline-none"
+                          buttonClass="!rounded-l-xl !border-0 !border-r !border-slate-200 !bg-transparent !shadow-none"
+                          dropdownClass="!text-black"
+                          inputProps={{ name: "phone", required: true }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </FormItem>
+                />
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel className="text-xs font-semibold text-slate-700">Location</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                          <Input type="text" placeholder="City, state, country" className="h-11 rounded-xl border-slate-200 bg-slate-50 pl-10 shadow-none focus-visible:ring-[#008888]" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="linkedin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-semibold text-slate-700">LinkedIn <span className="font-normal text-slate-400">(optional)</span></FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Linkedin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#0a66c2]" />
+                          <Input type="url" placeholder="https://linkedin.com/in/username" className="h-11 rounded-xl border-slate-200 bg-slate-50 pl-10 shadow-none focus-visible:ring-[#008888]" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="github"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-semibold text-slate-700">GitHub <span className="font-normal text-slate-400">(optional)</span></FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Github className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-700" />
+                          <Input type="url" placeholder="https://github.com/username" className="h-11 rounded-xl border-slate-200 bg-slate-50 pl-10 shadow-none focus-visible:ring-[#008888]" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="profileSummary"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel className="flex items-center justify-between text-xs font-semibold text-slate-700">
+                        <span>Profile summary <span className="font-normal text-slate-400">(optional)</span></span>
+                        <Info className="size-4 text-slate-400" />
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea rows={5} placeholder="Summarize your experience, strengths, and career goals in a few sentences…" className="min-h-[120px] resize-y rounded-xl border-slate-200 bg-slate-50 px-3.5 py-3 leading-6 shadow-none focus-visible:ring-[#008888]" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/80 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Review and save</p>
+                <p className="mt-0.5 text-xs text-slate-500">Make sure your details are correct before continuing.</p>
+              </div>
+              {!submitting ? (
+                <Button type="submit" className="h-11 min-w-[180px] rounded-xl bg-[#03257e] px-6 font-semibold text-white shadow-sm hover:bg-[#006666]">
+                  {user ? "Update personal details" : "Save personal details"}
+                </Button>
+              ) : (
+                <LoadingButton className="h-11 min-w-[180px] rounded-xl bg-[#03257e]" />
               )}
-            />
+            </div>
           </div>
-
-          {!submitting ? (
-            <Button
-              type="submit"
-              className="mt-2 text-white w-auto w-full bg-[#006666] hover:bg-[#008888] hover:opacity-90"
-            >
-              {user ? "Update" : "Save"}
-            </Button>
-          ) : (
-            <LoadingButton className="mt-2 w-auto w-full bg-[#006666]" />
-          )}
         </StepCard>
       </form>
     </Form>
