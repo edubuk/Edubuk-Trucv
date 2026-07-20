@@ -6,7 +6,7 @@ export type PaymentResponse<T> =
 
 export type PlanType = "starter" | "professional" | "elite";
 
-export interface ICheckout {
+interface IPaidCheckout {
   order: {
     amount: number;
     currency: string;
@@ -14,6 +14,19 @@ export interface ICheckout {
     id: string;
   };
 }
+
+interface IFreeCheckout {
+  balance: number;
+  couponCode: string;
+  email: string[];
+  paymentId: string;
+  startDate: string;
+  status: string;
+  subscriptionPlan: string;
+  updatedAt: string;
+}
+
+export type ICheckout = IPaidCheckout | IFreeCheckout;
 
 export interface IVerifyPaymentInput {
   razorpay_order_id: string;
