@@ -39,7 +39,7 @@ export default function LoginPage(): JSX.Element {
         e.preventDefault();
         const eObj = validate();
         setErrors(eObj);
-        const redirect = searchParams.get("redirect") || "/";
+        const redirect = searchParams.get("redirect") || "/pricing";
         if (Object.keys(eObj).length > 0) return;
 
         setLoading(true);

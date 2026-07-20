@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import EBUKLogo from "@/assets/ebukLogo.webp";
 import {
-  Coins,
   Infinity as InfinityIcon,
   ShieldCheck,
   TrendingUp,
@@ -10,8 +10,9 @@ import {
   Loader2,
   X,
   CheckCircle2,
+  ArrowLeft,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { usePayment } from "../../hooks/usePayment";
 import { useCoupon } from "../../hooks/useCoupon";
 
@@ -37,21 +38,21 @@ const PLANS: IPlan[] = [
   {
     id: "starter",
     label: "Starter",
-    price: 499,
+    price: 1999,
     points: 499,
   },
   {
     id: "professional",
     label: "Professional",
-    price: 999,
-    points: 1200,
+    price: 2499,
+    points: 799,
     badge: "Most Popular",
   },
   {
     id: "elite",
     label: "Elite",
-    price: 2000,
-    points: 2500,
+    price: 2999,
+    points: 999,
     badge:"Best value"
   },
 ];
@@ -181,12 +182,20 @@ export default function BuyPoints() {
         validateCouponData?.coupon.code ?? null,
         selectedPlan
       );
-
+       console.log("orderData", orderData);
       if (!orderData) {
         setCouponError("Could not create payment order");
         return;
       }
 
+      if('paymentId' in orderData){
+        // Handle free plan or existing payment
+        navigate("/dashboard", {
+            state: { purchased: true },
+          });
+        return;
+      }
+      
       const loaded = await loadRazorpayScript();
 
       if (!loaded) {
@@ -239,6 +248,12 @@ export default function BuyPoints() {
   console.log({validateCouponData})
   return (
     <div className="min-h-screen w-full" style={{ background: "#f7f8fb" }}>
+      <div className="flex items-center justify-start p-4">
+        <Link to="/" className="flex items-center gap-2 text-[#03257e] hover:text-gray-900 bg-white px-4 py-2 rounded-lg shadow-sm">
+          <ArrowLeft className="w-6 h-6" />
+          Go Back
+        </Link>
+      </div>
       <main className="w-full sm:max-w-4xl sm:mx-auto sm:px-6 py-6 space-y-6">
         <div className="relative">
           <div className="absolute -inset-3 rounded-xl bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419] opacity-90" />
@@ -247,7 +262,8 @@ export default function BuyPoints() {
               className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4"
               style={{ backgroundColor: "#e6f1fb" }}
             >
-              <Coins className="h-7 w-7" style={{ color: COLOR_PRIMARY }} />
+              <img src={EBUKLogo} alt="EBUK Logo" className="h-auto w-10 rounded-full" />
+            
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Buy EBUK Credits
@@ -308,7 +324,7 @@ export default function BuyPoints() {
                 </div>
 
                 <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
-                  <Coins className="h-4 w-4" style={{ color: COLOR_PRIMARY }} />
+                  <img src={EBUKLogo} alt="EBUK Logo" className="h-auto w-4 rounded-full" />
                   <span className="text-sm font-semibold text-gray-900">
                     {plan.points} credits
                   </span>

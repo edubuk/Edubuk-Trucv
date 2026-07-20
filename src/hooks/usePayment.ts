@@ -4,7 +4,7 @@ import type {
   ICheckout,
   IPaymentRecord,
   IVerifyPaymentInput,
-  PlanType
+  PlanType,
 } from "../api/payments.apis";
 
 export const usePayment = () => {
