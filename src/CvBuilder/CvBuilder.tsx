@@ -225,10 +225,9 @@ export default function CVBuilder() {
 
                 <Link
                   to="/dashboard?tab=cv"
-                  className="col-span-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#006666]/20 bg-[#f2fbf9] px-4 py-2 text-xs font-semibold leading-5 text-[#006666] shadow-sm transition hover:border-[#006666] hover:bg-[#006666] hover:text-white sm:w-auto sm:text-sm"
+                  className="col-span-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#00666]/20 bg-[#006666] px-4 py-2 text-xs font-semibold leading-5 text-white shadow-sm transition hover:border-[#006666] hover:bg-[#006666] hover:text-white sm:w-auto sm:text-sm"
                 >
-                  <EyeIcon className="size-4 shrink-0" />
-                  <span>Preview CV</span>
+                  <span>Submit CV</span>
                 </Link>
               </div>
             </div>
