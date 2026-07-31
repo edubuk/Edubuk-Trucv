@@ -118,8 +118,11 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
       year: "numeric",
     });
     console.log("formated date", formatedDate);
-    if (formatedDate == "Invalid Date" || formatedDate == "1 Jan 1970") {
+    if (formatedDate == "1 Jan 1970") {
       return "Present";
+    }
+    if (formatedDate == "Invalid Date") {
+      return "";
     }
     return formatedDate;
   };
@@ -244,7 +247,7 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
         </h1>
 
         <div className="flex justify-center items-center flex-col ml-[300px]">
-          <EdubukQR url={`https://edubuktrucv.com/cv/${id}`} />
+          <EdubukQR url={`https://edubuktrucv.com/cv/${id?id:userId}`} />
           <div className="flex flex-col gap-0.5 justify-center items-center">
             <p className="text-lg text-[#03257e] tracking-wide">
               <span className="font-bold">TruCV</span> powered by
@@ -511,7 +514,7 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
                               style={{ color: COLOR_TEAL }}
                             >
                               <CheckCircle className="h-3 w-3" />
-                              {skill?.endorserProfile??skill.endoresBy}
+                              Endorsed
                             </span>
                           )}
                         </div>
