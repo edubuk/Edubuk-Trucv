@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PersonalDetails } from "./PersonalDetails";
 import { EducationDetails } from "./EducationDetails";
 import { ExperienceDetails } from "./ExperienceDetails";
@@ -10,8 +10,21 @@ import api from "@/lib/api";
 import toast from "react-hot-toast";
 import HeaderButtons from "@/components/cvBuilder/HeaderButtonns";
 //import NewCV from "./NewCV";
-import { ArrowLeft, ArrowRight, EyeIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  EyeIcon,
+  X,
+  Briefcase,
+  Loader2,
+} from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  useCheckUserHasCreatedTrucvAndOnboardedOnTrujobs,
+  useOnBoardCandidateOnTruJobsInOneClick,
+} from "@/api/scraper.api";
+
+const TRUJOBS_URL = "https://edubuktrujobs.com";
 
 //import { WalletSetupPopup } from "./WalletSetupGuide";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
@@ -48,8 +61,47 @@ export default function CVBuilder() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState<boolean>(false);
   const [showParsedModel, setShowParsedModel] = useState<boolean>(false);
+  const [showTrujobsOnboardPopup, setShowTrujobsOnboardPopup] =
+    useState<boolean>(false);
    //const [showWalletSetup, setShowWalletSetup] = useState<boolean>(true);
   console.log("preview cv is", previewCV);
+
+  const { checkUserHasCreatedTrucvAndOnboardedOnTrujobsData } =
+    useCheckUserHasCreatedTrucvAndOnboardedOnTrujobs();
+
+  const {
+    onBoardCandidateOnTruJobsInOneClickData,
+    isLoading: isOnboardingOnTrujobs,
+  } = useOnBoardCandidateOnTruJobsInOneClick();
+
+  const handleOnboardOnTrujobs = async () => {
+    try {
+      await onBoardCandidateOnTruJobsInOneClickData();
+      toast.success("You've been onboarded on TruJobs!");
+      setShowTrujobsOnboardPopup(false);
+      window.open(TRUJOBS_URL, "_blank", "noopener,noreferrer");
+    } catch (error: any) {
+      console.log("Failed to onboard on trujobs", error);
+      toast.error(error?.message || "Failed to onboard on TruJobs");
+    }
+  };
+
+  useEffect(() => {
+    const checkTrujobsOnboarding = async () => {
+      try {
+        const res = await checkUserHasCreatedTrucvAndOnboardedOnTrujobsData();
+        // Show the popup only when the user has a complete TruCV but has
+        // NOT yet onboarded on TruJobs.
+        if (res?.has_complete_trucv && !res?.trujobs_onboarded_status) {
+          setShowTrujobsOnboardPopup(true);
+        }
+      } catch (error) {
+        console.log("Failed to check trujobs onboarding status", error);
+      }
+    };
+    checkTrujobsOnboarding();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [cvData, setCvData] = useState<any>({
     personal: {
       fullName: "",
@@ -117,6 +169,86 @@ export default function CVBuilder() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-0 sm:p-6">
+      {showTrujobsOnboardPopup && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="trujobs-onboard-title"
+          onClick={() => setShowTrujobsOnboardPopup(false)}
+        >
+          <div
+            className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowTrujobsOnboardPopup(false)}
+              aria-label="Close"
+              className="absolute right-3 top-3 inline-flex size-8 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              <X className="size-4" />
+            </button>
+
+            <div className="bg-gradient-to-r from-[#03257e] via-[#f14419] to-[#006666] px-6 py-5">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex size-11 items-center justify-center rounded-xl bg-white/15 text-white">
+                  <Briefcase className="size-5" />
+                </span>
+                <div>
+                  <h2
+                    id="trujobs-onboard-title"
+                    className="text-lg font-semibold text-white"
+                  >
+                    Complete your TruJobs setup
+                  </h2>
+                  <p className="text-xs text-white/80">
+                    You&apos;re one step away from applying to jobs
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-5">
+              <p className="text-sm leading-6 text-slate-600">
+                We&apos;ve detected that your TruCV is ready, but you haven&apos;t
+                onboarded on <span className="font-semibold text-slate-800">TruJobs</span> yet.
+                Create your TruJobs account to start discovering and applying to
+                opportunities that match your profile.
+              </p>
+
+              <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowTrujobsOnboardPopup(false)}
+                  disabled={isOnboardingOnTrujobs}
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Maybe later
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOnboardOnTrujobs}
+                  disabled={isOnboardingOnTrujobs}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#006666] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#03257e] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isOnboardingOnTrujobs ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Onboarding...
+                    </>
+                  ) : (
+                    <>
+                      Create account on TruJobs
+                      <ArrowRight className="size-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="grid grid-cols-1">
           <div className="col-span-7 p-2 sm:p-6 bg-slate-50 space-y-3">
