@@ -1,7 +1,6 @@
 import { API_BASE_URL } from "@/main";
 import { useMutation, useQuery } from "react-query";
 
-
 export const useGetLinkdeinProfile = () => {
   const getLinkdeinProfile = async (profileUrl: string): Promise<any> => {
     const response = await fetch(
@@ -27,10 +26,80 @@ export const useGetLinkdeinProfile = () => {
     },
   });
   const cvData = data?.data;
-  if(!localStorage.getItem("linkedInCvData") && cvData!==undefined) {
+  if (!localStorage.getItem("linkedInCvData") && cvData !== undefined) {
     localStorage.setItem("linkedInCvData", JSON.stringify(cvData));
   }
   return { getLinkdeinProfileData, isLoading, cvData };
+};
+
+export const useCheckUserHasCreatedTrucvAndOnboardedOnTrujobs = () => {
+  const checkUserHasCreatedTrucvAndOnboardedOnTrujobs =
+    async (): Promise<any> => {
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/trujobs/check-user-onboarded-on-trujobs`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Could not check trujobs onboarding status!");
+      }
+      return response.json();
+    };
+
+  const {
+    mutateAsync: checkUserHasCreatedTrucvAndOnboardedOnTrujobsData,
+    isLoading,
+    data,
+  } = useMutation(checkUserHasCreatedTrucvAndOnboardedOnTrujobs, {
+    onSuccess: () => {
+      console.log(
+        "Checked user has created trucv and onboarded on trujobs successfully",
+      );
+    },
+  });
+
+  return {
+    checkUserHasCreatedTrucvAndOnboardedOnTrujobsData,
+    isLoading,
+    data,
+  };
+};
+
+export const useOnBoardCandidateOnTruJobsInOneClick = () => {
+  const onBoardCandidateOnTruJobsInOneClick = async (): Promise<any> => {
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/trujobs/onboard-candidate-on-trujobs`,
+      {
+        method: "POST",
+        credentials: "include",
+      },
+    );
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(
+        data?.message || "Could not onboard candidate on trujobs!",
+      );
+    }
+    return data;
+  };
+
+  const {
+    mutateAsync: onBoardCandidateOnTruJobsInOneClickData,
+    isLoading,
+    data,
+  } = useMutation(onBoardCandidateOnTruJobsInOneClick, {
+    onSuccess: () => {
+      console.log("Onboarded candidate on trujobs successfully");
+    },
+  });
+
+  return {
+    onBoardCandidateOnTruJobsInOneClickData,
+    isLoading,
+    data,
+  };
 };
 
 export interface IImportedProfiles {
