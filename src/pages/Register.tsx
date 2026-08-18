@@ -63,9 +63,9 @@ export default function RegistrationPage(): JSX.Element {
       ? partnerName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
       : null;
   const jobsMelaFeatures = [
-    { icon: ScanSearch, label: "AI Career Screening" },
-    { icon: ShieldCheck, label: "Blockchain-Verified Profile" },
-    { icon: Briefcase, label: "Thousands of Live Jobs" },
+    { icon: ScanSearch, label: "AI Career Screening - via MIIT and CETA" },
+    { icon: ShieldCheck, label: "Blockchain-Verified Profile via TruCV" },
+    { icon: Briefcase, label: "Thousands of Live Jobs via TruJobs" },
     { icon: Bot, label: "AI-Powered Interviews" },
   ];
   const validate = (): FormErrors => {
@@ -540,9 +540,9 @@ export default function RegistrationPage(): JSX.Element {
                           <span className="font-semibold text-[#03257e]">
                             same email you registered with on Jobs Mela
                           </span>{" "}
-                          — the one used for your subscription. Using a different
-                          email may prevent us from linking your Jobs Mela
-                          profile.
+                          — the one used for your subscription. Using a
+                          different email may prevent us from linking your Jobs
+                          Mela profile.
                         </p>
                       </div>
                     )}
