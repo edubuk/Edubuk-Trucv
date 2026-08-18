@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import HeaderButtons from "@/components/cvBuilder/HeaderButtonns";
+import { TruCvGuideCard } from "./guide/TruCvGuideCard";
 //import NewCV from "./NewCV";
 import {
   ArrowLeft,
@@ -195,6 +196,8 @@ export default function CVBuilder() {
                 )}
               </span>
             </button>
+
+            <TruCvGuideCard />
 
             <div className="flex justify-between items-center">
               <Link
