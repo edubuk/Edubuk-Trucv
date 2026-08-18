@@ -24,11 +24,11 @@ export default defineConfig({
       },
     },
   },
-  server: {
-    port: 5174,
-    strictPort: true, // fail instead of auto-incrementing
-    host: true, // expose on 0.0.0.0, needed for Docker/remote access
-  },
+  // server: {
+  //   port: 5174,
+  //   strictPort: true, // fail instead of auto-incrementing
+  //   host: true, // expose on 0.0.0.0, needed for Docker/remote access
+  // },
 });
 
 // export default defineConfig({
