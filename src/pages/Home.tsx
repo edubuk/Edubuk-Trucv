@@ -16,6 +16,7 @@ import { Crown } from "lucide-react";
 // import toast from "react-hot-toast";
 // import { API_BASE_URL } from "@/main";
 import PartnerList from "@/components/HomePageSections/PartnerList";
+import EdubukPopup from "@/components/EdubukPopup";
 //import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 
@@ -145,6 +146,7 @@ const Home:React.FC = () => {
       <ThreeDot />
       <OurAdvisor />
       <Footer />
+      <EdubukPopup />
       {/* <div><DownloadButton/></div> */}
     </div>
   );
