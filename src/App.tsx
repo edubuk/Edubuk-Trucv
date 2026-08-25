@@ -19,6 +19,10 @@ import { Providers } from "./app/providers";
 import CvSearchPage from "./components/BrowseCvs/Cvsearchpage";
 import SessionExpiredPopup from "./pages/SessionExpiredPopup";
 import { useUserData } from "./context/AuthContext";
+import DeveloperSignInPage from "./pages/developer/DeveloperSignInPage";
+import DeveloperDebugRequestPage from "./pages/developer/DeveloperDebugRequestPage";
+import DeveloperDebugConfirmPage from "./pages/developer/DeveloperDebugConfirmPage";
+import ProtectDeveloperRoute from "./developer/protectDeveloperRoute";
 
 
 // Lazy-loaded pages
@@ -102,6 +106,11 @@ function App() {
               <Route path="/hackathons" element={<Layout><ProtectedRoute><Hackathons /></ProtectedRoute></Layout>} />
               <Route path="/document-verification-guide" element={<DocumentVerificationGuide />} />
               <Route path="browse-cvs" element={<CvSearchPage />} />
+              <Route path="/developer/sign-in" element={<DeveloperSignInPage />} />
+              <Route element={<ProtectDeveloperRoute />}>
+                <Route path="/developer/debug" element={<DeveloperDebugRequestPage />} />
+                <Route path="/developer/debug/confirm" element={<DeveloperDebugConfirmPage />} />
+              </Route>
             </Routes>
           </Suspense>
       </Providers>
