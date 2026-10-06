@@ -155,7 +155,7 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
       functionName: 'getUserSubmissions',
       args: [user],
     });
-
+     
     return {
       submissions: data as Submission[] | undefined,
       isLoading,

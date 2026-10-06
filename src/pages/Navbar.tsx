@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import logo from "../assets/newLogo.png";
 import truCv from "../assets/truCV2.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,13 +8,14 @@ import toast from "react-hot-toast";
 import { googleLogout } from "@react-oauth/google";
 import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
-import { Search } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Search, UserRound, WalletCards } from "lucide-react";
 import SearchResultsPopup from "@/components/ui/SearchResultsPopup";
 import { useSearchProfiles } from "@/hooks/useSearchProfiles";
 import { useDebounce } from "@/hooks/useDebounce";
 import { type SearchProfile } from "@/api/search.apis";
 import AnimatedSearchInput from "@/components/ui/AnimatedPlaceHolder";
-//import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import "./current-home.css";
 
 interface LinkItem {
   path: string;
@@ -34,10 +35,11 @@ interface SidebarProps {
 
 
 const Navbar: React.FC = () => {
-  const [isActive, setActive] = useState("/");
   const [search, setSearch] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
   const { user } = useUserData();
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,10 +80,6 @@ const Navbar: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handlerActive = (linkName: string): void => {
-    setActive(linkName);
   };
 
   const links = [
@@ -133,26 +131,39 @@ const Navbar: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const closeAccountMenu = (event: MouseEvent) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsAccountMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", closeAccountMenu);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeAccountMenu);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
+
   return (
-    <div
-      className="flex justify-between items-center sm:px-3 w-full border-b-2 border-gray-200 bg-white"
-      data-aos="fade-right"
-    >
-      <img
-        src={"/latest_edubuk_logo.png"}
-        alt="Logo"
-        className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 "
-      />
-      <div className="relative flex gap-3 justify-between items-start">
+    <header className="current-nav">
+      <div className="current-nav__inner">
+        <Link to="/" className="current-nav__edubuk" aria-label="Edubuk TruCV home">
+          <img src="/latest_edubuk_logo.png" alt="Edubuk" />
+        </Link>
+
+        <nav className="current-nav__links" aria-label="Primary navigation">
         {links?.map((link, i) =>
           link.name === "Home" ? (
             <Link
               key={i + 1}
               to={link.path}
-              onClick={() => handlerActive(link.name)}
-              className={`hidden lg:flex ${
-                isActive === link.name ? "text-[#f14419]" : "text-[#03257e]"
-              } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
+              className={currentPath === link.path ? "is-active" : ""}
             >
               {link.name}
             </Link>
@@ -161,12 +172,7 @@ const Navbar: React.FC = () => {
               <Link
                 key={i + 1}
                 to={link.path}
-                onClick={() => handlerActive(link.name)}
-                className={`hidden lg:flex ${
-                  currentPath === link.path
-                    ? "text-[#f14419]"
-                    : "text-[#03257e]"
-                } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
+                className={currentPath === link.path ? "is-active" : ""}
               >
                 {link.name}
               </Link>
@@ -177,94 +183,89 @@ const Navbar: React.FC = () => {
           <Link
             key="admin"
             to="/admin"
-            onClick={() => handlerActive("Admin")}
-            className={`hidden lg:flex ${
-              currentPath === "/admin" ? "text-[#f14419]" : "text-[#03257e]"
-            } hover:text-[#f14419] transition duration-200 py-2 text-[18px] font-medium`}
+            className={currentPath === "/admin" ? "is-active" : ""}
           >
             Admin
           </Link>
         )}
-        {!user ? (
-          <div className="hidden lg:flex relative rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
-            <Link
-              to="/login"
-              className="w-full bg-white py-1 text-[18px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
-            >
-              Login
-            </Link>
-          </div>
-        ) : (
-          <>
-            <div className="relative hidden lg:flex rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
-              <button
-                onClick={handlerLogout}
-                disabled={loading}
-                className="w-full bg-white py-1 text-[18px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
-                style={{ opacity: loading ? 0.7 : 1 }}
+        </nav>
+
+        <div className="current-nav__tools">
+          <div className="current-nav__search">
+            <Search size={15} />
+            <AnimatedSearchInput value={search} onChange={setSearch} />
+            {showResults && (
+              <div
+                onMouseDown={(e) => e.preventDefault()}
+                className="current-nav__results"
               >
-                {loading ? "Please Wait..." : "Logout"}
+                <SearchResultsPopup
+                  users={users}
+                  loading={isLoading}
+                  onSelect={(selectedUser: SearchProfile) => {
+                    setShowResults(false);
+                    setSearch("");
+                    navigate(`/cv/${selectedUser.userId}`);
+                    window.location.reload();
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+        {!user ? (
+          <Link to="/login" className="current-nav__auth">Sign in</Link>
+        ) : (
+          <div className="current-nav__account" ref={accountMenuRef}>
+            <button
+              type="button"
+              className={`current-nav__account-trigger ${isAccountMenuOpen ? "is-open" : ""}`}
+              onClick={() => setIsAccountMenuOpen((open) => !open)}
+              aria-expanded={isAccountMenuOpen}
+              aria-haspopup="menu"
+            >
+              <span className="current-nav__account-icon"><UserRound size={16} /></span>
+              <span>Account</span>
+              <ChevronDown size={15} className="current-nav__account-chevron" />
+            </button>
+
+            <div className={`current-nav__account-menu ${isAccountMenuOpen ? "is-open" : ""}`} role="menu">
+              <div className="current-nav__account-label"><WalletCards size={15} />Wallet</div>
+              <div className="current-nav__wallet">
+                <ConnectButton />
+              </div>
+              <div className="current-nav__account-divider" />
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAccountMenuOpen(false);
+                  handlerLogout();
+                }}
+                disabled={loading}
+                className="current-nav__logout"
+                role="menuitem"
+              >
+                <LogOut size={16} />
+                {loading ? "Signing out..." : "Logout"}
               </button>
             </div>
-            {/* <div className="hidden xl:block">
-              <ConnectButton />
-            </div> */}
-          </>
+          </div>
         )}
-        {/* Hamburger Menu */}
-        <div className="flex items-center justify-center gap-2 ml-1">
-          <div
-            className={`relative flex lg:hidden flex-col items-center justify-center w-8 h-8 cursor-pointer space-y-1 transition-all duration-300 ease-in-out ${
-              isSidebarOpen ? "open" : ""
-            }`}
+
+          <button
+            type="button"
+            className="current-nav__menu"
             onClick={toggleSidebar}
+            aria-label="Open navigation menu"
+            aria-expanded={isSidebarOpen}
           >
-            <span
-              className={`block w-8 h-1 bg-[#03257e] rounded transition duration-300 ease-in-out ${
-                isSidebarOpen ? "transform translate-y-3 rotate-45" : ""
-              }`}
-            ></span>
-            <span
-              className={`block w-8 h-1 bg-[#f14419] rounded transition duration-300 ease-in-out ${
-                isSidebarOpen ? "opacity-0" : ""
-              }`}
-            ></span>
-            <span
-              className={`block w-8 h-1 bg-[#006666] rounded transition duration-300 ease-in-out ${
-                isSidebarOpen ? "transform -translate-y-2 -rotate-45" : ""
-              }`}
-            ></span>
-          </div>
+            <Menu size={24} />
+          </button>
+
+          <img src={truCv} alt="TruCV" className="current-nav__trucv" />
         </div>
-        <div className="relative sm:block hidden">
-          <Search
-            size={14}
-            className="hidden sm:block absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 z-10"
-          />
-          <AnimatedSearchInput
-            value={search}
-            onChange={setSearch}
-          />
-        </div>
-        {showResults && (
-          <div
-            onMouseDown={(e) => e.preventDefault()}
-            className="absolute top-full left-0 w-full z-[999]"
-          >
-            <SearchResultsPopup
-              users={users}
-              loading={isLoading}
-              onSelect={(user: SearchProfile) => {
-                setShowResults(false);
-                setSearch("");
-                navigate(`/cv/${user.userId}`);
-                window.location.reload();
-              }}
-            />
-          </div>
-        )}
       </div>
-      {/* Sidebar */}
+
       <Sidebar
         isOpen={isSidebarOpen}
         links={links}
@@ -274,12 +275,7 @@ const Navbar: React.FC = () => {
         user={user}
         loading={loading}
       />
-      <img
-        src={truCv}
-        alt="trucv-logo"
-        className="w-32 h-16 sm:h-24 sm:w-48 md:w-60 md:h-24"
-      ></img>
-    </div>
+    </header>
   );
 };
 
@@ -293,30 +289,31 @@ const Sidebar: React.FC<SidebarProps> = ({
   loading,
 }) => {
   return (
-    <div
-      className={`fixed top-0 left-0 w-64 h-full bg-white text-[#006666] transform transition duration-300 ease-in-out ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      } shadow-lg z-10`}
-    >
-      <div className="flex flex-col space-y-4 p-4">
-        <div className="flex justify-between items-center">
-          <img src={logo} alt="Logo" className="h-20 w-20" />
+    <>
+      <button
+        type="button"
+        aria-label="Close navigation menu"
+        onClick={() => setIsSidebarOpen(false)}
+        className={`current-nav__overlay ${isOpen ? "is-open" : ""}`}
+      />
+      <aside className={`current-sidebar ${isOpen ? "is-open" : ""}`} aria-hidden={!isOpen}>
+        <div className="current-sidebar__head">
+          <img src={logo} alt="Edubuk" />
           <MdClose
-            className="size-8 cursor-pointer hover:text-[#03257e]"
+            className="current-sidebar__close"
             onClick={() => setIsSidebarOpen(false)}
           />
         </div>
+        <nav className="current-sidebar__links">
         {links?.map((link, i) =>
           link.name === "Home" ? (
             <Link
               key={i + 1}
               to={link.path}
               onClick={() => setIsSidebarOpen(false)}
-              className={`${
-                currentPath === link.path ? "text-[#f14419]" : "text-[#03257e]"
-              } hover:text-[#f14419] transition duration-200 py-2`}
+              className={currentPath === link.path ? "is-active" : ""}
             >
-              {link.name}
+              <span>0{i + 1}</span>{link.name}
             </Link>
           ) : (
             user && (
@@ -324,13 +321,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 key={i + 1}
                 to={link.path}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`${
-                  currentPath === link.path
-                    ? "text-[#f14419]"
-                    : "text-[#03257e]"
-                } hover:text-[#f14419] transition duration-200 py-2`}
+                className={currentPath === link.path ? "is-active" : ""}
               >
-                {link.name}
+                <span>0{i + 1}</span>{link.name}
               </Link>
             )
           ),
@@ -340,34 +333,33 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Link
             to="/admin"
             onClick={() => setIsSidebarOpen(false)}
-            className={`${
-              currentPath === "/admin" ? "text-[#f14419]" : "text-[#03257e]"
-            } hover:text-[#f14419] transition duration-200 py-2`}
+            className={currentPath === "/admin" ? "is-active" : ""}
           >
-            Admin
+            <span>06</span>Admin
           </Link>
         )}
+        </nav>
 
         {!user ? (
           <Link
             to="/login"
-            className="bg-[#03257e] py-2 px-4 rounded-full text-center text-white"
+            onClick={() => setIsSidebarOpen(false)}
+            className="current-sidebar__action"
           >
-            Login
+            Sign in to TruCV
           </Link>
         ) : (
-          <div className="relative p-0.5 rounded-full bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
-            <button
-              onClick={handlerLogout}
-              className=" w-full p-2 bg-white rounded-full text-[#03257e] hover:font-bold"
-              style={{ opacity: loading ? 0.7 : 1 }}
-            >
-              Logout
+          <div className="current-sidebar__account">
+            <div className="current-sidebar__wallet-label"><WalletCards size={16} />Wallet account</div>
+            <div className="current-sidebar__wallet"><ConnectButton /></div>
+            <button onClick={handlerLogout} className="current-sidebar__action" disabled={loading}>
+              <LogOut size={16} />{loading ? "Signing out..." : "Logout"}
             </button>
           </div>
         )}
-      </div>
-    </div>
+        <img src={truCv} alt="TruCV" className="current-sidebar__trucv" />
+      </aside>
+    </>
   );
 };
 

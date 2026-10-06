@@ -192,6 +192,8 @@ export default function EdubukRegistration({
 
   const controlled = typeof isOpen === "boolean";
   const open = controlled ? isOpen : internalOpen;
+  const popupDismissed = localStorage.getItem("edubukPopupClosed") === "true";
+  const isVisible = open && !popupDismissed;
 
   const closePopup = useCallback(() => {
     if (!controlled) {
@@ -202,7 +204,7 @@ export default function EdubukRegistration({
   }, [controlled, onClose]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!isVisible) return;
 
     const previousOverflow = document.body.style.overflow;
 
@@ -220,11 +222,11 @@ export default function EdubukRegistration({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open, closePopup]);
+  }, [isVisible, closePopup]);
 
   return (
     <>
-      {open && localStorage.getItem("edubukPopupClosed") !== "true" && (
+      {isVisible && (
         <div
           className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#02143f]/65 p-2 backdrop-blur-[3px] font-['Poppins',sans-serif] ${className}`}
           role="presentation"

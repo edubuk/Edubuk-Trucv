@@ -1,6 +1,7 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 //import {eni} from 'wagmi/chains';
 import { defineChain } from 'viem';
+import { sepolia } from 'viem/chains';
 
 export const myCustomChain = defineChain({
   id: 173, 
@@ -30,7 +31,7 @@ export const myCustomChain = defineChain({
 export const config = getDefaultConfig({
   appName: 'TruCV',
   projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || "eab12bd1a2511f9b3d7fb2d5757a2d30",
-  chains: [myCustomChain],
+  chains: [myCustomChain,sepolia],
   ssr: false,
 });
 

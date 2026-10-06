@@ -15,7 +15,7 @@ import StatusBadge from "@/CvBuilder/StatusBadge";
 import ResendEmail from "../../pages/ResendEmail";
 import UserDocsSkeleton from "./UserDocsSkeleton";
 import { Link } from "react-router-dom";
-import { EbukPointsBar, VerificationBenefits } from "./Utils";
+import { VerificationBenefits } from "./Utils";
 import { ISubscription } from "@/api/subscription.apis";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -308,7 +308,7 @@ export default function UserDocs({
                 </div>
               </div>
             </div>
-             <EbukPointsBar subscriptionDetails={subscriptionDetails}/>
+             {/* <EbukPointsBar subscriptionDetails={subscriptionDetails}/> */}
             {/* Documents Section */}
             <div className="px-1 sm:px-6 py-6">
                <VerificationBenefits />

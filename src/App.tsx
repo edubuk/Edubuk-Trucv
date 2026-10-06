@@ -48,6 +48,7 @@ const Hackathons = lazy(()=>import("./pages/Hackathons"));
 const UserVerification = lazy(()=>import("./pages/UserVerification"));
 const DocumentVerificationGuide = lazy(()=>import("./components/DocumentVerificationGuide"));
 const BuyPoints = lazy(()=>import("./components/Dashboard/Buypoints"));
+const HackathonHome = lazy(() => import("./pages/HackathonHome"));
 
 
 
@@ -73,6 +74,7 @@ function App() {
                 path="/"
                 element={<Layout> <Home /></Layout>}
               />
+              <Route path="/hackathon-home" element={<HackathonHome />} />
               <Route path="*" element={<NotFoundPage />} />
               <Route path="/digilocker" element={<Digilocker/>}/>
               <Route path="/new-cv/:id" element={<Resume />} />
