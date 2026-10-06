@@ -25,7 +25,6 @@ export const SkillDetails = ({
   step,
   setStep,
   uid,
-  setCvData,
   cvData,
 }: IStepCard) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -142,12 +141,8 @@ export const SkillDetails = ({
 
   useEffect(() => {
     fetchSkills();
-  }, [step === 5,refresh]);
+  }, [refresh]);
 
-  const includedIds = useMemo(
-    () => new Set(cvData.skills.map((e: any) => e.id)),
-    [cvData]
-  );
   const includedSkillIds = useMemo(
     () => new Set(selectedSkill?.skills?.map((e: any) => e.id)),
     [selectedSkill]
@@ -159,24 +154,6 @@ export const SkillDetails = ({
     // ensure a stable id — prefer existing ID from the form if present
     const id = row.id || uid("edu");
     return { ...row, id };
-  }
-
-  function handleToggleInclude(index: number) {
-    const payload = buildEducationPayload(index);
-
-    setCvData((prev: any) => {
-      const exists = prev.skills.some((e: any) => e.id === payload.id);
-      if (exists) {
-        // remove
-        return {
-          ...prev,
-          skills: prev.skills.filter((e: any) => e.id !== payload.id),
-        };
-      } else {
-        // add (append)
-        return { ...prev, skills: [...prev.skills, payload] };
-      }
-    });
   }
 
   const deleteHandler = async (index: number) => {
@@ -229,15 +206,12 @@ export const SkillDetails = ({
           open={step === 5}
           onToggle={() => setStep(step === 5 ? 0 : 5)}
         >
-          <p className="text-sm text-slate-500">
-            Add skills manually. Each skill supports self-attestation and can be
-            included in your resume.<br></br>
-            <span className="text-[#f14419] font-semibold">Note:</span> After listing the skills select internal checkbox to include the skill in verification list and click on Verify Below Listed Skills button to send verification request to the selected skill.
-          </p>
+          <p className="text-sm leading-6 text-slate-500">Add your strongest skills and proficiency level. Select existing skills when you want to request verification.</p>
 
           <div className="mt-4 space-y-4">
             {/* Common input row */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3 sm:p-4">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_12rem_auto] sm:items-center">
               <div className="flex-1">
                 <Input
                   placeholder="Enter a skill (e.g. React, Node.js)"
@@ -266,16 +240,17 @@ export const SkillDetails = ({
               <Button
                 type="button"
                 onClick={handleAddSkill}
-                className="px-4 py-2 bg-[#006666] text-white hover:bg-[#008888] transition"
+                className="h-10 w-full rounded-lg bg-[#006666] px-5 font-medium text-white shadow-sm transition hover:bg-[#005555]"
               >
                 Add Skill
               </Button> 
             </div>
-            <div className="flex justify-end items-center w-full">
+            </div>
+            <div className="flex w-full justify-start sm:justify-end">
             <Button 
             title="Select internal checkbox to include the skill in verification list"
             type="button" 
-            className="px-4 py-2 bg-[#03257e] text-white active:scale-[0.99] transition items-align-right" 
+            className="h-10 w-full rounded-lg bg-[#03257e] px-4 text-sm font-medium text-white shadow-sm transition hover:bg-[#03257e]/90 sm:w-auto" 
             disabled={selectedSkill?.skills?.length===0}
             onClick={() => setOpenModel(true)}>Verify Below Listed Skills</Button>
             </div>
@@ -284,34 +259,8 @@ export const SkillDetails = ({
               {fields.map((s, index) => {
                 return (
                   <React.Fragment key={s.rhfKey}>
-                    {/* Include checkbox */}
-                    <div className="flex justify-start items-center gap-2">
-                      {isMongoId(s.id) && (
-                        <div className="flex justify-start items-center gap-2">
-                          <input
-                            type="checkbox"
-                            className="border-[#008888] h-4 w-4"
-                            // checked if this row's id exists in cvData.educations
-                            checked={
-                              includedIds.has(s.id) ||
-                              cvData.skills.some(
-                                (e: any) =>
-                                  e.id ===
-                                  (form.getValues(`skills.${index}.id`) || s.id)
-                              )
-                            }
-                            onChange={() => handleToggleInclude(index)}
-                            aria-label={`Include skills ${index + 1} in CV`}
-                          />
-                          <p className="text-[#008888]">
-                            Select to include this data in your resume
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
                     {/* Bar row: name + level dropdown + self-attest + remove */}
-                    <div className="flex flex-wrap items-center gap-3 border p-3 rounded bg-white">
+                    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center">
                       {/* Skill name (editable inline if you want) */}
                         {isMongoId(s.id)&& (s.endoresBy?<CheckCircle className="text-[#006666]"/>: <input
                             type="checkbox"
@@ -329,54 +278,16 @@ export const SkillDetails = ({
                             onChange={() => handleSkillInclude(index)}
                             aria-label={`Include skills ${index + 1} in CV`}
                           />)}
-                      <div className="flex-1 text-sm font-medium text-slate-800">
-                        <FormField
-                          control={control}
-                          name={`skills.${index}.skillName`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input
-                                  disabled
-                                  {...field}
-                                  className="w-full"
-                                  placeholder="Skill name"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-slate-900">{s.skillName}</p>
+                        <p className="mt-0.5 text-xs text-slate-500">{s.endoresBy ? `Verified by ${s.endoresBy}` : isMongoId(s.id) ? "Available for verification" : "New skill"}</p>
                       </div>
 
                       {/* Level dropdown (per skill) */}
-                      <div className="w-full sm:w-40">
-                        <FormField
-                          control={control}
-                          name={`skills.${index}.level`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <select
-                                  disabled
-                                  className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#006666] focus:border-[#006666]"
-                                  {...field}
-                                >
-                                  {levelOptions.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>
-                                      {opt.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                      <span className="w-fit rounded-full bg-[#006666]/10 px-3 py-1 text-xs font-semibold capitalize text-[#006666]">{s.level}</span>
 
                       {/* Self-attest + remove */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <FormField
                           control={control}
                           name={`skills.${index}.selfAttested`}
@@ -402,7 +313,7 @@ export const SkillDetails = ({
                           <button
                             type="button"
                             onClick={() => deleteHandler(index)}
-                            className=" px-2 py-1 rounded border shadow-lg border-red-600 bg-transparent text-red-600 text-sm flex font-semibold items-center gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-sm font-medium text-red-700 shadow-sm transition hover:bg-red-50"
                           >
                             <Delete size={18} />
                             {loading&&idx===index?"Deleting...":"Delete"}
@@ -410,7 +321,7 @@ export const SkillDetails = ({
                         :<button
                             type="button"
                             onClick={() => removeSkill(index)}
-                            className=" px-2 py-1 rounded border shadow-lg border-red-600 bg-transparent text-red-600 text-sm flex font-semibold items-center gap-2 hover:bg-red-50 active:scale-[0.99] transition"
+                            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-sm font-medium text-red-700 shadow-sm transition hover:bg-red-50"
                           >
                             <Trash2 size={18} />
                             Remove
@@ -429,7 +340,7 @@ export const SkillDetails = ({
                 <Button 
                   type="submit"
                   disabled={!isNewSkill}
-                  className="w-full bg-[#006666] hover:bg-[#008888] active:scale-[0.99] transition">
+                  className="w-full text-white bg-[#006666] hover:bg-[#008888] active:scale-[0.99] transition">
                   {fields.length > 0?"Save New Skills":"Save Skills"}
                 </Button>
                 </>

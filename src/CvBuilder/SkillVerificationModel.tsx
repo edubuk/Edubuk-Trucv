@@ -33,7 +33,7 @@ const SkillVerificationModel: React.FC<SkillVerificationProps> = ({
         return setErrorMsg("Institutional/oraganizational email id is required");
       }
       const response = await fetch(
-        `${API_BASE_URL}/issuer/send-email-forSkills/${emailId}`,
+        `${API_BASE_URL}/api/v1/issuer/send-email-forSkills/${emailId}`,
         {
           method: "POST",
           credentials: "include",

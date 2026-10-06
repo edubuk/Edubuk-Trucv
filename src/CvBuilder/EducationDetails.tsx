@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
-import { useForm, useFieldArray} from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DigilockerImg from "../assets/digilocker.svg";
 import {
@@ -20,18 +20,17 @@ import {
   Calendar,
   Building,
   School,
-  Paperclip,
-  ExternalLink,
   BookOpen,
   Replace,
   CheckCircle,
   Delete,
-  SquarePercent
+  SquarePercent,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { StepCard } from "./StepCard";
 // import { uploadFile } from "@/uploadFile";
 import { DropDown } from "@/components/ui/dropdown";
-import { handleProofUploaded } from "./uploadProof";
 import DigiLockerTest from "@/components/DigiLocker/DigiLockerPullTest";
 import toast from "react-hot-toast";
 import LoadingButton from "@/components/LoadingButton";
@@ -39,9 +38,11 @@ import LoadingButton from "@/components/LoadingButton";
 import { isMongoId } from "@/lib/utils";
 import { ICvData } from "./CvBuilder";
 import api from "@/lib/api";
-import StatusBadge from "./StatusBadge"; 
+import StatusBadge from "./StatusBadge";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
-
+//import { useContract } from "@/Blockchain/hooks/useMyContract";
+//import { useAccount } from "wagmi";
+//import { parseContractError } from "@/Blockchain/utils/error";
 
 const collegeOptions = [
   {
@@ -75,7 +76,6 @@ export const EducationDetails = ({
   setStep,
   uid,
   docId,
-  setCvData,
   cvData,
 }: {
   step: number;
@@ -86,15 +86,16 @@ export const EducationDetails = ({
   cvData: ICvData;
 }) => {
   const [refresh, setRefresh] = useState<boolean>(true);
-  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   //const { user } = useUserData();
   const [idx, setIdx] = useState<number>();
-  const [loadingState,setLoadingState] = useState<"Updating"|"Deleting"|"Submitting" | null>(null);
+  const [loadingState, setLoadingState] = useState<
+    "Updating" | "Deleting" | "Submitting" | null
+  >(null);
   const [openDigiLocker, setOpenDigiLocker] = useState<boolean>(false);
-  const [parsedEducationData, setParsedEducationData] = useState<[]>();
-  const cvDataFromStorage = localStorage.getItem("educations");
-  const [customLevel,setCustomLevel] = useState<string>();
-
+  const [customLevel, setCustomLevel] = useState<string>();
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  // const { submitDocument } = useContract();
+  // const { address } = useAccount();
   const form = useForm<EducationFormValues>({
     resolver: zodResolver(EducationSchema),
     defaultValues: {
@@ -125,31 +126,61 @@ export const EducationDetails = ({
   });
 
   // local UI state for proof dialog/upload (example)
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  
+
   const submitFormHandler = async (index: number) => {
     console.log("error", errors);
     const isValid = await form.trigger(`educations.${index}`);
     if (!isValid) return;
     console.log("error", errors);
-    console.log("form submit", getValues(`educations.${index}`));
+    const digiLockerHash = "5de0e71f3766b54139668853b1c253dcdec61eef1f00fa24ba1ab112081148c0";
+    if(getValues(`educations.${index}.verifiedThrough`)==="DigiLocker"){
+      setValue(`educations.${index}.docHash`, digiLockerHash);
+    }
+    //console.log("form submit", getValues(`educations.${index}`));
     const payload = getValues(`educations.${index}`);
     try {
       setIdx(index);
       setLoadingState("Submitting");
-      const result = await api.post(`/doc/save-eduDoc`, {
-        data: payload,
-      });
-      const res = await result.data;
-      if (!res.success) {
-        toast.error(res.message);
+      // if (payload.docHash || payload.verifiedThrough==="DigiLocker") {
+      //   const id = toast.loading("Submitting on chain...");
+      //   // "This is DigiLocker verified"->hash256
+      //   try {
+      //     await submitDocument({
+      //       name: payload.level,
+      //       hashString: payload.verifiedThrough==="DigiLocker" ? `0x${digiLockerHash}` as `0x${string}` : `0x${payload.docHash}` as `0x${string}`,
+      //       docType: "education",
+      //       tokenUri: "",
+      //       currAddress: address as `0x${string}`,
+      //     });
+      //     toast.dismiss(id);
+      //   } catch (txError) {
+      //     const errMsg = parseContractError(txError);
+
+      //     if (errMsg === "This document has already been submitted.") {
+      //       // Already on chain — skip and proceed to DB save
+      //       toast.dismiss(id);
+      //       toast.custom(() => (
+      //         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+      //           <p>Document already on chain. Retrying database save...</p>
+      //         </div>
+      //       ));
+      //     } else {
+      //       // Any other chain error — stop everything
+      //       toast.dismiss(id);
+      //       throw txError;
+      //     }
+      //   }
+      // }
+
+      const { data } = await api.post(`/doc/save-eduDoc`, { data: payload });
+
+      if (!data.success) {
+        toast.error(data.message);
         return;
       }
-      toast.success(res.message);
+
+      toast.success(data.message);
       setRefresh((prev) => !prev);
-      updateLocalStorageData(payload.level);
-      
     } catch (error: any) {
       toast.error(error.message ?? error ?? "Something went wrong");
     } finally {
@@ -164,7 +195,7 @@ export const EducationDetails = ({
       | "Graduation"
       | "PostGraduation"
       | "Other"
-      | any
+      | any,
   ) => {
     append({
       id: uid("edu"),
@@ -179,6 +210,7 @@ export const EducationDetails = ({
       verified: false,
       status: "pending",
     });
+    setExpandedCard(fields.length);
   };
 
   const removeEducation = (index: number) => remove(index);
@@ -216,24 +248,20 @@ export const EducationDetails = ({
           verified: doc.verified ?? false,
           status: doc.status ?? "pending",
         }));
-        cvData.educations=educations;
+        cvData.educations = educations;
         // Update form values
         form.reset({ educations });
       }
     } catch (error) {
       toast.error("something went wrong");
-    }finally{
+    } finally {
       setRefresh(false);
     }
   };
 
   useEffect(() => {
     fetchEducationsDocs();
-    const cvDataFromStorageParsed = cvDataFromStorage ? JSON.parse(cvDataFromStorage) : null;
-    if(cvDataFromStorageParsed){
-      setParsedEducationData(cvDataFromStorageParsed);
-    }
-  }, [step === 3, refresh]);
+  }, [refresh]);
 
   const updateHandler = async (index: number) => {
     try {
@@ -262,10 +290,12 @@ export const EducationDetails = ({
 
   const deleteHandler = async (index: number) => {
     try {
-      const confirm = window.confirm("Are you sure you want to delete this educational document?");
+      const confirm = window.confirm(
+        "Are you sure you want to delete this educational document?",
+      );
       if (!confirm) return;
       setIdx(index);
-      setLoadingState("Deleting")
+      setLoadingState("Deleting");
       const payload = getValues(`educations.${index}`);
       const res = await api.delete(`/doc/delete-eduDoc/${payload.id}`);
       if (!res.data.success) {
@@ -274,115 +304,22 @@ export const EducationDetails = ({
       }
       toast.success(res.data.message);
       setRefresh((prev) => !prev);
-    } catch (error: any)  {
+    } catch (error: any) {
       toast.error(error.message ?? error ?? "something went wrong");
     } finally {
       setLoadingState(null);
     }
   };
 
-  const uploadDocHandler = async (file: File, index: number) => {
-    if (!file) return;
-    try {
-      setSelectedFileName(file.name);
-      setIdx(index);
-      const uploadRes = await handleProofUploaded({
-        file,
-        setIsUploading,
-        setUploadError,
-        setSelectedFileName,
+
+  const addCustomLevel = (index: number, field: any) => {
+    if (customLevel) {
+      update(index, {
+        ...field,
+        level: customLevel,
       });
-      console.log("upload res", uploadRes);
-      if (!uploadRes) return;
-      const { url, docHash } = uploadRes;
-      setValue(`educations.${index}.docUri`, url, {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-      setValue(`educations.${index}.docHash`, docHash, {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-    } catch (error) {
-      toast.error("something went wrong");
-    } finally {
-      setSelectedFileName(null);
-      setIsUploading(false);
     }
   };
-
-  const includedIds = useMemo(
-    () => new Set(cvData.educations.map((e: any) => e.id)),
-    [cvData]
-  );
-
-  function buildEducationPayload(index: number) {
-    // grab the whole education row from RHF form values
-    const row = getValues(`educations.${index}`) || {};
-    // ensure a stable id — prefer existing ID from the form if present
-    const id = row.id || uid("exp");
-    return { ...row, id };
-  }
-
-  function handleToggleInclude(index: number) {
-    const payload = buildEducationPayload(index);
-    setCvData((prev: any) => {
-      const exists = prev.educations.some((e: any) => e.id === payload.id);
-      if (exists) {
-        // remove
-        return {
-          ...prev,
-          educations: prev.educations.filter((e: any) => e.id !== payload.id),
-        };
-      } else {
-        // add (append)
-        return { ...prev, educations: [...prev.educations, payload] };
-      }
-    });
-  }
-
-
-  // const fillParsedEducationDetails = ()=>{
-  //  if(parsedEducationData)
-  //  {
-  //   parsedEducationData.map((doc:any)=>
-  //     append({
-  //     id: uid("edu"),
-  //     eduDocId: docId(),
-  //     level: doc.level==="Grade 10"?"Secondary School":doc.level==="Grade 12"?"Higher Secondary School":doc.level==="Undergraduate"?"Graduation":"PostGraduation",
-  //     boardNameOrDegree: doc.boardNameOrDegree==="CBSE"?"Central Board of Secondary Education(CBSE)":"",
-  //     institutionName: doc.institutionName ?? "",
-  //     gpa: doc.gpa.split("/")[0] ?? "",
-  //     orgId:doc.boardNameOrDegree==="CBSE"?"000027":"",
-  //     duration: { from: "", to: "" },
-  //     selfAttested: false,
-  //     isEmailSend: false,
-  //     verified: false,
-  //     status: "pending",
-  //   }))
-  //  }
-  // }
-
-  const updateLocalStorageData = (level:string)=>{
-    if(parsedEducationData){
-      const cvData = cvDataFromStorage ? JSON.parse(cvDataFromStorage):null;
-      const filterLevel = level==="Secondary School"?"Grade 10":level==="Higher Secondary School"?"Grade 12":level==="Graduation"?"Undergraduate":"Postgraduate"
-      const updatedData = cvData?.filter((doc:any)=>
-        doc.level!==filterLevel
-      )
-      localStorage.setItem("educations",JSON.stringify(updatedData))
-    }
-  }
-
-  const addCustomLevel = (index:number,field:any)=>{
-    if(customLevel)
-    {
-     update(index, {
-    ...field,
-    level: customLevel,
-  });
-    }
-  }
 
   return (
     <>
@@ -393,600 +330,409 @@ export const EducationDetails = ({
             index={3}
             title="Educational Details"
             icon={BookOpen}
-            open={step === 4}
-            onToggle={() => setStep(step === 4 ? 0 : 4)}
+            open={step === 3}
+            onToggle={() => setStep(step === 3 ? 0 : 3)}
           >
-            <p className="text-sm text-slate-500">
-              Add education entries. Choose school or college. Each entry can be
-              self-attested and have proof uploaded.
+            <p className="text-sm leading-6 text-slate-500">
+              Manage your education records from one place. Add a new document,
+              update saved details, include items in the resume, or delete old
+              records when they are no longer needed.
             </p>
-            {refresh?<ThreeDotLoader w={3} h={3} yPos="center"/>:<div className="mt-4 space-y-4">
-              {fields.map((field, index) => {
-                // Use field values if you need quick read-only access:
-                //const levelPath = `educations.${index}.level` as const;
-                return (
-                  <>
-                    {!isMongoId(field.id) &&<div className="flex items-center justify-center border-dashed border-[#03257e] border-b">
-                      <span className="relative top-4 bg-white p-1 text-md text-center text-[#03257e]">Save New Document</span>
-                    </div>}
-                  <div
-                    key={field.rhfKey}
-                    className="border p-4 md:p-6 rounded-xl bg-white shadow-sm"
-                  >
-                    {isMongoId(field.id) && (
-                      <div className="flex justify-start items-center gap-2">
-                        <input
-                          type="checkbox"
-                          className="border-[#008888] h-4 w-4"
-                          // checked if this row's id exists in cvData.educations
-                          checked={
-                            includedIds.has(field.id) ||
-                            cvData.educations.some(
-                              (e: any) =>
-                                e.id ===
-                                (form.getValues(`educations.${index}.id`) ||
-                                  field.id)
-                            )
-                          }
-                          onChange={() => handleToggleInclude(index)}
-                          aria-label={`Include education ${index + 1} in CV`}
-                        />
-                        <p className="text-[#008888]">
-                          Select to include this data in your resume
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-                        <div className="text-sm font-medium">
-                          {field.level === "Secondary School" ||
-                          field.level === "Higher Secondary School"
-                            ? "School"
-                            : "College"}{" "}
-                          entry
-                        </div>
-                        <div className="text-xs flex gap-1 items-center text-slate-500 break-all">
-                          {field.id}
-                          {isMongoId(field.id) &&
-                          <StatusBadge status={field.status} isEmailSend={field.isEmailSend}/>
-                          }
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-end gap-2">
-                        <FormField
-                          control={control}
-                          name={`educations.${index}.selfAttested`}
-                          render={() => (
-                            <FormItem>
-                              <FormControl>
-                                <SelfAttestButton
-                                  isAttested={
-                                    form.watch(
-                                      `educations.${index}.selfAttested`
-                                    ) as boolean
-                                  }
-                                  onClick={() => handleSelfAttest(index)}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <div className="flex items-center gap-1">
-                          {isMongoId(field.id) ? (
-                            <Button
-                              disabled={field.verified || loadingState==="Updating"}
-                              type="button"
-                              onClick={() => updateHandler(index)}
-                              className="mt-2 px-3 py-1 rounded border bg-[#006666] border-[#006666] text-white flex items-center shadow-lg gap-2 hover:bg-[#006666]/80 active:scale-[0.99] transition"
-                            >
-                              <Replace size={18} />{" "}
-                              {loadingState === "Updating" && idx === index
-                                ? "Updating..."
-                                : "Update"}
-                            </Button>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => removeEducation(index)}
-                              className="mt-2 px-3 py-1 rounded border border-red-600 text-red-600 flex items-center shadow-lg gap-2 hover:bg-red-50 active:scale-[0.99] transition"
-                            >
-                              <Trash2 size={18} /> Remove
-                            </button>
-                          )}
-                          {isMongoId(field.id) && (
-                            <Button
-                              disabled={field.verified || loadingState==="Deleting"}
-                              type="button"
-                              onClick={() => deleteHandler(index)}
-                              className="mt-2 px-3 py-1 rounded border bg-[#f14419] border-[#f14419] text-white flex items-center shadow-lg gap-2 hover:bg-[#f14419]/80 active:scale-[0.99] transition"
-                            >
-                              <Delete size={18} />
-                              {loadingState === "Deleting" ? "Deleting..." : "Delete"}
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Form body */}
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 w-full">
-                      {/* Level - use Controller-like binding via setValue so RHF knows about change */}
-                      <div>
-                        <label className="text-black text-sm font-semibold pb-2">
-                          Select your education level*
-                        </label>
-                        <select
-  disabled={field.verified}
-  value={field.level}
-  onChange={(e) =>
-    update(index, {
-      ...field,
-      level: e.target.value,
-    })
-  }
-  className="border text-[#03257e] bg-gray-100 h-9 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#006666]"
->
-  <option value="">Select level</option>
-  <option value="Secondary School">Secondary School</option>
-  <option value="Higher Secondary School">Higher Secondary School</option>
-  <option value="Graduation">Graduation</option>
-  <option value="PostGraduation">PostGraduation</option>
-
-  {customLevel && (
-    <option value={customLevel}>
-      {customLevel}
-    </option>
-  )}
-
-  <option value="Other">Other</option>
-                        </select>
-                        {
-                          field.level==="Other"&&
-                          <div className="flex gap-2 mt-1">
-                          <input
-                            type="text"
-                            value={customLevel}
-                            onChange={(e: any) => setCustomLevel(e.target.value)}
-                            placeholder="Enter your level"
-                            className="border text-[#03257e] bg-gray-100 h-9 rounded w-full px-2 focus:outline-none focus:ring-1 focus:ring-[#006666]"
-                          />
-                          <button
-                            type="button"
-                            className="flex gap-1 items-center bg-[#03257e] text-white px-2 py-1 rounded-lg hover:bg-[#005555]"
-                            onClick={()=>addCustomLevel(index,field)}
-                          >
-                            <PlusCircle size={18}/>Add
-                          </button>
-                        </div>
-                        }
-                      </div>
-
-                      {/* Duration: startDate & endDate */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <FormField
-                          control={control}
-                          name={`educations.${index}.duration.from`}
-                          render={({ field: innerField }) => (
-                            <FormItem>
-                              <FormLabel>
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="text-[#006666] size-4" />
-                                  Start date*
-                                </div>
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                type="date"
-                                  placeholder="YYYY"
-                                  {...innerField}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={control}
-                          name={`educations.${index}.duration.to`}
-                          render={({ field: innerField }) => (
-                            <FormItem>
-                              <FormLabel>
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="text-[#006666] size-4" />
-                                  End date*
-                                </div>
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                disabled={field.verified}
-                                  type="date"
-                                  placeholder="YYYY"
-                                  {...innerField}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Conditional fields: School */}
-                      <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-1">
-                        <FormField
-                          control={control}
-                          name={`educations.${index}.${
-                            field.level === "Secondary School" ||
-                            field.level === "Higher Secondary School"
-                              ? "boardNameOrDegree"
-                              : "institutionName"
-                          }`}
-                          render={({ field: f }) => (
-                            <FormItem className="w-full">
-                              <FormLabel>
-                                <div className="flex items-center gap-1">
-                                  <Building className="text-[#006666] size-4" />
-                                  {field.level === "Secondary School" ||
-                                  field.level === "Higher Secondary School"
-                                    ? "Board Name (e.g. CBSE/ICSE)*"
-                                    : "Institute Name*"}
-                                </div>
-                              </FormLabel>
-                              <FormControl>
-                                {/* <Input placeholder="Board name" className="w-full" {...f} /> */}
-                                <DropDown
-                                isDisabled={field.verified}
-                                  classOrgId={`educations.${index}.${
-                                    field.level === "Secondary School" ||
-                                    field.level === "Higher Secondary School"
-                                      ? "boardNameOrDegree"
-                                      : "institutionName"
-                                  }`}
-                                  index={index}
-                                  options={collegeOptions}
-                                  {...f}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={control}
-                          name={`educations.${index}.${
-                            field.level === "Secondary School" ||
-                            field.level === "Higher Secondary School"
-                              ? "institutionName"
-                              : "boardNameOrDegree"
-                          }`}
-                          render={({ field: f }) => (
-                            <FormItem className="w-full">
-                              <FormLabel>
-                                <div className="flex items-center gap-1">
-                                  <School className="text-[#006666] size-4" />
-                                  {field.level === "Secondary School" ||
-                                  field.level === "Higher Secondary School"
-                                    ? "Institution Name*"
-                                    : "Degree(e.g. BTech,BSc.)*"}
-                                </div>
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                disabled={field.verified}
-                                  placeholder={
-                                    field.level === "Secondary School" ||
-                                    field.level === "Higher Secondary School"
-                                      ? "School Name"
-                                      : "Degree(e.g. BTech,BSc.)"
-                                  }
-                                  className="w-full"
-                                  {...f}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={control}
-                          name={`educations.${index}.gpa`}
-                          render={({ field: f }) => (
-                            <FormItem className="w-full sm:col-span-2">
-                              <FormLabel>
-                                <div className="flex items-center gap-1">
-                                  <SquarePercent className="text-[#006666] size-4" />
-                                  {field.level === "Secondary School" ||
-                                  field.level === "Higher Secondary School"
-                                    ? "Percentage*"
-                                    : "GPA(Grade Point Average)*"}
-                                </div>
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                disabled={field.verified}
-                                  placeholder={
-                                    field.level === "Secondary School" ||
-                                    field.level === "Higher Secondary School"
-                                      ? "Percentage*"
-                                      : "GPA(Grade Point Average)*"
-                                  }
-                                  className="w-full"
-                                  {...f}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Proof Upload & DigiLocker area (single row UI) */}
-                      {!(
-                        field.verified ||
-                        (getValues(`educations.${index}.docUri`) &&
-                          getValues(`educations.${index}.verified`))
-                      ) && (
-                        <div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
-                          {
-                          getValues(`educations.${index}.${(field.level==="Secondary School" || field.level==="Higher Secondary School")?"boardNameOrDegree":"institutionName"}`)&& 
-                          (!getValues(`educations.${index}.orgId`)&&!field.orgId )? 
-                          <p className="text-sm text-[#f14419] text-center mb-2">DigiLocker not available for this college/Board {field.orgId}</p>:
-                          (<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                              <label className="text-sm font-medium text-gray-700">
-                                Get your document from{" "}
-                                <span className="text-[#6334FA] font-semibold">
-                                  DigiLocker</span>
-                                {" "}
-                                (Recommended)
-                              </label>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenDigiLocker(true);
-                                  setIdx(index);
-                                }}
-                                className="border border-[#6334FA] rounded-lg p-1.5 hover:bg-[#6334FA]/10 transition flex items-center justify-center"
-                              >
-                                <img
-                                  className="h-8 w-28 object-contain"
-                                  src={DigilockerImg}
-                                  alt="digilocker"
-                                />
-                              </button>
+            {refresh ? (
+              <ThreeDotLoader w={3} h={3} yPos="center" />
+            ) : (
+              <div className="mt-4 space-y-4">
+                {fields.map((field, index) => {
+                  // Use field values if you need quick read-only access:
+                  //const levelPath = `educations.${index}.level` as const;
+                  return (
+                    <>
+                      <div
+                        key={field.rhfKey}
+                        className={`overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md ${isMongoId(field.id) ? "border-slate-200" : "border-[#008888]/50 ring-2 ring-[#008888]/10"}`}
+                      >
+                        <div
+                          className="cursor-pointer bg-white px-4 py-3.5 md:px-5 hover:bg-slate-50/70 transition-colors"
+                          onClick={() => setExpandedCard(expandedCard === index ? null : index)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") setExpandedCard(expandedCard === index ? null : index);
+                          }}
+                        >
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#006666]/10 text-[#006666]"><School size={17} /></span>
+                              {field.level === "Secondary School" ||
+                              field.level === "Higher Secondary School"
+                                ? "School"
+                                : "College"}{" "}
+                              entry
+                              <span className={`rounded-full px-2 py-0.5 text-[11px] ${isMongoId(field.id) ? "bg-blue-50 text-blue-700" : "bg-emerald-50 text-emerald-700"}`}>
+                                {isMongoId(field.id) ? "Added" : "New draft"}
+                              </span>
                             </div>
-                          </div>)
-                          }
-                          {!isMongoId(field.id)&&<div className="relative border-t border-gray-300 my-2 mt-2">
-                            <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2 font-bold">
-                              OR
-                            </p>
-                          </div>}
+                            <div className="text-xs flex gap-1 items-center text-slate-500">
+                              {field.institutionName || field.boardNameOrDegree || "Details not added yet"}
+                              {isMongoId(field.id) && (
+                                <StatusBadge
+                                  status={field.status}
+                                  isEmailSend={field.isEmailSend}
+                                />
+                              )}
+                            </div>
+                          </div>
 
-                          {!isMongoId(field.id)&&<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full items-start md:items-center">
-                            {/* Upload / proof column */}
+                          <div className="flex flex-wrap items-center justify-end gap-2">
+                            <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition hover:border-[#006666]/40 hover:text-[#006666]" aria-label={expandedCard === index ? "Hide details" : "Edit education details"}>
+                              <Replace size={14} /> {expandedCard === index ? "Close" : "Edit"} {expandedCard === index ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                            </span>
+                          </div>
+                        </div>
+                        </div>
+
+                        {/* Form body */}
+                        {expandedCard === index && <>
+                        <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-5">
+                          <FormField control={control} name={`educations.${index}.selfAttested`} render={() => <FormItem><FormControl><SelfAttestButton isAttested={form.watch(`educations.${index}.selfAttested`) as boolean} onClick={() => handleSelfAttest(index)} /></FormControl><FormMessage /></FormItem>} />
+                          <div className="flex flex-wrap gap-2">
+                            {isMongoId(field.id) ? (
+                              <Button disabled={field.verified || loadingState === "Deleting"} type="button" onClick={() => deleteHandler(index)} className="h-9 rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50"><Delete size={15} className="mr-1.5" />{loadingState === "Deleting" && idx === index ? "Deleting..." : "Delete"}</Button>
+                            ) : <button type="button" onClick={() => removeEducation(index)} className="inline-flex items-center rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-50"><Trash2 size={16} className="mr-1.5" />Discard new draft</button>}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-4 md:p-5 w-full">
+                          {/* Level - use Controller-like binding via setValue so RHF knows about change */}
+                          <div>
+                            <label className="text-black text-sm font-semibold pb-2">
+                              Select your education level*
+                            </label>
+                            <select
+                              disabled={field.verified}
+                              value={field.level}
+                              onChange={(e) =>
+                                update(index, {
+                                  ...field,
+                                  level: e.target.value,
+                                })
+                              }
+                              className="border text-[#03257e] bg-gray-100 h-9 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#006666]"
+                            >
+                              <option value="">Select level</option>
+                              <option value="Secondary School">
+                                Secondary School
+                              </option>
+                              <option value="Higher Secondary School">
+                                Higher Secondary School
+                              </option>
+                              <option value="Graduation">Graduation</option>
+                              <option value="PostGraduation">
+                                PostGraduation
+                              </option>
+
+                              {customLevel && (
+                                <option value={customLevel}>
+                                  {customLevel}
+                                </option>
+                              )}
+
+                              <option value="Other">Other</option>
+                            </select>
+                            {field.level === "Other" && (
+                              <div className="flex gap-2 mt-1">
+                                <input
+                                  type="text"
+                                  value={customLevel}
+                                  onChange={(e: any) =>
+                                    setCustomLevel(e.target.value)
+                                  }
+                                  placeholder="Enter your level"
+                                  className="border text-[#000000] bg-gray-100 h-9 rounded w-full px-2 focus:outline-none focus:ring-1 focus:ring-[#000000]"
+                                />
+                                <button
+                                  type="button"
+                                  className="flex gap-1 items-center bg-[#000000] text-white px-2 py-1 rounded-lg"
+                                  onClick={() => addCustomLevel(index, field)}
+                                >
+                                  <PlusCircle size={18} />
+                                  Add
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Duration: startDate & endDate */}
+                          <div className="grid grid-cols-2 gap-2">
                             <FormField
-                              control={form.control}
-                              name={`educations.${index}.docUri`}
-                              render={() => (
-                                <FormItem className="flex-1">
+                              control={control}
+                              name={`educations.${index}.duration.from`}
+                              render={({ field: innerField }) => (
+                                <FormItem>
                                   <FormLabel>
-                                    <div className="flex items-start md:items-center gap-2">
-                                      <Paperclip className="h-5 w-5 text-gray-700" />
-                                      <div className="text-sm text-gray-700">
-                                        Upload your document and enter issuer
-                                        email id to send a email to the issuer
-                                        for verification.<br></br>
-                                        {/* <span className="text-[#03257e]">Note: Please ensure before enter the email id is correct and belong to the issuer </span> */}
-                                      </div>
+                                    <div className="flex items-center gap-1">
+                                      <Calendar className="text-[#006666] size-4" />
+                                      Start date*
                                     </div>
                                   </FormLabel>
-
                                   <FormControl>
-                                    {/* Styled drop area / button */}
-                                    <div className="relative w-full p-1 bg-white">
-                                      <input
-                                        id={`proof-file-${index}`}
-                                        type="file"
-                                        accept=".jpg,.jpeg,.png,.pdf"
-                                        onChange={(e) =>
-                                          uploadDocHandler(
-                                            e.target.files?.[0]!,
-                                            index
-                                          )
-                                        }
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                        aria-label={`Upload proof for education ${
-                                          index + 1
-                                        }`}
-                                      />
-
-                                      {/* Visible content */}
-                                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-2">
-                                        {form.getValues(
-                                          `educations.${index}.docUri`
-                                        ) ? (
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-green-600">
-                                              File Uploaded
-                                            </span>
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                // clear file input visually — if you need to clear the actual input element value, you can
-                                                // keep a ref to the input and set inputRef.current.value = ""
-                                                setSelectedFileName(null);
-                                                // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
-                                              }}
-                                              className="text-sm px-3 py-1 text-[#f14419] rounded-md border border-[#f14419] hover:bg-[#f14419] hover:text-white"
-                                            >
-                                              Clear
-                                            </button>
-                                          </div>
-                                        ) : (
-                                          <div className="flex flex-col gap-2">
-                                            <div className="flex items-center gap-2 p-2 rounded-md bg-gray-50 ring-1 ring-[#FB980E]">
-                                              <Paperclip className="h-4 w-4 text-[#171515]" />
-                                              <span className="text-sm text-gray-800">
-                                                {selectedFileName ??
-                                                  "Upload File"}
-                                              </span>
-                                            </div>
-                                            <p className="text-xs text-[#f14419]">
-                                              Accepted:.jpg .jpeg .png .pdf —
-                                              max 5MB
-                                            </p>
-                                          </div>
-                                        )}
-
-                                        {/* <div className="flex items-center gap-2">
-                                          {form.getValues(
-                                            `educations.${index}.docUri`
-                                          ) && (
-                                            <span className="text-green-600">
-                                              File Uploaded
-                                            </span>
-                                          )}
-
-                                          {selectedFileName && (
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                // clear file input visually — if you need to clear the actual input element value, you can
-                                                // keep a ref to the input and set inputRef.current.value = ""
-                                                setSelectedFileName(null);
-                                                // optionally update form state to clear URL: form.setValue(`educations.${index}.proof`, "")
-                                              }}
-                                              className="text-sm px-3 py-1 rounded-md border border-transparent hover:bg-gray-100"
-                                            >
-                                              Clear
-                                            </button>
-                                          )}
-                                        </div> */}
-                                      </div>
-                                    </div>
+                                    <Input
+                                      disabled={field.verified}
+                                      className={isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}
+                                      type="date"
+                                      placeholder="YYYY"
+                                      {...innerField}
+                                    />
                                   </FormControl>
-
                                   <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={control}
+                              name={`educations.${index}.duration.to`}
+                              render={({ field: innerField }) => (
+                                <FormItem>
+                                  <FormLabel>
+                                    <div className="flex items-center gap-1">
+                                      <Calendar className="text-[#006666] size-4" />
+                                      End date*
+                                    </div>
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      className={isMongoId(field.id) && innerField.value === "" ? "border-red-500" : ""}
+                                      disabled={field.verified}
+                                      type="date"
+                                      placeholder="YYYY"
+                                      {...innerField}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
 
-                                  {/* upload / error states already in your codebase */}
-                                  {uploadError && (
-                                    <p className="mt-2 text-sm text-red-600 font-medium">
-                                      {uploadError}
-                                    </p>
-                                  )}
-                                  {isUploading && (
-                                    <p className="mt-2 text-sm text-green-600">
-                                      Uploading document — please wait…
-                                    </p>
-                                  )}
-
-                                  {/* If you have a stored URL in the form value, show a preview link */}
-                                  {form.getValues(
-                                    `educations.${index}.docUri`
-                                  ) && (
-                                    <a
-                                      href={form.getValues(
-                                        `educations.${index}.docUri`
-                                      )}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="mt-3 flex w-32 justify-center items-center text-sm text-[#008888] rounded border border-[#008888] px-2 py-1 gap-1"
-                                    >
-                                      View proof{" "}
-                                      <ExternalLink className="size-4" />
-                                    </a>
-                                  )}
+                          {/* Conditional fields: School */}
+                          <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-1">
+                            <FormField
+                              control={control}
+                              name={`educations.${index}.${
+                                field.level === "Secondary School" ||
+                                field.level === "Higher Secondary School"
+                                  ? "boardNameOrDegree"
+                                  : "institutionName"
+                              }`}
+                              render={({ field: f }) => (
+                                <FormItem className="w-full">
+                                  <FormLabel>
+                                    <div className="flex items-center gap-1">
+                                      <Building className="text-[#006666] size-4" />
+                                      {field.level === "Secondary School" ||
+                                      field.level === "Higher Secondary School"
+                                        ? "Board Name (e.g. CBSE/ICSE)*"
+                                        : "Institute Name*"}
+                                    </div>
+                                  </FormLabel>
+                                  <FormControl>
+                                    {/* <Input placeholder="Board name" className="w-full" {...f} /> */}
+                                    <DropDown
+                                      isDisabled={field.verified}
+                                      classOrgId={`educations.${index}.${
+                                        field.level === "Secondary School" ||
+                                        field.level ===
+                                          "Higher Secondary School"
+                                          ? "boardNameOrDegree"
+                                          : "institutionName"
+                                      }`}
+                                      index={index}
+                                      options={collegeOptions}
+                                      {...f}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
                                 </FormItem>
                               )}
                             />
 
-                            {/* Issuer email + send button column */}
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
-                              <FormField
-                                control={control}
-                                name={`educations.${index}.issuerEmailId`}
-                                render={({ field: f }) => (
-                                  <>
-                                    <label
-                                      htmlFor={`issuerEmail-${index}`}
-                                      className="min-w-[110px] text-sm font-medium text-gray-700"
-                                    >
-                                      Issuer Email:
-                                    </label>
-
-                                    <div className="flex-1 flex-col gap-2 items-center">
-                                      <Input
-                                      disabled={field.verified}
-                                        id={`issuerEmail-${index}`}
-                                        placeholder="Enter issuer's email address"
-                                        className="w-full rounded-lg px-3 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6334FA] focus:border-[#6334FA]"
-                                        {...f}
-                                      />
-                                      <FormMessage />
+                            <FormField
+                              control={control}
+                              name={`educations.${index}.${
+                                field.level === "Secondary School" ||
+                                field.level === "Higher Secondary School"
+                                  ? "institutionName"
+                                  : "boardNameOrDegree"
+                              }`}
+                              render={({ field: f }) => (
+                                <FormItem className="w-full">
+                                  <FormLabel>
+                                    <div className="flex items-center gap-1">
+                                      <School className="text-[#006666] size-4" />
+                                      {field.level === "Secondary School" ||
+                                      field.level === "Higher Secondary School"
+                                        ? "Institution Name*"
+                                        : "Degree(e.g. BTech,BSc.)*"}
                                     </div>
-                                  </>
-                                )}
-                              />
-                            </div>
-                          </div>}
-                        </div>
-                      )}
-                      {getValues(`educations.${index}.docUri`) &&
-                        getValues(`educations.${index}.verified`) && (
-                          <div className="flex items-center p-4 text-green-600 gap-2">
-                            <CheckCircle size={18} /> <p>Document Saved</p>
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      className={`w-full ${isMongoId(field.id) && f.value === "" ? "border-red-500" : ""}`}
+                                      disabled={field.verified}
+                                      placeholder={
+                                        field.level === "Secondary School" ||
+                                        field.level ===
+                                          "Higher Secondary School"
+                                          ? "School Name"
+                                          : "Degree(e.g. BTech,BSc.)"
+                                      }
+                                      {...f}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={control}
+                              name={`educations.${index}.gpa`}
+                              render={({ field: f }) => (
+                                <FormItem className="w-full sm:col-span-2">
+                                  <FormLabel>
+                                    <div className="flex items-center gap-1">
+                                      <SquarePercent className="text-[#006666] size-4" />
+                                      {field.level === "Secondary School" ||
+                                      field.level === "Higher Secondary School"
+                                        ? "Percentage*"
+                                        : "GPA(Grade Point Average)*"}
+                                    </div>
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      className={`w-full ${isMongoId(field.id) && f.value === "" ? "border-red-500" : ""}`}
+                                      disabled={field.verified}
+                                      placeholder={
+                                        field.level === "Secondary School" ||
+                                        field.level ===
+                                          "Higher Secondary School"
+                                          ? "Percentage*"
+                                          : "GPA(Grade Point Average)*"
+                                      }
+                                      {...f}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
-                        )}
-                      {openDigiLocker && index === idx && (
-                        <DigiLockerTest
-                          setOpenDigiLocker={setOpenDigiLocker}
-                          openDigiLocker={openDigiLocker}
-                          field={field.level}
-                          index={index}
-                        />
-                      )}
-                    </div>
-                    {loadingState==="Submitting"
-                      ? index === idx && (
-                          <LoadingButton className="w-full bg-[#008888] mt-2 hover:bg-[#006666]" />
-                        )
-                      : !isMongoId(field.id) && (
+
+                          {/* Proof Upload & DigiLocker area (single row UI) */}
+                          {!(
+                            field.verified ||
+                            (getValues(`educations.${index}.docUri`) &&
+                              getValues(`educations.${index}.verified`))
+                          ) && (
+                            <div className="sm:col-span-2 mt-3 w-full rounded-xl p-2 sm:p-4 bg-white border">
+                              {getValues(
+                                `educations.${index}.${field.level === "Secondary School" || field.level === "Higher Secondary School" ? "boardNameOrDegree" : "institutionName"}`,
+                              ) &&
+                              !getValues(`educations.${index}.orgId`) &&
+                              !field.orgId ? (
+                                <p className="text-sm text-[#f14419] text-center mb-2">
+                                  DigiLocker not available for this
+                                  college/Board {field.orgId}
+                                </p>
+                              ) : (
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <label className="text-sm font-medium text-gray-700">
+                                      Get your document from{" "}
+                                      <span className="text-[#6334FA] font-semibold">
+                                        DigiLocker
+                                      </span>{" "}
+                                      (Recommended)
+                                    </label>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setOpenDigiLocker(true);
+                                        setIdx(index);
+                                      }}
+                                      className="border border-[#6334FA] rounded-lg p-1.5 hover:bg-[#6334FA]/10 transition flex items-center justify-center"
+                                    >
+                                      <img
+                                        className="h-8 w-28 object-contain"
+                                        src={DigilockerImg}
+                                        alt="digilocker"
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {getValues(`educations.${index}.docUri`) &&
+                            getValues(`educations.${index}.verified`) && (
+                              <div className="flex items-center p-4 text-green-600 gap-2">
+                                <CheckCircle size={18} /> <p>Document Saved</p>
+                              </div>
+                            )}
+                          {openDigiLocker && index === idx && (
+                            <DigiLockerTest
+                              setOpenDigiLocker={setOpenDigiLocker}
+                              openDigiLocker={openDigiLocker}
+                              field={field.level}
+                              index={index}
+                            />
+                          )}
+                        </div>
+                        {isMongoId(field.id) ? (
+                          <Button
+                            disabled={field.verified || loadingState === "Updating"}
+                            type="button"
+                            onClick={() => updateHandler(index)}
+                            className="mt-2 w-full bg-[#006666] text-white transition hover:bg-[#005555]"
+                          >
+                            <Replace size={16} className="mr-2" />
+                            {loadingState === "Updating" && idx === index ? "Updating..." : "Update education"}
+                          </Button>
+                        ) : loadingState === "Submitting" && index === idx ? (
+                          <LoadingButton className="mt-2 w-full bg-[#008888] hover:bg-[#006666]" />
+                        ) : (
                           <Button
                             type="button"
                             onClick={() => submitFormHandler(index)}
-                            className="w-full bg-[#008888] mt-2 hover:bg-[#006666] transition"
+                            className="mt-2 w-full bg-[#008888] text-white transition hover:bg-[#006666]"
                           >
-                            Save
+                            Save new education
                           </Button>
                         )}
-                  </div>
-                  </>
-                );
-              })}
+                        </>}
+                      </div>
+                    </>
+                  );
+                })}
 
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => addEducation("Secondary School")}
-                  className="flex items-center gap-2 px-3 py-1 rounded border shadow-lg border-[#03257e] text-[#03257e]"
-                >
-                  <PlusCircle size={16} /> Add School
-                </button>
-                <button
-                  type="button"
-                  onClick={() => addEducation("Graduation")}
-                  className="flex items-center gap-2 px-3 py-1 rounded border shadow-lg border-[#03257e] text-[#03257e]"
-                >
-                  <PlusCircle size={16} /> Add University/College
-                </button>
+                <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => addEducation("Secondary School")}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#03257e]/20 bg-[#03257e]/5 px-4 py-2.5 text-sm font-medium text-[#03257e] shadow-sm transition hover:bg-[#03257e]/10 sm:w-auto"
+                  >
+                    <PlusCircle size={16} /> Add School
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addEducation("Graduation")}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#006666]/20 bg-[#006666]/5 px-4 py-2.5 text-sm font-medium text-[#006666] shadow-sm transition hover:bg-[#006666]/10 sm:w-auto"
+                  >
+                    <PlusCircle size={16} /> Add University/College
+                  </button>
+                </div>
               </div>
-            </div>}
+            )}
           </StepCard>
         </form>
       </Form>

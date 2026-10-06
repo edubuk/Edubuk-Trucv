@@ -63,7 +63,7 @@ export const autoSave = async (cvData: any) => {
             const skills = cvData.skills.map((skill: any) => ({
                 skillName: skill.skillName,
                 level: skill.level,
-                selfAttested: false,
+                selfAttested: true,
                 endoresBy:'',
                 endoresThrough:'',
             }));
@@ -89,7 +89,7 @@ export const autoSave = async (cvData: any) => {
                             duration: { from: data.duration.from, to: data.duration.to },
                             skills: data.skills,
                             description: data.description,
-                            selfAttested: false,
+                            selfAttested: true,
                         }
                     })
                 )
@@ -112,7 +112,7 @@ export const autoSave = async (cvData: any) => {
                             organisation:data.organisation,
                             duration: { from: data.duration.from, to: data.duration.to },
                             description:data.description,
-                            selfAttested:false,
+                            selfAttested:true,
                             isEmailSend:false,
                             verified:false,
                             status:"pending",
@@ -139,21 +139,20 @@ export const autoSave = async (cvData: any) => {
 };
 
 export const autoSaveParsedData = async (cvData: any) => {
-    try {
+   try {
         // 1. Save education data
         if (cvData.educations.length > 0) {
             console.log("education data saving", cvData.educations);
 
             const eduResults = await Promise.all(
-                cvData.educations.map((doc: any) =>
+                cvData.educations.map((data: any) =>
                     api.post(`/doc/save-eduDoc`, {
                         data: {
-                            level: doc.level==="Grade 10"?"Secondary School":doc.level==="Grade 12"?"Higher Secondary School":doc.level==="Undergraduate"?"Graduation":"PostGraduation",
-                            boardNameOrDegree: doc.boardNameOrDegree==="CBSE"?"Central Board of Secondary Education(CBSE)":"",
-                            institutionName: doc.institutionName ?? "",
-                            gpa: doc.gpa.split("/")[0] ?? "",
-                            orgId:doc.boardNameOrDegree==="CBSE"?"000027":"",
-                            duration: { from: "", to: "" },
+                            level: data.level,
+                            boardNameOrDegree: data.boardNameOrDegree,
+                            institutionName: data.institutionName,
+                            gpa: data.gpa,
+                            duration: { from: data.duration.from, to: data.duration.to },
                             selfAttested: false,
                             isEmailSend: false,
                             verified: false,
@@ -173,18 +172,19 @@ export const autoSaveParsedData = async (cvData: any) => {
             console.log("experiences data saving", cvData.experiences);
 
             const expResults = await Promise.all(
-                cvData.experiences.map((doc: any) =>
+                cvData.experiences.map((data: any) =>
                     api.post(`/doc/save-expDoc`, {
                         data: {
-                            companyName:doc.companyName,
-                            jobRole:doc.jobRole,
-                            duration: { from: "", to: "" },
-                            skills:doc.skills || "",
-                            description:doc.description || "",
-                            selfAttested: false,
+                            companyName: data.companyName,
+                            jobRole: data.jobRole,
+                            duration: {
+                                from: data.duration.from,
+                                to: data.duration.to,
+                            },
+                            description: data.description,
+                            selfAttested:false,
                             isEmailSend: false,
-                            verified: false,
-                            status: "pending",
+                            verified:false,
                         }
                     })
                 )
@@ -200,8 +200,8 @@ export const autoSaveParsedData = async (cvData: any) => {
             console.log("skills data saving", cvData.skills);
             const skills = cvData.skills.map((skill: any) => ({
                 skillName: skill.skillName,
-                level: skill.level?.toLowerCase(),
-                selfAttested: false,
+                level: skill.level.toLowerCase(),
+                selfAttested: true,
                 endoresBy:'',
                 endoresThrough:'',
             }));
@@ -217,21 +217,24 @@ export const autoSaveParsedData = async (cvData: any) => {
         //4. Save Projects data
         if(cvData.projects.length > 0) {
             console.log("projects data saving", cvData.projects);
-            const projects = cvData.projects.map((doc:any)=>{
-                return {
-                    projectName:doc.projectName || "",
-                    projectUrl: doc.projectUrl || "",
-                    duration: { from: "", to: "" },
-                    skills:doc.skills || "",
-                    description: doc.description || "",
-                    selfAttested: false,
-                }
-            })
-            const projectResults = await api.post(`/doc/save-projects`, {
-                        data: projects
+
+            const projectResults = await Promise.all(
+                cvData.projects.map((data: any) =>
+                    api.post(`/doc/save-projects`, {
+                        data: [{
+                            projectName:data.projectName,
+                            projectUrl: data.projectUrl,
+                            duration: { from: data.duration.from, to: data.duration.to },
+                            skills: data.skills,
+                            description: data.description,
+                            selfAttested: true,
+                        }]
                     })
+                )
+            );
             // Check if any project save failed
-            if (!projectResults.data.success) return { success: false, message: projectResults.data.message };
+            const projectFailed = projectResults.find(result => !result.data.success);
+            if (projectFailed) return { success: false, message: projectFailed.data.message };
         }
 
         //5. Save award data
@@ -239,23 +242,21 @@ export const autoSaveParsedData = async (cvData: any) => {
             console.log("awards data saving", cvData.awards);
 
             const awardResults = await Promise.all(
-                cvData.awards.map((doc: any) =>
-                    {
-                        return api.post(`/doc/save-awards`, {
-                            data: {
-                                level: "Certificate",
-                                name: doc.name,
-                                organisation: doc.organisation,
-                                duration: { from: "", to: "" },
-                                description: doc.description || "",
-                                isEmailSend: false,
-                                selfAttested: false,
-                                verified: false,
-                                status: "pending",
-                                verifiedThrough: ""
-                            }
-                        });
-                    }
+                cvData.awards.map((data: any) =>
+                    api.post(`/doc/save-awards`, {
+                        data: {
+                            level: "Award",
+                            name:data.name,
+                            organisation:data.organisation,
+                            duration: { from: data.duration.from, to: data.duration.to },
+                            description:data.description,
+                            selfAttested:true,
+                            isEmailSend:false,
+                            verified:false,
+                            status:"pending",
+                            verifiedThrough:"",
+                        }
+                    })
                 )
             );
 

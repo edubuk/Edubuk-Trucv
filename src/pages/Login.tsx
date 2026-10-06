@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import loginImg from "../assets/login.avif";
 import toast from "react-hot-toast";
-import { ArrowLeftSquare } from "lucide-react";
+import { ArrowLeftSquare, EyeIcon, EyeOffIcon } from "lucide-react";
 import api from "@/lib/api";
+import Footer from "./Footer";
 
 type FormState = {
     email: string;
@@ -20,14 +21,12 @@ export default function LoginPage(): JSX.Element {
 
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
-
+    const [seePassword, setSeePassword] = useState(false);
+    const [searchParams] = useSearchParams();
     const validate = (): FormErrors => {
         const e: FormErrors = {};
         if (!form.email || !form.email.includes("@") || !form.email.includes(".")) {
             e.email = "Please enter a valid email address";
-        }
-        if (form.password.length < 8) {
-            e.password = "Password must be at least 8 characters";
         }
         return e;
     };
@@ -41,6 +40,7 @@ export default function LoginPage(): JSX.Element {
         e.preventDefault();
         const eObj = validate();
         setErrors(eObj);
+        const redirect = searchParams.get("redirect") || "/";
         if (Object.keys(eObj).length > 0) return;
 
         setLoading(true);
@@ -53,7 +53,7 @@ export default function LoginPage(): JSX.Element {
 
             if (data?.success) {
                 toast.success(data.message);
-                window.location.href = "/";
+                window.location.href = redirect;
             } else {
                 toast.error(data.message);
             }
@@ -65,6 +65,8 @@ export default function LoginPage(): JSX.Element {
     };
 
     return (
+        <>
+        
         <div className="min-h-screen lg:h-screen flex items-center justify-center bg-white px-2 md:px-4 py-3">
             <div className="max-w-8xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
 
@@ -121,7 +123,7 @@ export default function LoginPage(): JSX.Element {
                             <p className="text-slate-400">
                                 New here?{" "}
                                 <Link
-                                    to="/register"
+                                    to="/register/me"
                                     className="font-bold text-[#03257e] hover:underline"
                                 >
                                     Create an account
@@ -166,13 +168,13 @@ export default function LoginPage(): JSX.Element {
                                 )}
                             </label>
 
-                            <label className="block">
+                            <label className="relative block">
                                 <span className="text-sm font-medium text-slate-700">
                                     Password*
                                 </span>
                                 <input
                                     name="password"
-                                    type="password"
+                                    type={seePassword ? "text" : "password"}
                                     value={form.password}
                                     onChange={handleChange}
                                     placeholder="Minimum 8 characters"
@@ -182,6 +184,12 @@ export default function LoginPage(): JSX.Element {
                                             : "border-slate-200 focus:ring-[#03257e]"
                                     }`}
                                 />
+                                <div
+                                    onClick={() => setSeePassword(!seePassword)}
+                                    className="absolute right-3 top-1/2 cursor-pointer"
+                                >
+                                    {seePassword ? <EyeIcon color={"#03257e"}/> : <EyeOffIcon color={"#03257e"} />}
+                                </div>
                                 {errors.password && (
                                     <p className="text-xs text-red-500 mt-1">
                                         {errors.password}
@@ -214,5 +222,8 @@ export default function LoginPage(): JSX.Element {
                 </div>
             </div>
         </div>
+
+        <Footer/>
+        </>
     );
 }

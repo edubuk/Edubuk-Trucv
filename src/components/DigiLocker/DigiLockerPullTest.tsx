@@ -1,5 +1,4 @@
 // DigiLockerTest.tsx (styled)
-import api from "@/lib/api";
 import { API_BASE_URL } from "@/main";
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -231,6 +230,7 @@ export default function DigiLockerTest({
   let description =null;
   let orgId =null;
   let doctype = null;
+
   switch (field) {
     case "Secondary School":
       issuerName = getValues(`educations.${index}.boardNameOrDegree`);
@@ -261,10 +261,16 @@ export default function DigiLockerTest({
   const fetchProfile = async () => {
     try {
       setLoading(true)
-      const r:any = await api.get("/api/dl/me")
-      if (r.status===200) {
-        console.log("Profile:", r.data);
-        setProfile(r.data);
+      const r:any = await fetch(`${API_BASE_URL}/api/dl/me`,{
+        method:"GET",
+        headers:{
+          "Content-Type":"application/json"
+        }
+      })
+      if (r.ok) {
+        const data = await r.json();
+        console.log("Profile:", data);
+        setProfile(data);
         setOpenDigiLocker(true);
       }
     } catch (err) {
@@ -279,11 +285,17 @@ export default function DigiLockerTest({
         return;
       }
       setLoading(true);
-      const res:any = await api.post(`api/dl/pullParams?orgid=${orgId}&doctype=${doctype}`)
+      const res:any = await fetch(`${API_BASE_URL}/api/dl/pullParams?orgid=${orgId}&doctype=${doctype}`,{
+        method:"GET",
+        headers:{
+          "Content-Type":"application/json"
+        }
+      })
       console.log("res",res)
-      if (res.data.ok) {
-        console.log("response",res.data.data);
-        setDlFormFields(res.data.data);
+      if (res.ok) {
+        const data = await res.json();
+        console.log("response",data);
+        setDlFormFields(data.data);
       }
     } catch (error:any) {
       setErrorMsg(error?.response?.data?.error?.error_description??error?.message??error);
@@ -336,13 +348,14 @@ export default function DigiLockerTest({
     )}&code_challenge_method=S256`;
 
     // 6. Redirect user
-    window.location.href = authUrl;
+    window.open(authUrl, "_blank", "noopener,noreferrer");
+    setOpenDigiLocker(false);
   }
 
 
   useEffect(() => {
       fetchProfile();
-  },[]);
+  },[openDigiLocker]);
 
   // If there's no connected profile, show the Digilocker pull card (static JSX)
   if (!profile?.digilockerid) {

@@ -12,7 +12,7 @@ const UpdateSubscription = ({setModalOpen,user,userSubscriptionDetails}:any) => 
     if (!user) return;
     setSaving(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/admin/updateSubscriptionPlan?userId=${user._id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/updateSubscriptionPlan?userId=${user._id}`, {
         method: "PUT",
         credentials:"include",
         headers: {

@@ -1,9 +1,16 @@
 import Navbar from "../pages/Navbar"
+import DebugSessionBanner from "../components/developer/DebugSessionBanner"
 
-const Layout = ({children}: {children: React.ReactNode}) => {
+interface layoutProps {
+    children: React.ReactNode;
+    isAuthenticated?: boolean;
+}
+
+const Layout = ({children}: layoutProps) => {
     return (
         <div>
             <Navbar />
+            <DebugSessionBanner />
             <main>{children}</main>
         </div>
     )

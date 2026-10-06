@@ -5,20 +5,22 @@ import {
   FileText,
   FolderOpen,
   Image as NftIcon,
+  Database,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import CvById from "./CvById";
 import UserDocs from "./UserDocs";
 import api from "@/lib/api";
-import Certificate from "./Certificate";
+//import Certificate from "./Certificate";
 import { useUserData } from "@/context/AuthContext";
+import OnChainSubmission from "./On-ChainSubmission";
+import { useSearchParams } from "react-router-dom";
 //import DocumentNFTCard from "@/components/Dashboard/DocumentNFTCard";
 
 const DashBoard = () => {
-  const [cvData, setCvData] = useState([]);
+
   const [docRefresh, setDocRefresh] = useState(false);
-  const [cvRefresh, setCvRefresh] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const {user} = useUserData();
@@ -28,10 +30,12 @@ const DashBoard = () => {
     awards: [],
   });
 
-  const [selected, setSelected] = useState<"cv" | "nft" | "docs">("docs");
+  //const [selected, setSelected] = useState<"cv" | "nft" | "docs" | "onchain">("docs");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selected = searchParams.get("tab") as "cv" | "docs" | "nft" | "onchain" | null || "docs";
 
   const getDocs = async () => {
-    setSelected("docs");
+    setSearchParams({ tab: "docs" });
     setSidebarOpen(false);
     try {
       setIsFetching(true);
@@ -48,22 +52,9 @@ const DashBoard = () => {
     }
   };
 
-  const userCvs = async () => {
-    setSelected("cv");
-    setSidebarOpen(false);
-    try {
-      setIsFetching(true);
-      const res = await api.get("/cv/user-cvs");
-      if (res.data.success) setCvData(res.data.data);
-    } catch {
-      toast.error("Failed to fetch CVs");
-    } finally {
-      setIsFetching(false);
-    }
-  };
 
   const fetchNFTsHandler = async() => {
-    setSelected("nft");
+    setSearchParams({ tab: "nft" });
     setSidebarOpen(false);
     // try {
     //   setIsFetching(true);
@@ -80,13 +71,16 @@ const DashBoard = () => {
     // }
   };
 
-  useEffect(() => {
-    getDocs();
-  }, [docRefresh]);
+useEffect(() => {
+  if (selected === "docs") getDocs();
+  if (selected === "nft") fetchNFTsHandler();
+}, [selected, docRefresh]);
 
-  useEffect(() => {
-    userCvs();
-  }, [cvRefresh]);
+  const handleTabChange = (tab: "cv" | "docs" | "nft" | "onchain") => {
+    setSearchParams({ tab });
+    setSidebarOpen(false);
+  };
+
 
   const NavItem = ({
     id,
@@ -94,7 +88,7 @@ const DashBoard = () => {
     Icon,
     onClick,
   }: {
-    id: "docs" | "cv" | "nft";
+    id: "docs" | "cv" | "nft" | "onchain";
     label: string;
     Icon: any;
     onClick: () => void;
@@ -143,15 +137,21 @@ const DashBoard = () => {
         <nav className="flex flex-col gap-2">
           <NavItem
             id="docs"
-            label="Uploaded Documents"
+            label="My Documents"
             Icon={FolderOpen}
-            onClick={getDocs}
+            onClick={() => handleTabChange("docs")}
           />
           <NavItem
             id="cv"
-            label="My CVs"
+            label="My CV"
             Icon={FileText}
-            onClick={userCvs}
+            onClick={() => handleTabChange("cv")}
+          />
+          <NavItem
+            id="onchain"
+            label="On-Chain Submission"
+            Icon={Database}
+            onClick={() => handleTabChange("onchain")}
           />
           {user?.isHackathonUser && <NavItem
             id="nft"
@@ -163,7 +163,7 @@ const DashBoard = () => {
       </aside>
 
       {/* Content Area */}
-      <main className="flex-1 h-screen overflow-y-auto w-full p-4 sm:p-6">
+      <main className="flex-1 h-screen overflow-y-auto w-full p-1 sm:p-6">
         {/* Mobile Header */}
         <div className="flex items-center gap-3 mb-4 lg:hidden">
           <button
@@ -186,9 +186,6 @@ const DashBoard = () => {
 
         {selected === "cv" && (
           <CvById
-            cvData={cvData}
-            setCvRefresh={setCvRefresh}
-            isFetching={isFetching}
           />
         )}
 
@@ -202,10 +199,13 @@ const DashBoard = () => {
           />
         )}
 
-        {selected === "nft" && (
+        {/* {selected === "nft" && (
           <Certificate 
           cvData={cvData}
           />
+        )} */}
+        {selected === "onchain" && (
+          <OnChainSubmission />
         )}
       </main>
     </div>

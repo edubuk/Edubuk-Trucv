@@ -1,20 +1,30 @@
-import {
-  useGetLinkdeinProfile,
-} from "@/api/scraper.api";
+import { useGetLinkdeinProfile } from "@/api/scraper.api";
 import { useState, useRef } from "react";
 import toast from "react-hot-toast";
 
 import LinkedinProfileCvModal from "./LinkdeinProfileCv";
 import { StepCard } from "@/CvBuilder/StepCard";
 import { autoSave, autoSaveParsedData } from "@/api/autoSave.apis";
-import {Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Check,
+  Eye,
+  FileText,
+  Files,
+  Link2,
+  Save,
+  Sparkles,
+  Trash2,
+  UploadCloud,
+  X,
+} from "lucide-react";
 
 //import AllImportedLinkdeinProfilesModel from "./AllImportedLinkdeinProfilesModels";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface HeaderButtonsProps {
-  step:number,
-  setStep:(step:number) => void,
+  step: number;
+  setStep: (step: number) => void;
   previewCV: boolean;
   setPreviewCV: (v: boolean) => void;
   cvData: any;
@@ -29,39 +39,6 @@ interface HeaderButtonsProps {
 
 type ImportTab = "cv" | "linkedin";
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-const EyeIcon = () => (
-  <svg
-    width="15"
-    height="15"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
-
-const XIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="18" y1="6" x2="6" y2="18" />
-    <line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
-);
-
 const LinkedInLogo = ({
   size = 18,
   color = "white",
@@ -74,71 +51,76 @@ const LinkedInLogo = ({
   </svg>
 );
 
-const DropUpIcon = () => (
-  <svg
-    width="38"
-    height="38"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.4"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="16 16 12 12 8 16" />
-    <line x1="12" y1="12" x2="12" y2="21" />
-    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
-  </svg>
-);
-
-const CheckCircleSmall = () => (
-  <svg
-    width="13"
-    height="13"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
-
-const SpinnerIcon = () => (
-  <svg
-    width="15"
-    height="15"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-  </svg>
-);
-
-const FileIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#036665"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-    <polyline points="14 2 14 8 20 8" />
-  </svg>
-);
-
 // ─── Helper ───────────────────────────────────────────────────────────────────
 const isValidLinkedIn = (url: string) =>
   /^https?:\/\/(www\.)?linkedin\.com\/[a-zA-Z0-9\-_%]+\/?/.test(url.trim());
+
+const AvailableDataPanel = ({
+  title,
+  description,
+  isSaving,
+  onSave,
+  onClear,
+  onPreview,
+}: {
+  title: string;
+  description: string;
+  isSaving: boolean;
+  onSave: () => void;
+  onClear: () => void;
+  onPreview?: () => void;
+}) => (
+  <div className="flex min-h-[240px] w-full flex-col items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 text-center sm:p-5">
+    <span className="flex size-12 items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm ring-1 ring-emerald-200">
+      <Check className="size-6" />
+    </span>
+    <h3 className="mt-4 text-base font-bold text-slate-900">{title}</h3>
+    <p className="mt-1 max-w-lg text-xs leading-5 text-slate-600">{description}</p>
+    <div className="mt-5 flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center">
+      {onPreview && (
+        <button type="button" onClick={onPreview} className="flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold leading-5 text-slate-700 transition hover:border-[#006666] hover:text-[#006666] sm:w-auto sm:text-sm">
+          <Eye className="size-4 shrink-0" /> <span>Preview data</span>
+        </button>
+      )}
+      <button type="button" disabled={isSaving} onClick={onSave} className="flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#03257e] px-4 py-2 text-xs font-semibold leading-5 text-white transition hover:bg-[#006666] disabled:opacity-50 sm:w-auto sm:text-sm">
+        <Save className="size-4 shrink-0" /> <span>{isSaving ? "Saving…" : "Save to CV"}</span>
+      </button>
+      <button type="button" onClick={onClear} className="flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2 text-xs font-semibold leading-5 text-red-600 transition hover:bg-red-50 sm:w-auto sm:text-sm">
+        <Trash2 className="size-4 shrink-0" /> <span>Clear data</span>
+      </button>
+    </div>
+    <div className="mt-5 flex w-full max-w-xl items-start gap-3 rounded-xl border border-amber-300 bg-amber-100 px-3 py-3 text-left shadow-sm sm:px-4">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white">
+        <AlertTriangle className="size-4" />
+      </span>
+      <p className="text-xs font-medium leading-5 text-amber-950">
+        <strong className="block font-bold">Important note</strong>
+        Imported data may be incomplete. Review every field after saving.
+      </p>
+    </div>
+  </div>
+);
+
+const ImportConflictPanel = ({
+  message,
+  clearLabel,
+  onClear,
+}: {
+  message: string;
+  clearLabel: string;
+  onClear: () => void;
+}) => (
+  <div className="flex min-h-[240px] w-full flex-col items-center justify-center rounded-2xl border border-amber-200 bg-amber-50/60 p-4 text-center sm:p-5">
+    <span className="flex size-12 items-center justify-center rounded-2xl bg-white text-amber-700 shadow-sm ring-1 ring-amber-200">
+      <AlertTriangle className="size-5" />
+    </span>
+    <h3 className="mt-4 text-base font-bold text-slate-900">Existing import found</h3>
+    <p className="mt-1 max-w-lg text-xs leading-5 text-slate-600">{message}</p>
+    <button type="button" onClick={onClear} className="mt-5 flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2 text-xs font-semibold leading-5 text-red-600 transition hover:bg-red-50 sm:w-auto sm:text-sm">
+      <Trash2 className="size-4 shrink-0" /> <span>{clearLabel}</span>
+    </button>
+  </div>
+);
 
 // ─── Component ────────────────────────────────────────────────────────────────
 const HeaderButtons = ({
@@ -151,8 +133,11 @@ const HeaderButtons = ({
   parseCV,
   isParsing,
 }: HeaderButtonsProps) => {
-  const { getLinkdeinProfileData, cvData, isLoading: isLinkdeinImportLoading } =
-    useGetLinkdeinProfile();
+  const {
+    getLinkdeinProfileData,
+    cvData,
+    isLoading: isLinkdeinImportLoading,
+  } = useGetLinkdeinProfile();
   // const { profiles, isLoading: isAllImportedProfilesLoading } =
   //   useGetALLImportedProfiles();
   console.log("linkdein cvData is", cvData);
@@ -168,6 +153,12 @@ const HeaderButtons = ({
   const fileRef = useRef<HTMLInputElement>(null);
   const [isDataSaving, setIsDataSaving] = useState(false);
   const linkedInValid = isValidLinkedIn(linkedInUrl);
+  const hasParsedCV = Boolean(
+    typeof window !== "undefined" && localStorage.getItem("cvData"),
+  );
+  const hasLinkedInData = Boolean(
+    typeof window !== "undefined" && localStorage.getItem("linkedInCvData"),
+  );
 
   // Per-tab validation — CV tab needs a file, LinkedIn tab needs a valid URL
   const canSubmit =
@@ -197,7 +188,7 @@ const HeaderButtons = ({
       return toast.success("LinkedIn profile imported successfully.");
     }
     const success = parseCV();
-    if(!success) {
+    if (!success) {
       toast.error("Failed to parse CV");
     }
   };
@@ -210,522 +201,279 @@ const HeaderButtons = ({
     setTab("cv");
   };
 
-  const saveLinkedInData = async()=>{
-      try {
-        setIsDataSaving(true);
-        const data = localStorage.getItem("linkedInCvData");
-        const cvData = JSON.parse(data || "{}");
-        const savedData =  await autoSave(cvData);
-      if(savedData?.success) {
+  const saveLinkedInData = async () => {
+    try {
+      setIsDataSaving(true);
+      const data = localStorage.getItem("linkedInCvData");
+      const cvData = JSON.parse(data || "{}");
+      const savedData = await autoSave(cvData);
+      if (savedData?.success) {
         toast.success("Data saved successfully");
         localStorage.removeItem("linkedInCvData");
         window.location.reload();
       } else {
-        toast.error("Something went wrong...")
+        toast.error("Something went wrong...");
       }
-      } catch (error) {
-        toast.error("Something went wrong...")
-      } finally {
-        setIsDataSaving(false);
-      }
-  }
-  const saveParsedData = async()=>{
-      try {
-        setIsDataSaving(true);
-        const data = localStorage.getItem("cvData");
-        const cvData = JSON.parse(data || "{}");
-        const savedData =  await autoSaveParsedData(cvData);
-      if(savedData?.success) {
+    } catch (error) {
+      toast.error("Something went wrong...");
+    } finally {
+      setIsDataSaving(false);
+    }
+  };
+  const saveParsedData = async () => {
+    try {
+      setIsDataSaving(true);
+      const data = localStorage.getItem("cvData");
+      const cvData = JSON.parse(data || "{}");
+      const savedData = await autoSaveParsedData(cvData);
+      if (savedData?.success) {
         toast.success("Data saved successfully");
         localStorage.removeItem("cvData");
         window.location.reload();
       } else {
-        toast.error("Something went wrong...")
+        toast.error("Something went wrong...");
       }
-      } catch (error) {
-        toast.error("Something went wrong...")
-      } finally {
-        setIsDataSaving(false);
-      }
-  }
-
+    } catch (error) {
+      toast.error("Something went wrong...");
+    } finally {
+      setIsDataSaving(false);
+    }
+  };
 
   return (
-    <StepCard 
-    index={1}
-    title="Smart Autofill"
-    icon={FileIcon}
-    open={step === 1}
-    onToggle={() => setStep(step === 1 ? 0 : 1)} >
-    <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
-        @keyframes hb-slideup {
-          from { opacity: 0; transform: translateY(20px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes hb-fadein {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes hb-spin {
-          to { transform: rotate(360deg); }
-        }
-        .hb-animate-slideup { animation: hb-slideup 0.3s cubic-bezier(0.16,1,0.3,1); }
-        .hb-animate-fadein  { animation: hb-fadein 0.2s ease; }
-        .hb-spin { animation: hb-spin 0.7s linear infinite; display: inline-flex; }
-      `}</style>
-
-      {/* ── Top bar ── */}
-      <div className="flex items-center justify-between gap-3">
-        {/* Preview button */}
-        {/* <button
-          onClick={() => setPreviewCV(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-[13px] font-medium text-slate-700 cursor-pointer transition-all duration-200 shadow-sm hover:border-[#036665] hover:text-[#036665] hover:-translate-y-px hover:shadow-md"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          <EyeIcon />
-          Preview CV
-        </button> */}
-
-        {/* imported linkdein profiles list */}
-        {/* {!isAllImportedProfilesLoading && profiles && profiles?.length > 0 && (
-          <AllImportedLinkdeinProfilesModel importedProfiles={profiles} />
-        )} */}
-        {/* Right side */}
-        {/* {hasParsedCV ? (
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg text-[12px] font-medium text-green-700">
-              <CheckBadgeIcon />
-              CV Parsed
-            </span>
-            <button
-              onClick={clearParsedCV}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-lg text-[12px] font-medium text-rose-600 cursor-pointer transition-all duration-200 hover:bg-rose-100 hover:border-rose-300 hover:-translate-y-px"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              <TrashIcon />
-              Clear
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowParsedModel(true)}
-            disabled={isParsing}
-            className="inline-flex items-center gap-1.5 px-4 py-2 border-none rounded-lg text-[13px] font-medium text-white cursor-pointer transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-px hover:shadow-lg"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              background:
-                "linear-gradient(135deg, #024544 0%, #036665 55%, #048a89 100%)",
-              boxShadow: "0 2px 10px rgba(3,102,101,0.35)",
-            }}
-          >
-            <UploadCloudIcon />
-            Import CV
-          </button>
-        )} */}
-      </div>
-
-      {/* ── Modal ── */}
+    <StepCard
+      index={1}
+      title="Smart Autofill"
+      icon={Sparkles}
+      open={step === 1}
+      onToggle={() => setStep(step === 1 ? 0 : 1)}
+    >
       {!showParsedModel && (
-        <div
-          className="w-full flex items-center justify-center hb-animate-fadein bg-white"
-          onClick={(e) => e.target === e.currentTarget && closeModal()}
-        >
-          <div
-            className="w-full overflow-hidden hb-animate-slideup"
-          >
-            {/* ── Modal Header ── */}
-            <div
-              className="flex flex-col w-full px-6 pt-[22px] pb-5"
-              style={{
-                background:
-                  "linear-gradient(135deg, #011a1a 0%, #024544 45%, #036665 100%)",
-              }}
-            >
-            
-              <p className="text-[10px] font-semibold tracking-widest uppercase text-teal-300 mb-1">
-                Smart Autofill
-              </p>
-              <h2 className="text-[18px] font-bold text-white leading-snug mb-5">
-                Import &amp; <span className="text-[#5dd4d3]">auto-fill</span>
-                <br />
-                your Trucv
-              </h2>
+        <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-100 bg-gradient-to-r from-[#f5f9ff] to-[#f2fbf9] p-4 sm:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <div className="flex items-center gap-2 text-[#03257e]">
+                  <Sparkles className="size-5" />
+                  <h2 className="text-base font-bold leading-6 sm:text-xl">Import your existing profile</h2>
+                </div>
+                <p className="mt-1.5 max-w-xl text-sm leading-6 text-slate-600">
+                  Upload a resume or use LinkedIn to fill your CV details automatically.
+                </p>
+              </div>
 
-              {/* Tabs */}
-              <div
-                className="flex gap-1 rounded-[10px] p-[3px]"
-                style={{ background: "rgba(255,255,255,0.07)" }}
-              >
+              <div className="grid w-full grid-cols-2 rounded-xl border border-slate-200 bg-white p-1 shadow-sm lg:w-[360px]">
                 <button
+                  type="button"
                   onClick={() => setTab("cv")}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2.5 border-none cursor-pointer rounded-lg text-[12.5px] font-medium transition-all duration-200 ${
-                    tab === "cv"
-                      ? "bg-white text-[#036665] shadow-md"
-                      : "bg-white/10 text-white/80 hover:bg-white/15 hover:text-white"
-                  }`}
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  className={`flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold leading-4 transition sm:gap-2 sm:px-3 sm:text-sm ${tab === "cv" ? "bg-[#03257e] text-white shadow-sm" : "text-slate-600 hover:bg-slate-50"}`}
                 >
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                  </svg>
-                  CV / Resume
+                  <FileText className="size-4 shrink-0" />
+                  <span className="min-w-0">CV / Resume</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => setTab("linkedin")}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2.5 border-none cursor-pointer rounded-lg text-[12.5px] font-medium transition-all duration-200 ${
-                    tab === "linkedin"
-                      ? "bg-white text-[#036665] shadow-md"
-                      : "bg-white/10 text-white/80 hover:bg-white/15 hover:text-white"
-                  }`}
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  className={`flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold leading-4 transition sm:gap-2 sm:px-3 sm:text-sm ${tab === "linkedin" ? "bg-[#006666] text-white shadow-sm" : "text-slate-600 hover:bg-slate-50"}`}
                 >
-                  <LinkedInLogo size={13} color={tab==="linkedin"?"#036665":"white"}/>
-                  LinkedIn Profile
+                  <LinkedInLogo size={15} color={tab === "linkedin" ? "white" : "#64748b"} />
+                  <span className="min-w-0">LinkedIn</span>
                 </button>
               </div>
             </div>
+          </div>
 
-            {/* ── Modal Body ── */}
-            {isLinkdeinImportLoading ? (
-              <>
-                <div className="px-[22px] pb-[22px] pt-4 bg-[#fafbff] flex flex-col items-center justify-center min-h-[220px]">
-                  {/* Animated LinkedIn-branded orb */}
-                  <div className="relative flex items-center justify-center mb-5">
-                    {/* Outer pulse rings */}
-                    <span
-                      className="absolute w-16 h-16 rounded-full border border-[#036665] opacity-20"
-                      style={{ animation: "hb-ring 2s ease-out infinite" }}
-                    />
-                    <span
-                      className="absolute w-16 h-16 rounded-full border border-[#036665] opacity-10"
-                      style={{ animation: "hb-ring 2s ease-out infinite 0.6s" }}
-                    />
-                    {/* Icon container */}
-                    <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-md"
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #011a1a 0%, #036665 100%)",
-                        animation: "hb-breathe 2.4s ease-in-out infinite",
-                      }}
-                    >
-                      <LinkedInLogo size={22} color="#fff" />
-                    </div>
+          <div className="p-4 sm:p-6">
+            {isLinkdeinImportLoading || isParsing ? (
+              <div className="relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-[#006666]/15 bg-gradient-to-br from-[#f5f9ff] via-white to-[#f2fbf9] px-4 text-center sm:min-h-[300px] sm:px-6">
+                <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-[#03257e]/5 blur-2xl" />
+                <div className="pointer-events-none absolute -bottom-20 -left-16 size-52 rounded-full bg-[#006666]/10 blur-3xl" />
+
+                <div className="relative flex items-center justify-center">
+                  <div className="flex size-16 animate-pulse items-center justify-center rounded-2xl bg-gradient-to-br from-[#03257e] to-[#006666] text-white shadow-xl shadow-[#03257e]/20">
+                    {isParsing ? <Files className="size-6" /> : <LinkedInLogo size={23} />}
                   </div>
-
-                  {/* Text */}
-                  <p
-                    className="text-[13.5px] font-semibold text-slate-800 mb-1 text-center"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    Importing your LinkedIn profile
-                  </p>
-                  <p
-                    className="text-[12px] text-slate-400 text-center mb-4"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    Extracting your details — just a moment…
-                  </p>
-
-                  {/* Animated progress dots / bar */}
-                  <div className="flex gap-1.5">
-                    {[0, 1, 2, 3, 4].map((i) => (
-                      <span
-                        key={i}
-                        className="w-1.5 h-1.5 rounded-full bg-[#036665]"
-                        style={{
-                          animation: "hb-bounce 1.2s ease-in-out infinite",
-                          animationDelay: `${i * 0.15}s`,
-                          opacity: 0.3,
-                        }}
-                      />
-                    ))}
-                  </div>
-
-                  <style>{`
-      @keyframes hb-ring {
-        0%   { transform: scale(1);   opacity: 0.25; }
-        100% { transform: scale(2.2); opacity: 0; }
-      }
-      @keyframes hb-breathe {
-        0%, 100% { transform: scale(1);    box-shadow: 0 4px 18px rgba(3,102,101,0.35); }
-        50%       { transform: scale(1.07); box-shadow: 0 6px 24px rgba(3,102,101,0.55); }
-      }
-      @keyframes hb-bounce {
-        0%, 80%, 100% { transform: scaleY(1);   opacity: 0.3; }
-        40%            { transform: scaleY(1.9); opacity: 1; }
-      }
-    `}</style>
                 </div>
-              </>
-            ) : (
-              <div className="px-[22px] pb-[22px] pt-4 bg-[#fafbff]">
-                {/* ─ CV Tab ─ */}
-                {tab === "cv" &&(localStorage.getItem("cvData")?
-                <div className="flex gap-2 justify-center items-center">
-                  <button className="flex items-center gap-1 bg-teal-500 text-white px-4 py-2 rounded-lg"
-                  onClick={()=>setOpenLinkdeinProfileCV(true)}
-                  ><EyeIcon /> Preview Parsed Data</button>
-                  <button 
-                  disabled={isDataSaving}
-                  onClick={saveParsedData}
-                  className="px-2 py-2 border-none rounded-lg cursor-pointer flex items-center justify-center gap-2 text-white transition-all duration-200 disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none hover:enabled:-translate-y-px"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    background:
-                      "linear-gradient(135deg, #011a1a 0%, #036665 100%)",
-                    boxShadow:
-                      !canSubmit || isParsing
-                        ? "none"
-                        : "0 3px 14px rgba(3,102,101,0.4)",
-                  }}
-                  >{isDataSaving ? "Saving..." : "Save Data for CV"}</button>
-                  <button 
-                  className="flex items-center justify-center gap-1 text-red-500 border border-red-500 rounded-lg px-2 py-2"
-                  onClick={()=>{localStorage.removeItem("cvData"); window.location.reload()}}
-                  > <Trash2 size={16} /> Clear CV Data</button>
-                </div> :
-                <>
-                    <input
-                      ref={fileRef}
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      className="hidden"
-                      onChange={(e) => setCvFile(e.target.files?.[0] ?? null)}
-                    />
 
-                    {!cvFile ? (
-                      <>
-                        <div
-                          onClick={() => fileRef.current?.click()}
-                          onDragOver={(e) => {
-                            e.preventDefault();
-                            setIsDragging(true);
-                          }}
-                          onDragLeave={() => setIsDragging(false)}
-                          onDrop={handleDrop}
-                          className={`mt-1 border-2 border-dashed rounded-xl p-7 text-center cursor-pointer transition-all duration-200 bg-white ${
-                            isDragging
-                              ? "border-[#036665] bg-[#f0fafa]"
-                              : "border-slate-300 hover:border-[#036665] hover:bg-[#f0fafa]"
-                          }`}
-                        >
-                          <div className="text-[#036665] opacity-65 mx-auto mb-2.5 flex justify-center">
-                            <DropUpIcon />
-                          </div>
-                          <p className="text-[13.5px] font-semibold text-slate-800 mb-0.5">
-                            Drop your CV here
-                          </p>
-                          <p className="text-[12px] text-slate-400">
-                            or{" "}
-                            <strong className="text-[#036665] font-semibold">
-                              browse files
-                            </strong>{" "}
-                            from your device
-                          </p>
+                <p className="mt-5 text-base font-bold text-slate-900">
+                  {isParsing ? "Parsing your CV" : "Importing your LinkedIn profile"}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  {isParsing
+                    ? "Reading your document and organizing each CV section."
+                    : "Fetching your profile and organizing your professional details."}
+                </p>
+
+                <div className="mt-5 flex items-center gap-2" aria-label="Import in progress">
+                  {[0, 1, 2].map((dot) => (
+                    <span
+                      key={dot}
+                      className="size-2 animate-bounce rounded-full bg-[#006666]"
+                      style={{ animationDelay: `${dot * 160}ms` }}
+                    />
+                  ))}
+                </div>
+
+                <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                  <span className="rounded-full bg-white px-2.5 py-1 text-[#03257e] shadow-sm ring-1 ring-slate-200">Reading</span>
+                  <span>•</span>
+                  <span>Extracting</span>
+                  <span>•</span>
+                  <span>Organizing</span>
+                </div>
+              </div>
+            ) : tab === "cv" ? (
+              hasParsedCV ? (
+                <AvailableDataPanel
+                  title="Your CV data is ready"
+                  description="Save the imported information, then review each field for accuracy."
+                  isSaving={isDataSaving}
+                  onSave={saveParsedData}
+                  onClear={() => {
+                    localStorage.removeItem("cvData");
+                    window.location.reload();
+                  }}
+                />
+              ) : hasLinkedInData ? (
+                <ImportConflictPanel
+                  message="LinkedIn data is already available. Clear it before importing a resume."
+                  clearLabel="Clear LinkedIn data"
+                  onClear={() => {
+                    localStorage.removeItem("linkedInCvData");
+                    window.location.reload();
+                  }}
+                />
+              ) : (
+                <>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    className="hidden"
+                    onChange={(event) => setCvFile(event.target.files?.[0] ?? null)}
+                  />
+                  {!cvFile ? (
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      onDragOver={(event) => {
+                        event.preventDefault();
+                        setIsDragging(true);
+                      }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={handleDrop}
+                      className={`group flex min-h-[230px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-6 text-center transition sm:min-h-[250px] sm:px-6 ${isDragging ? "border-[#006666] bg-[#f2fbf9]" : "border-slate-300 bg-slate-50 hover:border-[#006666] hover:bg-[#f2fbf9]"}`}
+                    >
+                      <span className="flex size-16 items-center justify-center rounded-2xl bg-white text-[#03257e] shadow-sm ring-1 ring-slate-200 transition group-hover:-translate-y-0.5 group-hover:text-[#006666]">
+                        <UploadCloud className="size-7" />
+                      </span>
+                      <span className="mt-4 text-sm font-bold text-slate-900 sm:text-base">Drop your CV here</span>
+                      <span className="mt-1 text-xs leading-5 text-slate-500 sm:text-sm">or click to browse from your device</span>
+                      <span className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#03257e] px-4 py-2 text-xs font-semibold text-white group-hover:bg-[#006666]">
+                        Choose a file
+                      </span>
+                      <span className="mt-3 text-xs text-slate-400">PDF, DOC, or DOCX</span>
+                    </button>
+                  ) : (
+                    <div className="flex min-h-[150px] flex-col justify-center rounded-2xl border border-[#006666]/25 bg-[#f2fbf9] p-4 sm:p-6">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#006666] shadow-sm ring-1 ring-[#006666]/10">
+                          <FileText className="size-5" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="max-w-full truncate text-xs font-bold text-slate-900 sm:text-sm">{cvFile.name}</p>
+                          <p className="mt-0.5 text-xs text-slate-500">{(cvFile.size / 1024).toFixed(0)} KB · Ready to import</p>
                         </div>
-                        <div className="flex gap-1.5 justify-center mt-3">
-                          {["PDF", "DOC", "DOCX"].map((f) => (
-                            <span
-                              key={f}
-                              className="text-[10px] font-semibold tracking-wide px-1.5 py-0.5 rounded bg-teal-50 text-[#036665]"
-                              style={{ fontFamily: "'DM Mono', monospace" }}
-                            >
-                              {f}
-                            </span>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex items-center gap-2.5 bg-[#f0fafa] border border-teal-200 rounded-xl px-3 py-2.5 mt-2.5">
-                        <span className="text-[#036665] flex-shrink-0">
-                          <FileIcon />
-                        </span>
-                        <span
-                          className="flex-1 text-[12.5px] font-medium text-slate-800 whitespace-nowrap overflow-hidden text-ellipsis"
-                          style={{ fontFamily: "'DM Mono', monospace" }}
-                        >
-                          {cvFile.name}
-                        </span>
-                        <span className="text-[11px] text-slate-400 whitespace-nowrap">
-                          {(cvFile.size / 1024).toFixed(0)} KB
-                        </span>
-                        <button
-                          onClick={() => setCvFile(null)}
-                          className="bg-transparent border-none cursor-pointer text-slate-400 flex p-0.5 transition-colors duration-150 hover:text-rose-500"
-                        >
-                          <XIcon />
+                        <button type="button" onClick={() => setCvFile(null)} aria-label="Remove selected file" className="flex size-9 items-center justify-center rounded-lg text-slate-400 transition hover:bg-white hover:text-red-600">
+                          <X className="size-4" />
                         </button>
                       </div>
-                    )}
-                  </>
-                )}
-
-                {/* ─ LinkedIn Tab ─ */}
-                {tab === "linkedin" && (localStorage.getItem("linkedInCvData")?
-                <div className="flex gap-2 justify-center items-center">
-                  <button className="bg-teal-500 text-white px-4 py-2 rounded-lg"
-                  onClick={()=>setOpenLinkdeinProfileCV(true)}
-                  >Preview LinkedIn Data</button>
-                  <button 
-                  disabled={isDataSaving}
-                  onClick={saveLinkedInData}
-                  className="px-2 py-3.5 border-none rounded-xl cursor-pointer flex items-center justify-center gap-2 text-[13.5px] font-semibold text-white transition-all duration-200 disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none hover:enabled:-translate-y-px"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    background:
-                      "linear-gradient(135deg, #011a1a 0%, #036665 100%)",
-                    boxShadow:
-                      !canSubmit || isParsing
-                        ? "none"
-                        : "0 3px 14px rgba(3,102,101,0.4)",
-                  }}
-                  >{isDataSaving ? "Saving..." : "Save Data for CV"}</button>
-                  <button 
-                  className="flex items-center justify-center gap-1 text-red-500 border border-red-500 rounded-lg px-2 py-2"
-                  onClick={()=>{localStorage.removeItem("linkedInCvData"); window.location.reload()}}
-                  > <Trash2 size={16} /> Clear CV Data</button>
-                </div>:
-                  <>
-                    <div className="bg-[#f0fafa] rounded-xl p-3 flex flex-col gap-2 mt-1">
-                      {[
-                        "Open your LinkedIn profile in a browser.",
-                        "Copy the full URL from the address bar.",
-                        "Paste it below — we'll extract your details instantly.",
-                      ].map((text, i) => (
-                        <div key={i} className="flex items-start gap-2.5">
-                          <span className="w-[17px] h-[17px] rounded-full bg-[#036665] text-white text-[9.5px] font-bold flex items-center justify-center flex-shrink-0 mt-px">
-                            {i + 1}
-                          </span>
-                          <span className="text-[12px] text-slate-600 leading-relaxed">
-                            {text}
-                          </span>
-                        </div>
-                      ))}
                     </div>
-
-                    <div className="relative mt-3">
-                      <input
-                        type="url"
-                        placeholder="https://www.linkedin.com/in/your-name"
-                        value={linkedInUrl}
-                        onChange={(e) => {
-                          setLinkedInUrl(e.target.value);
-                          if (urlError) setUrlError("");
-                        }}
-                        className={`w-full text-[12.5px] text-slate-800 bg-white rounded-xl py-[11px] px-2 outline-none transition-all duration-150 border ${
-                          urlError
-                            ? "border-rose-500 focus:shadow-[0_0_0_3px_rgba(225,29,72,0.1)]"
-                            : linkedInValid
-                              ? "border-green-500 focus:shadow-[0_0_0_3px_rgba(22,163,74,0.1)]"
-                              : "border-slate-300 focus:border-[#036665] focus:shadow-[0_0_0_3px_rgba(3,102,101,0.1)]"
-                        }`}
-                        style={{
-                          fontFamily: "'DM Mono', monospace",
-                        }}
-                      />
-                      {linkedInValid && (
-                        <span className="absolute right-[11px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-green-600 text-white flex items-center justify-center">
-                          <CheckCircleSmall />
-                        </span>
-                      )}
-                    </div>
-                    {urlError && (
-                      <p className="text-[11.5px] text-rose-600 mt-1.5">
-                        {urlError}
-                      </p>
-                    )}
-                  </>
-                  
-                )}
-
-                {/* Divider */}
-                <div className="flex items-center gap-2 my-3.5 text-[11px] text-slate-300 font-medium">
-                  <span className="flex-1 h-px bg-slate-200" />
-                  auto-fill your sections
-                  <span className="flex-1 h-px bg-slate-200" />
-                </div>
-
-                {/* Submit button */}
-                {(!localStorage.getItem("cvData")&&!localStorage.getItem("linkedInCvData"))&&<button
-                  disabled={!canSubmit || isParsing}
-                  onClick={handleSubmit}
-                  className="w-full py-3.5 border-none rounded-xl cursor-pointer flex items-center justify-center gap-2 text-[13.5px] font-semibold text-white transition-all duration-200 disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none hover:enabled:-translate-y-px"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    background:
-                      "linear-gradient(135deg, #011a1a 0%, #036665 100%)",
-                    boxShadow:
-                      !canSubmit || isParsing
-                        ? "none"
-                        : "0 3px 14px rgba(3,102,101,0.4)",
-                  }}
-                >
-                  {isParsing ? (
-                    <>
-                      <span className="hb-spin">
-                        <SpinnerIcon />
-                      </span>
-                      Processing…
-                    </>
-                  ) : tab === "cv" ? (
-                    <>
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="16 16 12 12 8 16" />
-                        <line x1="12" y1="12" x2="12" y2="21" />
-                        <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
-                      </svg>
-                      Parse &amp; Autofill CV
-                    </>
-                  ) : (
-                    <>
-                      <LinkedInLogo size={14} />
-                      Import LinkedIn Profile
-                    </>
                   )}
-                </button>}
+                </>
+              )
+            ) : hasLinkedInData ? (
+              <AvailableDataPanel
+                title="Your LinkedIn data is ready"
+                description="Preview the imported profile or save it to your CV."
+                isSaving={isDataSaving}
+                onSave={saveLinkedInData}
+                onPreview={() => setOpenLinkdeinProfileCV(true)}
+                onClear={() => {
+                  localStorage.removeItem("linkedInCvData");
+                  window.location.reload();
+                }}
+              />
+            ) : hasParsedCV ? (
+              <ImportConflictPanel
+                message="Parsed CV data is already available. Clear it before importing from LinkedIn."
+                clearLabel="Clear parsed CV data"
+                onClear={() => {
+                  localStorage.removeItem("cvData");
+                  window.location.reload();
+                }}
+              />
+            ) : (
+              <div className="mx-auto max-w-2xl py-2">
+                <div className="rounded-2xl border border-[#0a66c2]/15 bg-[#0a66c2]/[0.04] p-4 sm:p-5">
+                  <div className="flex items-start gap-3">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#0a66c2] text-white shadow-sm">
+                      <LinkedInLogo size={18} />
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Import from your public profile</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-600">Copy the full URL from your LinkedIn profile and paste it below.</p>
+                    </div>
+                  </div>
+                </div>
+                <label htmlFor="linkedin-profile-url" className="mt-5 block text-xs font-semibold text-slate-700">LinkedIn profile URL</label>
+                <div className="relative mt-2">
+                  <Link2 className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="linkedin-profile-url"
+                    type="url"
+                    placeholder="https://www.linkedin.com/in/your-name"
+                    value={linkedInUrl}
+                    onChange={(event) => {
+                      setLinkedInUrl(event.target.value);
+                      if (urlError) setUrlError("");
+                    }}
+                    className={`h-12 w-full rounded-xl border bg-slate-50 pl-10 pr-11 text-sm text-slate-800 outline-none transition ${urlError ? "border-red-400 ring-1 ring-red-200" : linkedInValid ? "border-[#006666] ring-1 ring-[#006666]/20" : "border-slate-200 focus:border-[#006666] focus:ring-1 focus:ring-[#006666]/20"}`}
+                  />
+                  {linkedInValid && (
+                    <span className="absolute right-3 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center rounded-full bg-[#006666] text-white">
+                      <Check className="size-3.5" />
+                    </span>
+                  )}
+                </div>
+                {urlError && <p className="mt-2 text-xs font-medium text-red-600">{urlError}</p>}
               </div>
             )}
           </div>
+
+          {!hasParsedCV && !hasLinkedInData && !isLinkdeinImportLoading && !isParsing && (
+            <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/80 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <p className="text-xs leading-5 text-slate-500">Imported information can be reviewed and edited before you save your CV.</p>
+              <button
+                type="button"
+                disabled={!canSubmit}
+                onClick={handleSubmit}
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#03257e] px-4 py-2.5 text-xs font-semibold leading-5 text-white shadow-sm transition hover:bg-[#006666] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none sm:w-auto sm:min-w-[210px] sm:px-5 sm:text-sm"
+              >
+                {tab === "cv" ? (
+                  <><Sparkles className="size-4" /> Parse &amp; autofill CV</>
+                ) : (
+                  <><LinkedInLogo size={14} /> Import LinkedIn profile</>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {!showParsedModel && openLinkdeinProfileCV && cvData && (
-        <LinkedinProfileCvModal
-          cvData={cvData}
-          onClose={() => setOpenLinkdeinProfileCV(false)}
-        />
+        <LinkedinProfileCvModal cvData={cvData} onClose={() => setOpenLinkdeinProfileCV(false)} />
       )}
-
-      {/* for testing */}
-      {/* {!showParsedModel && (
-        <LinkedinProfileCvModal
-          cvData={MOCK_CV_2}
-          onClose={() => setOpenLinkdeinProfileCV(false)}
-        />
-      )} */}
-    </div>
     </StepCard>
   );
 };

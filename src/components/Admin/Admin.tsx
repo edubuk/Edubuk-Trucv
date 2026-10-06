@@ -120,7 +120,7 @@ export default function AdminUserProfilesPage() {
     try {
       setIsFetching(true);
       setLoading(true);
-      const users = await fetch(`${API_BASE_URL}/admin/users-list?page=${pageNum}&email=${email ? email : ""}`, { credentials: "include" })
+      const users = await fetch(`${API_BASE_URL}/api/v1/admin/users-list?page=${pageNum}&email=${email ? email : ""}`, { credentials: "include" })
       const usersList = await users.json();
       if (!usersList.success) {
         toast.error(usersList.message);
@@ -162,7 +162,7 @@ export default function AdminUserProfilesPage() {
 
   const userSubscription = async (userId: string) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/user/subscription?id=${userId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/user/subscription?id=${userId}`, {
         method: "GET",
         credentials: "include",
       });
@@ -210,7 +210,7 @@ export default function AdminUserProfilesPage() {
   const fetchIds = async (userId: string) => {
     try {
       setLoadingCvs(true);
-      const response = await fetch(`${API_BASE_URL}/admin/user-cvs?userIdThroughAdmin=${userId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/admin/user-cvs?userIdThroughAdmin=${userId}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -244,7 +244,7 @@ export default function AdminUserProfilesPage() {
   const userDocsHandler = async (userId: string) => {
     try {
       setCurrentUserId(userId);
-      const response = await fetch(`${API_BASE_URL}/admin/user-docs?userId=${userId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/admin/user-docs?userId=${userId}`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -279,7 +279,7 @@ export default function AdminUserProfilesPage() {
   return (
     <>
       {user?.roles === "admin" ?
-        <div className="min-h-screen w-full" style={{ background: "#f7f8fb" }}>
+        <div className="min-h-screen w-auto" style={{ background: "#f7f8fb" }}>
           {/* Header */}
           <header className="w-full shadow-sm" style={{ backgroundColor: COLOR_PRIMARY }}>
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between">

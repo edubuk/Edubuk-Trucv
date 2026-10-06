@@ -1,9 +1,9 @@
 import { useForm, useFormContext } from "react-hook-form";
 import { useState } from "react";
-import api from "@/lib/api";
 import PdfViewerModal from "./PDFViewermodel";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { API_BASE_URL } from "@/main";
 // import qs from "qs";
 
 type FieldSpec = {
@@ -64,11 +64,19 @@ export default function DynamicDigilockerForm({
       setLoading(true);
       const body = values;
       console.log("body",body)
-      const r: any = await api.post(`/api/dl/fetchDocUri?orgid=${orgid}&doctype=${doctype}`,body)
+      const r: any = await fetch(`${API_BASE_URL}/api/dl/fetchDocUri?orgid=${orgid}&doctype=${doctype}`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(body)
+      } )
       console.log("response",r.data);
-      if (r.data.ok) {
-        setUri(r.data.data.uri);
-        setValue(`educations.${index}.docUri`, r.data.data.uri, {
+      const data = await r.json();
+      console.log("data",data);
+      if (data.ok) {
+        setUri(data.data.uri);
+        setValue(`educations.${index}.docUri`, data.data.uri, {
           shouldValidate: true,
           shouldDirty: true,
         });
@@ -79,8 +87,8 @@ export default function DynamicDigilockerForm({
       } else {
         setErrorMsg("No document found");
       }
-      if (!r.response.data.ok) {
-        setErrorMsg(r?.response?.data?.error?.error_description);
+      if (!data.ok) {
+        setErrorMsg(data?.error?.error_description);
       }
     } catch (e: any) {
       setErrorMsg(e?.response?.data?.error?.error_description);
@@ -90,13 +98,19 @@ export default function DynamicDigilockerForm({
 
     const fetchDoc = async()=>{
     try {
-      const response = await api.get(`/api/dl/view-doc?docUri=${uri}`);
-      if(response.data.ok){
+      const response = await fetch(`${API_BASE_URL}/api/dl/view-doc?docUri=${uri}`,
+        {
+          method:"GET",
+        }
+      );
+      const data = await response.json();
+      //console.log("data",data);
+      if(data.ok){
         setOpen(true);
-        setPdfSource(response.data.data);
+        setPdfSource(await data.arrayBuffer());
       }
     } catch (error:any) {
-      toast.error(error?.response?.data?.error?.error_description ?? error.response.data)
+      toast.error(error.message||error)
     }
   }
 

@@ -2,22 +2,54 @@ import { useEffect, useState } from "react";
 import {
   Menu,
   X,
-  FileText,
   FolderOpen,
   Image as NftIcon,
+  ShieldCheck,
+  Zap,
+  File,
+  UserCogIcon,
+  Tag,
 } from "lucide-react";
 
 import AdminUserProfilesPage from "./Admin";
 import { useUserData } from "@/context/AuthContext";
-import AccessDeniedPage from "@/pages/AccessDenied";
-import Hackathon from "./Hackathon";
 import CVData from "./CVData";
+import WhitelistIssuer from "./ManageIssuer";
+import DocumentCard from "./ManageRequestDoc";
+import api from "@/lib/api";
+import toast from "react-hot-toast";
+import ManageHackathon from "./ManageHackathon";
+import AccessDeniedPage from "@/pages/AccessDenied";
+import CreateUser from "./CreateUser";
+import CouponManager from "./CouponManager";
+import TrackingLink from "./TrackingLink";
+type SelectType = "users" | "hackathon" | "cvData" | "cv" | "nft" | "issuer" | "requestedDoc"|"create-user" | "tracking-link" | "coupon-manager";
 
 const AdminDashBoard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState<boolean>(true);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [requestedDoc,setRequestedDoc] = useState<[]>([]);
   const {user} = useUserData();
-  const [selected, setSelected] = useState<"users" | "hackathon" | "cvData" | "cv" | "nft" >("users");
+  const [selected, setSelected] = useState<SelectType>("users");
+
+    const fetchRequestDocHandler = async() => {
+    setSelected("requestedDoc");
+    setSidebarOpen(false);
+    try {
+      setIsFetching(true);
+      const res = await api.get("/admin/get-requested-doc");
+      console.log("doc res",res);
+      if (res.data.success) {
+        console.log(res.data.data);
+        setRequestedDoc(res.data.data);
+      }
+    } catch (error) {
+      toast.error("Failed to fetch requested doc");
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
   const Users = () => {
     setSelected("users");
@@ -35,7 +67,7 @@ const AdminDashBoard = () => {
     Icon,
     onClick,
   }: {
-    id:"users" | "hackathon" | "cvData" | "cv" | "nft" ;
+    id: SelectType;
     label: string;
     Icon: any;
     onClick: () => void;
@@ -92,7 +124,7 @@ const AdminDashBoard = () => {
           <NavItem
             id="hackathon"
             label="Manage Hackathon"
-            Icon={FileText}
+            Icon={Zap}
             onClick={()=>setSelected("hackathon")}
           />
           <NavItem
@@ -101,6 +133,36 @@ const AdminDashBoard = () => {
             Icon={NftIcon}
             onClick={()=>setSelected("cvData")}
           />
+          <NavItem
+            id="issuer"
+            label="Manage Issuer"
+            Icon={ShieldCheck}
+            onClick={()=>setSelected("issuer")}
+          />
+            <NavItem
+              id="requestedDoc"
+              label="Manage Requested Doc"
+              Icon={File}
+              onClick={fetchRequestDocHandler}
+            />
+            <NavItem
+              id="create-user"
+              label="Create User"
+              Icon={UserCogIcon}
+              onClick={()=>setSelected("create-user")}
+            />
+            <NavItem
+              id="coupon-manager"
+              label="Coupon Manager"
+              Icon={Tag}
+              onClick={()=>setSelected("coupon-manager")}
+              />
+            <NavItem
+              id="tracking-link"
+              label="Create Tracking Link"
+              Icon={UserCogIcon}
+              onClick={()=>setSelected("tracking-link")}
+            />
         </nav>
       </aside>
 
@@ -131,11 +193,33 @@ const AdminDashBoard = () => {
         )}
 
         {selected === "hackathon" && (
-         <Hackathon />
+         <ManageHackathon />
         )}
 
         {selected === "cvData" && (
         <CVData />
+        )}
+        
+        {selected === "issuer" && (
+        <WhitelistIssuer />
+        )}
+        {
+          selected==="requestedDoc"&&(
+            <DocumentCard 
+            requestedDoc={requestedDoc}
+            isFetching={isFetching}
+            />
+          )
+        }
+        {selected === "create-user" && (
+        <CreateUser />
+        )}
+        {selected === "coupon-manager" && (
+        <CouponManager />
+        )}
+
+        {selected ==="tracking-link" && (
+         <TrackingLink/>
         )}
       </main>
     </div>:<AccessDeniedPage />}

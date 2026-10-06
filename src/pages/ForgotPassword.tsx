@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Mail, Key, ArrowRight } from "lucide-react";
+import { Mail, Key, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useLocation, useNavigate} from "react-router-dom";
 import { API_BASE_URL } from "@/main";
 import toast from "react-hot-toast";
@@ -62,7 +62,7 @@ function ForgotForm() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/user/password-reset-link`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/user/password-reset-link`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -149,7 +149,7 @@ function ResetForm({ token }: { token: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
-
+  const [seePassword, setSeePassword] = useState(false);
   useEffect(() => {
     // Basic UX: if token is missing, redirect to forgot page
     if (!token) navigate("/forgot-password");
@@ -170,7 +170,7 @@ function ResetForm({ token }: { token: string }) {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/user/update-password`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/user/update-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),
@@ -208,13 +208,18 @@ function ResetForm({ token }: { token: string }) {
                 <Key size={16} color={"#03257e"} />
               </span>
               <input
-                type="password"
+                type={seePassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2"
                 placeholder="At least 8 characters"
               />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <button type="button" onClick={() => setSeePassword(!seePassword)}>
+                  {seePassword ? <Eye size={16} color={"#03257e"} /> : <EyeOff size={16} color={"#03257e"} />}
+                </button>
+              </div>
             </div>
           </label>
 

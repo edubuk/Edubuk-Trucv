@@ -1,10 +1,11 @@
 import { FaLinkedinIn } from 'react-icons/fa';
-import advisor1 from '../../assets/Advisor/advisor1.png'
-import advisor2 from '../../assets/Advisor/advisor2.png'
-import advisor3 from '../../assets/Advisor/advisor3.png'
-import advisor4 from '../../assets/Advisor/advisor4.png'
-import advisor5 from '../../assets/Advisor/advisor5.png'
-import advisor6 from '../../assets/Advisor/advisor6.png'
+import advisor1 from '@/assets/Advisor/advisor1.png'
+import advisor2 from '@/assets/Advisor/advisor2.png'
+import advisor3 from '@/assets/Advisor/advisor3.png'
+import advisor4 from '@/assets/Advisor/advisor4.png'
+import advisor5 from '@/assets/Advisor/advisor5.png'
+import advisor6 from '@/assets/Advisor/advisor6.png'
+import advisor7 from '@/assets/Advisor/advisor7.jpeg';
 
 const OurAdvisor = () => {
 
@@ -43,6 +44,13 @@ const OurAdvisor = () => {
     intro: `30 years + of experience in Education Sector as Vice Chancellor & Chief Mentor at Indian Universities ex-Professor`,
     image: advisor5,
     linkdeinProfile: "https://www.linkedin.com/in/dr-narsing-rao-gs-a318735/",
+  },
+  {
+    name:"Christian Sauer",
+    position:"Founder, Soonami",
+    intro:"Early-Stage AI & Web3 Investor, Soonami.io, from Germany EU. Investing in early-stage startups",
+    image:advisor7,
+    linkdeinProfile:"https://www.linkedin.com/in/christian-sauer-soonami/"
   },
   {
     name: "James Wren",

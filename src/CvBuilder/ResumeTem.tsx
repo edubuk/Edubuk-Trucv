@@ -182,7 +182,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
                     <FaPhoneAlt className="text-sm text-[#000000]" />
                   </span>
                   <span className="text-gray-800 hover:text-[#000000] font-semibold inline-flex items-center align-middle">
-                    {cvData.personal.phone}
+                    {cvData.personal.phoneNumber}
                   </span>
                 </div>
 
@@ -205,7 +205,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
                     <FaLinkedin className="text-sm text-[#000000]" />
                   </span>
                   <a
-                    href={cvData?.personal?.linkedin}
+                    href={cvData?.personal?.linkedInUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-800 hover:text-[#000000] font-semibold inline-flex items-center align-middle"
@@ -220,7 +220,7 @@ const Resume = ({cvData,setPreviewCV}:{cvData:ICvData,setPreviewCV:React.Dispatc
                     <FaGithub className="text-sm text-[#000000]" />
                   </span>
                   <a
-                    href={cvData?.personal?.github}
+                    href={cvData?.personal?.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-black hover:text-[#000000] font-semibold inline-flex items-center align-middle"

@@ -1,3 +1,5 @@
+import { useContract } from "@/Blockchain/hooks/useMyContract";
+import { parseContractError } from "@/Blockchain/utils/error";
 import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -11,13 +13,16 @@ import { ExternalLink, Paperclip, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useSubscription } from "@/hooks/useSubscription";
+import { ISubscription } from "@/api/subscription.apis";
+import { useAccount } from "wagmi";
 const ResendEmail = ({
   openModel,
   setOpenModel,
   docId,
   setDocId,
   info,
-  setRefreshKey 
+  setRefreshKey
 }: {
   openModel: boolean;
   setOpenModel: (value: boolean) => void;
@@ -29,11 +34,15 @@ const ResendEmail = ({
     docType:string
   };
   setRefreshKey:React.Dispatch<React.SetStateAction<boolean>>
-    }) => {
+  subscriptionDetails:ISubscription | null
+}) => {
     const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [loading,setLoading] = useState<boolean | null>(null);
+    const {getSubscription} = useSubscription();
+    const {submitDocument} = useContract();
+    const {address} = useAccount();
     //console.log("docId",docId);
     const form = useForm<TypeResendEmail>({
         resolver: zodResolver(ResendEmailDoc),
@@ -86,10 +95,43 @@ const ResendEmail = ({
         console.log("errors",errors); 
         console.log("project form values", data);
         try {
+
             setLoading(true);
+            const docHash = getValues("docHash");
+            const issuerEmailId = getValues("issuerEmailId");
+                // Blockchain Registration
+            if (docHash) {
+              const id = toast.loading("Submitting on chain...");
+              try {
+                await submitDocument({
+                  name       : info.roleOrLevel,
+                  hashString : `0x${docHash}` as `0x${string}`,
+                  docType    : info.docType,
+                  tokenUri   : "",
+                  currAddress: address as `0x${string}`,
+                });
+                toast.dismiss(id);
+              } catch (txError) {
+                const errMsg = parseContractError(txError);
+
+                if (errMsg === "This document has already been submitted.") {
+                  // Already on chain — skip and proceed to DB save
+                  toast.dismiss(id);
+                  toast.custom(() => (
+                    <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+                      <p>Document already on chain. Retrying database save...</p>
+                    </div>
+                  ));
+                } else {
+                  // Any other chain error — stop everything
+                  toast.dismiss(id);
+                  throw txError;
+                }
+              }
+            }
             const res = await api.post(`/doc/resend-email/${getValues("id")}?docType=${info.docType}`,
             {
-                data:{issuerEmailId:getValues("issuerEmailId"),docUri:getValues("docUri"),docHash:getValues("docHash")}
+                data:{issuerEmailId:issuerEmailId,docUri:getValues("docUri"),docHash:docHash}
             });
             const {data} = res;
             //console.log("data",data);   
@@ -105,6 +147,7 @@ const ResendEmail = ({
                 });
                 setRefreshKey((prev)=>!prev)
                 setOpenModel(false)
+                getSubscription();
             }
         } catch (error) {
             toast.error("something went wrong");
@@ -205,7 +248,7 @@ const ResendEmail = ({
                             </span>
                           </div>
 
-                          <p className="text-xs text-[#f14419]">
+                          <p className="text-xs text-[#006666]">
                             Accepted: .jpg, .jpeg, .png, .pdf — max 5MB
                           </p>
                         </div>
@@ -268,14 +311,18 @@ const ResendEmail = ({
                 </div>
               )}
             />
-
+            {/* {
+              (subscriptionDetails==null || subscriptionDetails?.balance < 50)&&
+              <p className="text-[#f14419] text-sm text-center border border-dashed border-[#f14419] p-2 rounded-full">Insufficient credits to send email for verification</p>
+              
+            } */}
             <Button
-              type="submit"
-              className="w-full md:w-auto"
-            >
-              {loading ? <LoadingButton /> : "Send Email To Issuer"}
-            </Button>
-
+                  type="submit"
+                  className="w-full text-[#03257e]"
+                  // disabled={(subscriptionDetails==null || subscriptionDetails?.balance < 50)}
+                >
+                  {loading ? <LoadingButton /> : "Send Email To Issuer"}
+                </Button>
           </div>
 
         </form>

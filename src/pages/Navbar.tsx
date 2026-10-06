@@ -1,16 +1,21 @@
-import React, {useState,useEffect} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import logo from "../assets/newLogo.png";
 import truCv from "../assets/truCV2.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import {
-  MdClose,
-} from "react-icons/md";
+import { MdClose } from "react-icons/md";
 import toast from "react-hot-toast";
 import { googleLogout } from "@react-oauth/google";
 import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
-
+import { ChevronDown, LogOut, Menu, Search, UserRound, WalletCards } from "lucide-react";
+import SearchResultsPopup from "@/components/ui/SearchResultsPopup";
+import { useSearchProfiles } from "@/hooks/useSearchProfiles";
+import { useDebounce } from "@/hooks/useDebounce";
+import { type SearchProfile } from "@/api/search.apis";
+import AnimatedSearchInput from "@/components/ui/AnimatedPlaceHolder";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import "./current-home.css";
 
 interface LinkItem {
   path: string;
@@ -23,57 +28,58 @@ interface SidebarProps {
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handlerLogout: () => void;
   currentPath: string;
-  user:any;
-  loading:boolean;
+  user: any;
+  loading: boolean;
 }
 
 
 
-
-const Navbar:React.FC = () => {
-  const [isActive, setActive] = useState("/");
+const Navbar: React.FC = () => {
+  const [search, setSearch] = useState("");
+  const [showResults, setShowResults] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const {user} = useUserData();
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+  const { user } = useUserData();
+  const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-  const [loading,setLoading] = useState(false);
-console.log("currentPath",currentPath);
+  const [loading, setLoading] = useState(false);
+  //`console.log("currentPath", currentPath);
 
+  const debouncedSearch = useDebounce(search, 300);
 
+  const { users, isLoading, searchProfiles } = useSearchProfiles();
+  
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
 
-
   const handlerLogout = async () => {
     try {
       setLoading(true);
-      const logoutData = await fetch(`${API_BASE_URL}/user/logout`,{
-        method:"PUT",
-        credentials: "include"
-      })
+      const logoutData = await fetch(`${API_BASE_URL}/api/v1/user/logout`, {
+        method: "PUT",
+        credentials: "include",
+      });
       const logoutResult = await logoutData.json();
-      console.log("logoutResult",logoutResult);
-      if(logoutResult.success){
-        googleLogout();    // Perform Google OAuth logout and remove stored token  
+      console.log("logoutResult", logoutResult);
+      if (logoutResult.success) {
+        googleLogout(); // Perform Google OAuth logout and remove stored token
         localStorage.removeItem("googleIdToken");
         localStorage.removeItem("email");
         localStorage.removeItem("userName");
         localStorage.removeItem("userImage");
         localStorage.removeItem("tokenExpiry");
-        window.location.href="/login";
+        window.location.href = "/login";
       }
-        } catch (error) {
-            console.error("Logout failed:", error);
-            toast.error("Logout failed");
-        }finally{
-          setLoading(false);
-        }
-  };
-
-  const handlerActive = (linkName: string): void => {
-    setActive(linkName);
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const links = [
@@ -90,111 +96,178 @@ console.log("currentPath",currentPath);
       path: "/dashboard",
     },
     {
-      name: "Admin",
-      path: "/admin",
-    }
+      name: "Verify",
+      path: "/verify",
+    },
+    {
+      name: "Browse CV",
+      path: "/browse-cvs",
+    },
+    // {
+    //   name:"Hackathons",
+    //   path:"/hackathons"
+    // }
   ];
 
+  useEffect(() => {
+    if (debouncedSearch.length < 2) {
+      setShowResults(false);
+      return;
+    }
 
+    setShowResults(true);
+    searchProfiles(debouncedSearch);
+  }, [debouncedSearch]);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     const tokenExpiry = localStorage.getItem("tokenExpiry");
-    if(tokenExpiry){
+    if (tokenExpiry) {
       const expiryTime = Number(tokenExpiry);
       const currentTime = Date.now() / 1000;
-      if(expiryTime < currentTime){
+      if (expiryTime < currentTime) {
         toast.error("Your session has expired. Please login again.");
         handlerLogout();
       }
     }
-  },[])
+  }, []);
 
+  useEffect(() => {
+    const closeAccountMenu = (event: MouseEvent) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsAccountMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", closeAccountMenu);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeAccountMenu);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
 
   return (
-    <div className="flex justify-between items-center sm:px-3 w-full border-b-2 border-gray-200 bg-white" data-aos="fade-right">
-      <img src={logo} alt="Logo" className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 " />
-      <div className="flex gap-3 justify-between items-center">
-          {links?.map((link, i) =>
-            link.name === "Home" ? (
+    <header className="current-nav">
+      <div className="current-nav__inner">
+        <Link to="/" className="current-nav__edubuk" aria-label="Edubuk TruCV home">
+          <img src="/latest_edubuk_logo.png" alt="Edubuk" />
+        </Link>
+
+        <nav className="current-nav__links" aria-label="Primary navigation">
+        {links?.map((link, i) =>
+          link.name === "Home" ? (
+            <Link
+              key={i + 1}
+              to={link.path}
+              className={currentPath === link.path ? "is-active" : ""}
+            >
+              {link.name}
+            </Link>
+          ) : (
+            user && (
               <Link
                 key={i + 1}
                 to={link.path}
-                onClick={() => handlerActive(link.name)}
-                className={`hidden lg:flex ${
-                  isActive === link.name ? "text-[#f14419]" : "text-[#03257e]"
-                } hover:text-[#f14419] transition duration-200 py-2 text-[22px] font-medium`}
+                className={currentPath === link.path ? "is-active" : ""}
               >
                 {link.name}
               </Link>
-            ) : (
-              user && (
-                <Link
-                  key={i + 1}
-                  to={link.path}
-                  onClick={() => handlerActive(link.name)}
-                  className={`hidden lg:flex ${
-                    currentPath === link.path
-                      ? "text-[#f14419]"
-                      : "text-[#03257e]"
-                  } hover:text-[#f14419] transition duration-200 py-2 text-[22px] font-medium`}
-                >
-                  {link.name}
-                </Link>
-              )
             )
-          )}
+          ),
+        )}
+        {user?.roles === "admin" && (
+          <Link
+            key="admin"
+            to="/admin"
+            className={currentPath === "/admin" ? "is-active" : ""}
+          >
+            Admin
+          </Link>
+        )}
+        </nav>
+
+        <div className="current-nav__tools">
+          <div className="current-nav__search">
+            <Search size={15} />
+            <AnimatedSearchInput value={search} onChange={setSearch} />
+            {showResults && (
+              <div
+                onMouseDown={(e) => e.preventDefault()}
+                className="current-nav__results"
+              >
+                <SearchResultsPopup
+                  users={users}
+                  loading={isLoading}
+                  onSelect={(selectedUser: SearchProfile) => {
+                    setShowResults(false);
+                    setSearch("");
+                    navigate(`/cv/${selectedUser.userId}`);
+                    window.location.reload();
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
         {!user ? (
-            <div className="hidden lg:flex relative rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
-              <Link
-                to="/login"
-                className="w-full bg-white py-1 text-[20px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
-              >
-                Login
-              </Link>
-            </div>
-          ) : (
-           <div className="relative hidden lg:flex rounded-full p-[2px] bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
+          <Link to="/login" className="current-nav__auth">Sign in</Link>
+        ) : (
+          <div className="current-nav__account" ref={accountMenuRef}>
+            <button
+              type="button"
+              className={`current-nav__account-trigger ${isAccountMenuOpen ? "is-open" : ""}`}
+              onClick={() => setIsAccountMenuOpen((open) => !open)}
+              aria-expanded={isAccountMenuOpen}
+              aria-haspopup="menu"
+            >
+              <span className="current-nav__account-icon"><UserRound size={16} /></span>
+              <span>Account</span>
+              <ChevronDown size={15} className="current-nav__account-chevron" />
+            </button>
+
+            <div className={`current-nav__account-menu ${isAccountMenuOpen ? "is-open" : ""}`} role="menu">
+              <div className="current-nav__account-label"><WalletCards size={15} />Wallet</div>
+              <div className="current-nav__wallet">
+                <ConnectButton />
+              </div>
+              <div className="current-nav__account-divider" />
               <button
-                onClick={handlerLogout}
+                type="button"
+                onClick={() => {
+                  setIsAccountMenuOpen(false);
+                  handlerLogout();
+                }}
                 disabled={loading}
-                className="w-full bg-white py-1 text-[20px] px-8 font-bold rounded-full text-[#03257e] hover:text-[#f14419]"
-                style={{opacity:loading?0.7:1}}
+                className="current-nav__logout"
+                role="menuitem"
               >
-                {loading?"Please Wait...":"Logout"}
+                <LogOut size={16} />
+                {loading ? "Signing out..." : "Logout"}
               </button>
             </div>
-          )}
-        {/* Hamburger Menu */}
-        <div className="flex items-center justify-center gap-2 ml-2">
-          <div
-            className={`relative flex lg:hidden flex-col items-center justify-center w-8 h-8 cursor-pointer space-y-1.5 transition-all duration-300 ease-in-out ${
-              isSidebarOpen ? "open" : ""
-            }`}
-            onClick={toggleSidebar}
-          >
-            <span
-              className={`block w-8 h-1 bg-[#03257e] rounded transition duration-300 ease-in-out ${
-                isSidebarOpen ? "transform translate-y-3 rotate-45" : ""
-              }`}
-            ></span>
-            <span
-              className={`block w-8 h-1 bg-[#f14419] rounded transition duration-300 ease-in-out ${
-                isSidebarOpen ? "opacity-0" : ""
-              }`}
-            ></span>
-            <span
-              className={`block w-8 h-1 bg-[#006666] rounded transition duration-300 ease-in-out ${
-                isSidebarOpen ? "transform -translate-y-2 -rotate-45" : ""
-              }`}
-            ></span>
           </div>
-        </div>
+        )}
 
+          <button
+            type="button"
+            className="current-nav__menu"
+            onClick={toggleSidebar}
+            aria-label="Open navigation menu"
+            aria-expanded={isSidebarOpen}
+          >
+            <Menu size={24} />
+          </button>
+
+          <img src={truCv} alt="TruCV" className="current-nav__trucv" />
+        </div>
       </div>
-      {/* Sidebar */}
+
       <Sidebar
-      isOpen={isSidebarOpen}
+        isOpen={isSidebarOpen}
         links={links}
         setIsSidebarOpen={setIsSidebarOpen}
         handlerLogout={handlerLogout}
@@ -202,8 +275,7 @@ console.log("currentPath",currentPath);
         user={user}
         loading={loading}
       />
-      <img src={truCv} alt="trucv-logo" className="w-32 h-16 sm:h-24 sm:w-48 md:w-60 md:h-24"></img>
-    </div>
+    </header>
   );
 };
 
@@ -214,66 +286,80 @@ const Sidebar: React.FC<SidebarProps> = ({
   handlerLogout,
   currentPath,
   user,
-  loading
+  loading,
 }) => {
   return (
-    <div
-      className={`fixed top-0 left-0 w-64 h-full bg-white text-[#006666] transform transition duration-300 ease-in-out ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      } shadow-lg z-10`}
-    >
-      <div className="flex flex-col space-y-4 p-4">
-        <div className="flex justify-between items-center">
-        <img src={logo} alt="Logo" className="h-20 w-20" />
-        <MdClose className="size-8 cursor-pointer hover:text-[#03257e]" onClick={()=>setIsSidebarOpen(false)}/>
+    <>
+      <button
+        type="button"
+        aria-label="Close navigation menu"
+        onClick={() => setIsSidebarOpen(false)}
+        className={`current-nav__overlay ${isOpen ? "is-open" : ""}`}
+      />
+      <aside className={`current-sidebar ${isOpen ? "is-open" : ""}`} aria-hidden={!isOpen}>
+        <div className="current-sidebar__head">
+          <img src={logo} alt="Edubuk" />
+          <MdClose
+            className="current-sidebar__close"
+            onClick={() => setIsSidebarOpen(false)}
+          />
         </div>
+        <nav className="current-sidebar__links">
         {links?.map((link, i) =>
           link.name === "Home" ? (
             <Link
               key={i + 1}
               to={link.path}
               onClick={() => setIsSidebarOpen(false)}
-              className={`${
-                currentPath === link.path ? "text-[#f14419]" : "text-[#03257e]"
-              } hover:text-[#f14419] transition duration-200 py-2`}
+              className={currentPath === link.path ? "is-active" : ""}
             >
-              {link.name}
+              <span>0{i + 1}</span>{link.name}
             </Link>
           ) : (
-            (localStorage.getItem("googleIdToken") || user) && (
+            user && (
               <Link
                 key={i + 1}
                 to={link.path}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`${
-                  currentPath === link.path ? "text-[#f14419]" : "text-[#03257e]"
-                } hover:text-[#f14419] transition duration-200 py-2`}
+                className={currentPath === link.path ? "is-active" : ""}
               >
-                {link.name}
+                <span>0{i + 1}</span>{link.name}
               </Link>
             )
-          )
+          ),
         )}
-        {!(localStorage.getItem("googleIdToken") || user)? (
+
+        {user?.roles === "admin" && (
+          <Link
+            to="/admin"
+            onClick={() => setIsSidebarOpen(false)}
+            className={currentPath === "/admin" ? "is-active" : ""}
+          >
+            <span>06</span>Admin
+          </Link>
+        )}
+        </nav>
+
+        {!user ? (
           <Link
             to="/login"
-            className="bg-[#03257e] py-2 px-4 rounded-full text-center text-white"
+            onClick={() => setIsSidebarOpen(false)}
+            className="current-sidebar__action"
           >
-            Login
+            Sign in to TruCV
           </Link>
         ) : (
-          <div className="relative rounded-full bg-gradient-to-r from-[#03257e] via-[#006666] to-[#f14419]">
-            <button
-              onClick={handlerLogout}
-              className=" w-full bg-white py-2 px-4 rounded-full text-[#03257e] hover:font-bold"
-              style={{opacity:loading?0.7:1}}
-            >
-              Logout
+          <div className="current-sidebar__account">
+            <div className="current-sidebar__wallet-label"><WalletCards size={16} />Wallet account</div>
+            <div className="current-sidebar__wallet"><ConnectButton /></div>
+            <button onClick={handlerLogout} className="current-sidebar__action" disabled={loading}>
+              <LogOut size={16} />{loading ? "Signing out..." : "Logout"}
             </button>
           </div>
         )}
-      </div>
-    </div>
+        <img src={truCv} alt="TruCV" className="current-sidebar__trucv" />
+      </aside>
+    </>
   );
 };
 

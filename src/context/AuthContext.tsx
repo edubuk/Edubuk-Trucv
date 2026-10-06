@@ -12,6 +12,7 @@ interface IUSER {
   githubUrl: string;
   linkedInUrl: string;
   selfAttested: boolean;
+  exp:number;
   updatedAt: string;
   profession: "student" | "employee";
   profileSummary: string;
@@ -43,42 +44,16 @@ export const UserContextProvider = ({
   const fetchDetails = async () => {
     try {
       //setLoading(true);
-      const [data1, data2, data3] = await Promise.allSettled([
+      const [data1] = await Promise.allSettled([
         api.get("/user/profile"),
-        api.get("/user/subscription"),
-        api.get("/hackathon/is-email-present")
       ]);
 
-      const userData = data1.status === "fulfilled" ? data1.value.data : null;
+      const userData = data1.status === "fulfilled" ? data1.value.data : null;  
 
-      const subscription = data2.status === "fulfilled" ? data2.value.data : null;
-      
-      const isMatch = data3.status === "fulfilled" ? data3.value.data : null;
-      console.log("User:", userData);
-      console.log("Subscription:", subscription);
-
-      console.log("userData", userData);
       if (userData && userData.success) {
-        console.log("userData", userData);
-        // setUser({name:userData?.user?.name,email:userData?.user?.email,phoneNumber:userData?.user?.phoneNumber,address:userData.user.address,roles:userData?.user?.roles,uuid:userData?.user?.uuid,_id:userData?.user?._id})
-        setUser(userData.user);
+        setUser({...userData.user, exp: parseInt(userData.exp)});
       }
-      if (subscription && subscription.success) {
-        // update user state safely (functional update to avoid stale closure)
-        setUser((prev) =>
-          prev
-            ? {
-                ...prev,
-                subscriptionPlan: subscription.subscription.subscriptionPlan,
-                subscriptionExpiry: subscription.subscription.endDate,
-                isHackathonUser: isMatch.match,
-                tag: isMatch.tag,
-                rank: isMatch.rank,
-                collegeName: isMatch.collegeName
-              }
-            : prev
-        );
-      }
+      console.log("userData", userData);
     } catch (error) {
       console.error("Error fetching user subscription:", error);
     } finally {

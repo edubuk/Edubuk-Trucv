@@ -54,9 +54,12 @@ export const handleProofUploaded = async ({file,setIsUploading,setUploadError,se
         if (!file) return;
         setIsUploading(true);
         //let docHash = null;
+        setUploadError(null);
         const validation = validateProofFile(file);
             if (!validation.isValid) {
                 alert(validation.error);
+                setIsUploading(false);
+                setUploadError(validation?.error || "Not a valid file");
                 setSelectedFileName(null);
                 return;
             }
@@ -73,6 +76,7 @@ export const handleProofUploaded = async ({file,setIsUploading,setUploadError,se
             if (response?.data?.success) {
                 const url = response.data.url;
                 setIsUploading(false);
+                setSelectedFileName(null);
                 return {url,docHash};
             } else {
                 // try to pick error message from response

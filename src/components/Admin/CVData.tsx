@@ -92,7 +92,7 @@ const CVData = ()=>{
                     <div className="flex flex-wrap items-center justify-center gap-2">
                         {cvIds?.map((cvId:any) => (
                             <a key={cvId._id} 
-                            href={selectedCV==="TruCV" ? `/cv/${cvId._id}` : selectedCV==="Lisk-CV" ? `https://tru-cv-lisk.vercel.app/cv/${cvId._id}` : selectedCV==="Algorand-CV" ? `https://algorand.edubuktrucv.com/cv/${cvId._id}` :`/cv/${cvId._id}`} 
+                            href={selectedCV==="TruCV" ? `/cv/${cvId._id}` : selectedCV==="Lisk-CV" ? `https://tru-cv-lisk.vercel.app/cv/${cvId._id}` : selectedCV==="Algorand-CV" ? `https://algorand.edubuktrucv.com/cv/${cvId._id}` :`https://educhaintrucv-backend.edubuktrucv.com/cv/${cvId._id}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="w-full flex mb-2 p-2 bg-[#006666] text-white rounded-lg hover:bg-[#005555] transition-colors">
