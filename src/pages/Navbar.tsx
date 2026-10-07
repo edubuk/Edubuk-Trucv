@@ -153,8 +153,12 @@ const Navbar: React.FC = () => {
   return (
     <header className="current-nav">
       <div className="current-nav__inner">
-        <Link to="/" className="current-nav__edubuk" aria-label="Edubuk TruCV home">
-          <img src="/latest_edubuk_logo.png" alt="Edubuk" />
+        <Link to="/" className="current-nav__brand" aria-label="Edubuk TruCV home">
+          <span className="current-nav__edubuk">
+            <img src="/latest_edubuk_logo.png" alt="Edubuk" />
+          </span>
+          <span className="current-nav__brand-divider" aria-hidden="true" />
+          <img src={truCv} alt="TruCV" className="current-nav__trucv" />
         </Link>
 
         <nav className="current-nav__links" aria-label="Primary navigation">
@@ -261,8 +265,6 @@ const Navbar: React.FC = () => {
           >
             <Menu size={24} />
           </button>
-
-          <img src={truCv} alt="TruCV" className="current-nav__trucv" />
         </div>
       </div>
 
