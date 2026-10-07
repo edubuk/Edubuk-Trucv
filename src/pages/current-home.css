@@ -14,15 +14,33 @@
   min-height: 94px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 136px minmax(320px, 1fr) auto;
+  grid-template-columns: 250px minmax(320px, 1fr) auto;
   align-items: center;
   gap: 26px;
+}
+
+.current-nav__brand {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 13px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.current-nav__brand-divider {
+  width: 1px;
+  height: 34px;
+  flex: 0 0 1px;
+  background: #d8dfeb;
 }
 
 .current-nav__edubuk {
   display: block;
   width: 112px;
   height: 82px;
+  flex: 0 0 auto;
 }
 
 .current-nav__edubuk img {
@@ -136,7 +154,7 @@
 
 .current-nav__auth:disabled { cursor: wait; opacity: .65; }
 
-.current-nav__account { position: relative; }
+.current-nav__account { position: relative; z-index: 90; }
 .current-nav__account-trigger {
   display: inline-flex;
   min-height: 43px;
@@ -161,11 +179,12 @@
 .current-nav__account-trigger.is-open .current-nav__account-chevron { transform: rotate(180deg); }
 .current-nav__account-menu {
   position: absolute;
-  z-index: 65;
+  z-index: 100;
   top: calc(100% + 12px);
   right: 0;
   visibility: hidden;
-  width: 248px;
+  box-sizing: border-box;
+  width: min(310px, calc(100vw - 32px));
   padding: 14px;
   border: 1px solid #e2e7ef;
   border-radius: 15px;
@@ -178,9 +197,10 @@
 }
 .current-nav__account-menu.is-open { visibility: visible; opacity: 1; transform: translateY(0) scale(1); }
 .current-nav__account-label { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; color: #637087; font-size: 10px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
-.current-nav__wallet { display: flex; width: 100%; }
-.current-nav__wallet > div { width: 100%; }
-.current-nav__wallet button { width: 100% !important; min-height: 42px !important; justify-content: center !important; border-radius: 10px !important; box-shadow: none !important; font-family: "Montserrat", sans-serif !important; font-size: 12px !important; }
+.current-nav__wallet { display: flex; width: 100%; min-width: 0; overflow: hidden; border-radius: 10px; }
+.current-nav__wallet > div { width: 100%; min-width: 0; max-width: 100%; }
+.current-nav__wallet button { width: 100% !important; max-width: 100% !important; min-height: 42px !important; min-width: 0 !important; justify-content: center !important; overflow: hidden !important; border-radius: 10px !important; box-shadow: none !important; font-family: "Montserrat", sans-serif !important; font-size: 12px !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+.current-nav__wallet button > * { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .current-nav__account-divider { height: 1px; margin: 13px 0 10px; background: #edf0f4; }
 .current-nav__logout { display: flex; width: 100%; min-height: 40px; align-items: center; gap: 9px; padding: 0 11px; border: 0; border-radius: 9px; background: #fff3ef; color: #c63b18; font-family: inherit; font-size: 12px; font-weight: 750; cursor: pointer; transition: background .2s ease; }
 .current-nav__logout:hover { background: #ffe9e2; }
@@ -441,11 +461,12 @@
 .credential-process__ledger-status { display: inline-flex; align-items: center; gap: 6px; padding: 7px 9px; border-radius: 7px; background: rgba(255,255,255,.1); color: #d9f6f1; font-size: 9px; font-weight: 700; white-space: nowrap; }
 
 @media (max-width: 1260px) {
-  .current-nav__inner { grid-template-columns: 110px 1fr auto; gap: 15px; }
+  .current-nav__inner { grid-template-columns: 215px 1fr auto; gap: 15px; }
   .current-nav__links { gap: 16px; }
   .current-nav__search { width: 175px; }
-  .current-nav__edubuk { width: 100px; }
-  .current-nav__trucv { width: 125px; }
+  .current-nav__brand { gap: 9px; }
+  .current-nav__edubuk { width: 82px; height: 70px; }
+  .current-nav__trucv { width: 112px; height: 50px; }
   .home-hero-utility { display: flex; }
 }
 
@@ -454,8 +475,10 @@
   .current-nav__links, .current-nav__search, .current-nav__auth, .current-nav__account { display: none; }
   .current-nav__tools { margin-left: auto; }
   .current-nav__menu { display: grid; }
-  .current-nav__edubuk { width: 94px; height: 70px; }
-  .current-nav__trucv { width: 145px; height: 58px; }
+  .current-nav__brand { gap: 9px; }
+  .current-nav__brand-divider { height: 28px; }
+  .current-nav__edubuk { width: 82px; height: 66px; }
+  .current-nav__trucv { width: 118px; height: 48px; }
   .home-hero-container { grid-template-columns: 1fr; gap: 12px; padding-top: 85px; text-align: center; }
   .home-hero-copy > p { margin-inline: auto; }
   .home-hero-actions, .home-hero-trust { justify-content: center; }
@@ -467,8 +490,10 @@
 
 @media (max-width: 620px) {
   .current-nav__inner { width: calc(100% - 24px); min-height: 72px; }
-  .current-nav__edubuk { width: 82px; height: 62px; }
-  .current-nav__trucv { width: 116px; height: 50px; }
+  .current-nav__brand { gap: 7px; }
+  .current-nav__brand-divider { height: 24px; }
+  .current-nav__edubuk { width: 66px; height: 54px; }
+  .current-nav__trucv { width: 90px; height: 40px; }
   .current-nav__menu { width: 39px; height: 39px; }
   .home-hero-redesign { min-height: auto; }
   .home-hero-utility { top: 15px; right: 14px; transform: scale(.86); transform-origin: top right; }
@@ -500,8 +525,9 @@
 }
 
 @media (max-width: 390px) {
-  .current-nav__edubuk { width: 76px; }
-  .current-nav__trucv { width: 104px; }
+  .current-nav__inner { width: calc(100% - 16px); }
+  .current-nav__edubuk { width: 58px; height: 50px; }
+  .current-nav__trucv { width: 80px; height: 36px; }
   .home-hero-copy h1 { font-size: 40px; }
   .home-hero-visual { transform: scale(.82); margin-inline: -24px; }
 }
