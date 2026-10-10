@@ -1,0 +1,142 @@
+.verified-cv-sheet,
+.verified-cv-sheet .font-body,
+.verified-cv-sheet .font-heading {
+  font-family: "Times New Roman", Times, serif !important;
+}
+
+.verified-cv-brand {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 190px;
+  min-height: 92px;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 18px;
+  border: 1px solid #dfe5ed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.verified-cv-brand__logos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.verified-cv-brand__logos > i {
+  width: 1px;
+  height: 34px;
+  background: #d5dce7;
+}
+
+.verified-cv-brand__logos img {
+  display: block;
+  object-fit: contain;
+}
+
+.verified-cv-brand__edubuk {
+  width: 54px;
+  height: 54px;
+}
+
+.verified-cv-brand__trucv {
+  width: 122px;
+  height: 48px;
+}
+
+.verified-cv-brand__title {
+  text-align: center;
+}
+
+.verified-cv-brand__title h1 {
+  margin: 0;
+  color: #03257e;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.verified-cv-brand__title p {
+  margin: 5px 0 0;
+  color: #006666;
+  font-size: 13px;
+}
+
+.verified-cv-brand__qr {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  color: #03257e;
+  text-decoration: none;
+}
+
+.verified-cv-brand__qr span,
+.verified-cv-brand__qr strong,
+.verified-cv-brand__qr small {
+  display: block;
+}
+
+.verified-cv-brand__qr span {
+  text-align: right;
+}
+
+.verified-cv-brand__qr strong {
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+.verified-cv-brand__qr small {
+  margin-top: 3px;
+  color: #657086;
+  font-size: 9px;
+}
+
+.verified-cv-brand__qr img {
+  width: 58px;
+  height: 58px;
+  border: 1px solid #dfe5ed;
+  border-radius: 5px;
+}
+
+.verified-cv-monogram {
+  display: grid;
+  width: 128px;
+  height: 128px;
+  place-items: center;
+  border: 2px solid #449298;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+@media print {
+  .verified-cv-sheet {
+    width: 210mm !important;
+    gap: 12px !important;
+  }
+
+  .verified-cv-sheet > div {
+    width: 210mm !important;
+  }
+
+  .verified-cv-brand {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border-radius: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+@media (max-width: 767px) {
+  .verified-cv-monogram {
+    width: 96px;
+    height: 96px;
+    font-size: 30px;
+  }
+}

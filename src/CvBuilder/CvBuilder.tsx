@@ -16,12 +16,8 @@ import {
   ArrowRight,
   EyeIcon,
   Briefcase,
-  Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useOnBoardCandidateOnTruJobsInOneClick } from "@/api/scraper.api";
-
-const TRUJOBS_URL = "https://edubuktrujobs.com/candidate/sign-in";
 
 //import { WalletSetupPopup } from "./WalletSetupGuide";
 // import { EducationFormValues, ExperienceFormValues } from "./cvSchema";
@@ -60,33 +56,6 @@ export default function CVBuilder() {
   const [showParsedModel, setShowParsedModel] = useState<boolean>(false);
   //const [showWalletSetup, setShowWalletSetup] = useState<boolean>(true);
   console.log("preview cv is", previewCV);
-
-  const {
-    onBoardCandidateOnTruJobsInOneClickData,
-    isLoading: isOnboardingOnTrujobs,
-  } = useOnBoardCandidateOnTruJobsInOneClick();
-
-  const handleOnboardOnTrujobs = async () => {
-    try {
-      await onBoardCandidateOnTruJobsInOneClickData();
-      toast.success("You've been onboarded on TruJobs!");
-      window.open(TRUJOBS_URL, "_blank", "noopener,noreferrer");
-    } catch (error: any) {
-      console.log("Failed to onboard on trujobs", error);
-      const message: string = error?.message || "Failed to onboard on TruJobs";
-      // Backend returns this message when the user's TruCV is incomplete
-      // (e.g. no education details yet) — nudge them to finish it instead
-      // of showing a generic failure toast.
-      if (
-        message.toLowerCase().includes("complete") &&
-        message.toLowerCase().includes("trucv")
-      ) {
-        toast.error("Please complete your TruCV first to onboard on TruJobs.");
-      } else {
-        toast.error(message);
-      }
-    }
-  };
 
   const [cvData, setCvData] = useState<any>({
     personal: {
@@ -163,13 +132,12 @@ export default function CVBuilder() {
             {/* <p className="text-xs text-[#f14419]"><strong>Note: </strong>You can edit your educational (if not verified through DigiLocker), experience, course certificates details only up to three times in case they are rejected by the issuer. Please enter your information carefully. For any queries or issues, reach out to us at <a href="mailto:support@edubuk.com" className="text-[#006666] underline">support@edubuk.com</a> or <a href="mailto:support@edubukeseal.org" className="text-[#006666] underline">support@edubukeseal.org</a></p> */}
             {/* Step 1 */}
 
-            {/* Static TruJobs ad — always visible, does not wait for the
-                onboarding-status check on mount */}
-            <button
-              type="button"
-              onClick={handleOnboardOnTrujobs}
-              disabled={isOnboardingOnTrujobs}
-              className="group flex w-full items-center gap-3 rounded-xl bg-gradient-to-r from-[#03257e] via-[#f14419] to-[#006666] px-4 py-3 text-left shadow-sm transition hover:shadow-md disabled:cursor-not-allowed disabled:opacity-80"
+            {/* Static TruJobs discovery banner */}
+            <a
+              href="https://jobs.edubuk.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex w-full items-center gap-3 rounded-xl bg-gradient-to-r from-[#03257e] via-[#f14419] to-[#006666] px-4 py-3 text-left shadow-sm transition hover:shadow-md"
             >
               <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white">
                 <Briefcase className="size-4" />
@@ -179,23 +147,14 @@ export default function CVBuilder() {
                   Get discovered on TruJobs
                 </span>
                 <span className="block truncate text-xs text-white/80">
-                  One-click onboard with your TruCV and start matching with jobs
+                  Explore opportunities that match your skills and experience
                 </span>
               </span>
               <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-[#03257e] shadow-sm transition group-hover:bg-white/90">
-                {isOnboardingOnTrujobs ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" />
-                    Onboarding...
-                  </>
-                ) : (
-                  <>
-                    Try now
-                    <ArrowRight className="size-3.5" />
-                  </>
-                )}
+                Explore Jobs
+                <ArrowRight className="size-3.5" />
               </span>
-            </button>
+            </a>
 
             <TruCvGuideCard />
 

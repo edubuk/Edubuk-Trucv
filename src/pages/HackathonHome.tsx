@@ -8,7 +8,6 @@ import {
   Fingerprint,
   Globe2,
   LockKeyhole,
-  ScanSearch,
   ShieldCheck,
   Sparkles,
   UserCheck,
@@ -89,9 +88,6 @@ const HackathonHome = () => {
               <Link to="/create-cv" className="hack-btn hack-btn--primary">
                 Create your TruCV <ArrowRight size={18} />
               </Link>
-              <a href="https://edubuktrucv.com/browse-cvs" className="hack-btn hack-btn--ghost">
-                Explore verified talent <ScanSearch size={18} />
-              </a>
             </div>
             <div className="hack-proof-row">
               <div className="hack-avatars" aria-hidden="true">
