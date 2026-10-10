@@ -1,20 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import logo from "../assets/newLogo.png";
 import truCv from "../assets/truCV2.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { MdClose } from "react-icons/md";
 import toast from "react-hot-toast";
 import { googleLogout } from "@react-oauth/google";
 import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
-import { ChevronDown, LogOut, Menu, Search, UserRound, WalletCards } from "lucide-react";
-import SearchResultsPopup from "@/components/ui/SearchResultsPopup";
-import { useSearchProfiles } from "@/hooks/useSearchProfiles";
-import { useDebounce } from "@/hooks/useDebounce";
-import { type SearchProfile } from "@/api/search.apis";
-import AnimatedSearchInput from "@/components/ui/AnimatedPlaceHolder";
+import { ChevronDown, LogOut, Menu, UserRound, WalletCards } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 import "./current-home.css";
 
 interface LinkItem {
@@ -28,29 +24,22 @@ interface SidebarProps {
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handlerLogout: () => void;
   currentPath: string;
-  user: any;
+  user: { roles?: string } | null;
   loading: boolean;
 }
 
 
 
 const Navbar: React.FC = () => {
-  const [search, setSearch] = useState("");
-  const [showResults, setShowResults] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const { user } = useUserData();
-  const navigate = useNavigate();
+  const { isConnected } = useAccount();
   const location = useLocation();
   const currentPath = location.pathname;
   const [loading, setLoading] = useState(false);
   //`console.log("currentPath", currentPath);
-
-  const debouncedSearch = useDebounce(search, 300);
-
-  const { users, isLoading, searchProfiles } = useSearchProfiles();
-  
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -99,25 +88,11 @@ const Navbar: React.FC = () => {
       name: "Verify",
       path: "/verify",
     },
-    {
-      name: "Browse CV",
-      path: "/browse-cvs",
-    },
     // {
     //   name:"Hackathons",
     //   path:"/hackathons"
     // }
   ];
-
-  useEffect(() => {
-    if (debouncedSearch.length < 2) {
-      setShowResults(false);
-      return;
-    }
-
-    setShowResults(true);
-    searchProfiles(debouncedSearch);
-  }, [debouncedSearch]);
 
   useEffect(() => {
     const tokenExpiry = localStorage.getItem("tokenExpiry");
@@ -195,65 +170,46 @@ const Navbar: React.FC = () => {
         </nav>
 
         <div className="current-nav__tools">
-          <div className="current-nav__search">
-            <Search size={15} />
-            <AnimatedSearchInput value={search} onChange={setSearch} />
-            {showResults && (
-              <div
-                onMouseDown={(e) => e.preventDefault()}
-                className="current-nav__results"
-              >
-                <SearchResultsPopup
-                  users={users}
-                  loading={isLoading}
-                  onSelect={(selectedUser: SearchProfile) => {
-                    setShowResults(false);
-                    setSearch("");
-                    navigate(`/cv/${selectedUser.userId}`);
-                    window.location.reload();
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
         {!user ? (
           <Link to="/login" className="current-nav__auth">Sign in</Link>
         ) : (
-          <div className="current-nav__account" ref={accountMenuRef}>
-            <button
-              type="button"
-              className={`current-nav__account-trigger ${isAccountMenuOpen ? "is-open" : ""}`}
-              onClick={() => setIsAccountMenuOpen((open) => !open)}
-              aria-expanded={isAccountMenuOpen}
-              aria-haspopup="menu"
-            >
-              <span className="current-nav__account-icon"><UserRound size={16} /></span>
-              <span>Account</span>
-              <ChevronDown size={15} className="current-nav__account-chevron" />
-            </button>
-
-            <div className={`current-nav__account-menu ${isAccountMenuOpen ? "is-open" : ""}`} role="menu">
-              <div className="current-nav__account-label"><WalletCards size={15} />Wallet</div>
-              <div className="current-nav__wallet">
-                <ConnectButton />
-              </div>
-              <div className="current-nav__account-divider" />
+          <>
+            <div className="current-nav__account" ref={accountMenuRef}>
               <button
                 type="button"
-                onClick={() => {
-                  setIsAccountMenuOpen(false);
-                  handlerLogout();
-                }}
-                disabled={loading}
-                className="current-nav__logout"
-                role="menuitem"
+                className={`current-nav__account-trigger ${isAccountMenuOpen ? "is-open" : ""}`}
+                onClick={() => setIsAccountMenuOpen((open) => !open)}
+                aria-expanded={isAccountMenuOpen}
+                aria-haspopup="menu"
               >
-                <LogOut size={16} />
-                {loading ? "Signing out..." : "Logout"}
+                <span className="current-nav__account-icon"><UserRound size={16} /></span>
+                <span className="current-nav__account-copy">
+                  <span>Account</span>
+                  <small className={isConnected ? "is-connected" : ""} aria-live="polite">
+                    <i aria-hidden="true" />
+                    {isConnected ? "Wallet connected" : "Wallet not connected"}
+                  </small>
+                </span>
+                <ChevronDown size={15} className="current-nav__account-chevron" />
               </button>
+
+              <div className={`current-nav__account-menu ${isAccountMenuOpen ? "is-open" : ""}`} role="menu">
+                <div className="current-nav__account-label"><WalletCards size={15} />Wallet</div>
+                <div className="current-nav__wallet">
+                  <ConnectButton />
+                </div>
+              </div>
             </div>
-          </div>
+            <button
+              type="button"
+              onClick={handlerLogout}
+              disabled={loading}
+              className="current-nav__navbar-logout"
+            >
+              <LogOut size={15} />
+              {loading ? "Signing out..." : "Logout"}
+            </button>
+          </>
         )}
 
           <button

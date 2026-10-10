@@ -1,0 +1,95 @@
+.clean-cv-workspace { width: 100%; }
+.clean-cv-toolbar { display: flex; max-width: 210mm; margin: 0 auto 14px; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; box-shadow: 0 8px 24px rgba(15, 23, 42, .05); }
+.clean-cv-toolbar strong, .clean-cv-toolbar span { display: block; }
+.clean-cv-toolbar strong { color: #0f172a; font-size: 14px; }
+.clean-cv-toolbar span { margin-top: 2px; color: #64748b; font-size: 11px; }
+.clean-cv-toolbar button { display: inline-flex; min-height: 42px; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 10px; background: #006666; color: #fff; font: 700 12px/1.2 Montserrat, sans-serif; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 102, 102, .18); }
+.clean-cv-mobile-hint { display: none; margin: 0 0 10px; color: #64748b; font-size: 11px; text-align: center; }
+.clean-cv-preview { width: 100%; overflow: hidden; padding: 2px 2px 28px; }
+.clean-cv-sheet { width: 100%; max-width: 210mm; min-height: 297mm; margin: 0 auto; overflow: hidden; background: #fff; color: #1e293b; font-family: "Times New Roman", Times, serif; box-shadow: 0 18px 54px rgba(15, 23, 42, .12); }
+.clean-cv-sheet *, .clean-cv-sheet *::before, .clean-cv-sheet *::after { box-sizing: border-box; }
+.clean-cv-sheet a { color: inherit; text-decoration: none; }
+.clean-cv-brand { display: flex; min-height: 18mm; align-items: center; justify-content: space-between; gap: 12px; padding: 2mm 0; border-bottom: 1px solid #dbe3ea; }
+.clean-cv-brand__logos { display: flex; min-width: 0; align-items: center; gap: 9px; }
+.clean-cv-brand__logos > i { width: 1px; height: 23px; flex: 0 0 1px; background: #cbd5e1; }
+.clean-cv-brand__logos img { display: block; object-fit: contain; }
+.clean-cv-brand__edubuk { width: 32px; height: 32px; }
+.clean-cv-brand__trucv { width: 72px; height: 29px; }
+.clean-cv-brand__verify { display: flex; flex: 0 0 auto; align-items: center; gap: 7px; color: #03257e !important; text-align: right; }
+.clean-cv-brand__verify > span { display: grid; grid-template-columns: auto auto; align-items: center; justify-content: end; column-gap: 4px; }
+.clean-cv-brand__verify strong { font-size: 8px; letter-spacing: .08em; }
+.clean-cv-brand__verify small { grid-column: 1 / -1; color: #64748b; font-size: 7.5px; }
+.clean-cv-brand__verify > img { width: 42px; height: 42px; border: 1px solid #dbe3ea; border-radius: 4px; }
+.clean-cv-section { margin-top: 16px; }
+.clean-cv-section > h2 { margin: 0 0 11px; padding-bottom: 6px; border-bottom: 2px solid #0f766e; color: #0f172a; font-size: 17px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.clean-cv-copy, .clean-cv-entry p { margin: 0; color: #475569; font-size: 14px; line-height: 1.48; white-space: pre-line; }
+.clean-cv-entry { margin: 0 0 14px; }
+.clean-cv-entry:last-child { margin-bottom: 0; }
+.clean-cv-entry__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.clean-cv-entry h3, .clean-cv-entry strong, .clean-cv-entry time, .clean-cv-entry small { margin: 0; }
+.clean-cv-entry h3 { color: #0f172a; font-size: 15px; line-height: 1.32; }
+.clean-cv-entry strong { display: block; margin-top: 2px; color: #0f766e; font-size: 13px; font-weight: 700; }
+.clean-cv-entry time { flex: 0 0 auto; color: #64748b; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.clean-cv-entry p { margin-top: 6px; }
+.clean-cv-entry small { display: block; margin-top: 5px; color: #64748b; font-size: 12px; line-height: 1.42; }
+.clean-cv-tech-stack { font-weight: 700; }
+.clean-cv-verification { display: flex; margin-top: 6px; align-items: center; flex-wrap: wrap; gap: 5px 8px; font-size: 10.5px; }
+.clean-cv-verification > span { display: inline-flex; align-items: center; gap: 3px; padding: 2px 5px; border-radius: 10px; background: #eef2f7; color: #64748b; font-weight: 700; }
+.clean-cv-verification > span.is-verified { background: #e8f7f2; color: #08765f; }
+.clean-cv-verification > a { display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; border: 1px solid #cbd5e1; border-radius: 50%; color: #0759b7; }
+
+.classic-cv { padding: 10mm 12mm 12mm; }
+.classic-cv__header { padding: 12px 0 11px; border-bottom: 1px solid #cbd5e1; text-align: center; }
+.classic-cv__header h1 { margin: 0; color: #0f172a; font-size: 34px; font-weight: 800; letter-spacing: -.02em; }
+.classic-cv__header > p { margin: 5px 0 0; color: #0f766e; font-size: 14.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+.classic-cv__contact { display: flex; margin-top: 11px; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px; color: #475569; font-size: 12px; }
+.classic-cv__contact a, .classic-cv__contact span { display: inline-flex; align-items: center; gap: 4px; }
+.classic-cv__skills { display: flex; flex-wrap: wrap; gap: 6px; }
+.classic-cv__skills > span { display: inline-flex; padding: 5px 8px; align-items: center; gap: 5px; border: 1px solid #cbd5e1; border-radius: 5px; color: #334155; font-size: 12px; font-weight: 700; }
+.classic-cv__skills span small { display: inline-flex; margin: 0; align-items: center; gap: 2px; color: #08765f; font-size: 7px; }
+
+.modern-cv > .clean-cv-brand { min-height: 26mm; padding: 4mm 12mm; }
+.modern-cv-grid { display: grid; grid-template-columns: 66mm minmax(0, 1fr); min-height: 271mm; }
+.modern-cv__sidebar { padding: 17mm 9mm 14mm; overflow-wrap: anywhere; background: #12394a; color: #f8fafc; }
+.modern-cv__photo, .modern-cv__monogram { display: grid; width: 32mm; height: 32mm; margin: 0 auto 10px; place-items: center; border: 3px solid rgba(255,255,255,.32); border-radius: 50%; object-fit: cover; background: #0f766e; color: #fff; font-size: 24px; font-weight: 800; }
+.modern-cv__sidebar > h1 { margin: 0; color: #fff; font-size: 26px; line-height: 1.15; text-align: center; }
+.modern-cv__role { margin: 6px 0 0; color: #8be0d4; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
+.modern-cv__contact { display: grid; gap: 8px; margin-top: 24px; }
+.modern-cv__contact a, .modern-cv__contact > span { display: flex; align-items: flex-start; gap: 7px; color: #dbe7ec; font-size: 11.5px; line-height: 1.4; }
+.modern-cv__contact svg { flex: 0 0 auto; margin-top: 1px; color: #72d4c7; }
+.modern-cv__side-section { margin-top: 25px; }
+.modern-cv__side-section > h2 { margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.22); color: #fff; font-size: 13.5px; letter-spacing: .1em; text-transform: uppercase; }
+.modern-cv__skills { display: flex; flex-wrap: wrap; gap: 5px; }
+.modern-cv__skills > span { display: inline-flex; padding: 4px 6px; align-items: center; gap: 3px; border-radius: 4px; background: rgba(255,255,255,.1); color: #eefafa; font-size: 11px; }
+.modern-cv__skills span small { display: inline-flex; margin: 0; align-items: center; gap: 2px; color: #8be0d4; font-size: 6.5px; }
+.modern-cv__sidebar .clean-cv-entry { margin-bottom: 12px; }
+.modern-cv__sidebar .clean-cv-entry__head { display: block; }
+.modern-cv__sidebar .clean-cv-entry h3 { color: #fff; font-size: 12px; }
+.modern-cv__sidebar .clean-cv-entry strong { color: #9bded6; font-size: 11px; }
+.modern-cv__sidebar .clean-cv-entry time { display: block; margin-top: 3px; color: #bdcdd4; font-size: 10.5px; white-space: normal; }
+.modern-cv__main { padding: 17mm 14mm 14mm; }
+.modern-cv__main .clean-cv-section:first-child { margin-top: 0; }
+.modern-cv__main .clean-cv-section > h2 { border-color: #12394a; }
+
+@media (max-width: 700px) {
+  .clean-cv-toolbar { align-items: stretch; flex-direction: column; }
+  .clean-cv-toolbar button { width: 100%; }
+  .clean-cv-mobile-hint { display: block; }
+  .clean-cv-preview { overflow: visible; }
+  .clean-cv-sheet { min-height: 0; border-radius: 10px; }
+  .classic-cv { padding: 18px 14px; }
+  .clean-cv-brand { align-items: flex-start; }
+  .clean-cv-brand__verify > span { display: none; }
+  .modern-cv > .clean-cv-brand { padding: 14px 20px; }
+  .classic-cv__header h1 { font-size: 24px; }
+  .clean-cv-entry__head { flex-direction: column; gap: 3px; }
+  .modern-cv-grid { display: block; min-height: 0; }
+  .modern-cv__sidebar { padding: 34px 22px; }
+  .modern-cv__main { padding: 30px 20px; }
+}
+
+@media print {
+  .clean-cv-toolbar, .clean-cv-mobile-hint { display: none !important; }
+  .clean-cv-preview { padding: 0 !important; overflow: visible !important; }
+  .clean-cv-sheet { border-radius: 0 !important; }
+}

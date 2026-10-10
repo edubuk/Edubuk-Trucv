@@ -3,12 +3,10 @@ import { SiHyperskill } from "react-icons/si";
 import { FaBriefcase, FaCopy, FaGithub } from "react-icons/fa";
 import { GiAchievement } from "react-icons/gi";
 import { BiSolidBriefcase } from "react-icons/bi";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { FileSearch, Plus } from "lucide-react";
+import { FileSearch, Plus, Printer } from "lucide-react";
 import QRCode from "qrcode";
 import {
   CheckCircle,
-  CircleUser,
   FolderOpen,
   GraduationCap,
   Link2,
@@ -17,7 +15,7 @@ import {
   MapPinned,
   Phone,
 } from "lucide-react";
-//import { useReactToPrint } from "react-to-print";
+import { useReactToPrint } from "react-to-print";
 
 import ShowVerifications from "@/components/ShowVerifications";
 import toast from "react-hot-toast";
@@ -32,10 +30,10 @@ import {
 } from "@/CvBuilder/cvSchema";
 import { MdSchool } from "react-icons/md";
 import StatusBadge from "@/CvBuilder/StatusBadge";
-import { EdubukQR } from "@/components/QrCode";
-import { CvPdfDocument } from "@/components/PDFDownloader/CvPdfDocument";
 import { useCvData } from "@/hooks/useCvData";
 import { CvSkeleton } from "@/components/SkeletonLoader/CvSkeleton";
+import truCvLogo from "@/assets/truCV2.png";
+import "./cv-output.css";
 
   const COLOR_TEAL = "#006666";
 export const formatDate = (dateString: string) => {
@@ -70,6 +68,42 @@ export const formatDate = (dateString: string) => {
   return `${day} ${month} ${year}`;
 };
 
+const getInitials = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "CV";
+
+const verifiedCvPrintStyles = `
+  @page { size: A4 portrait; margin: 0; }
+  @media print {
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .verified-cv-sheet {
+      width: 210mm !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .verified-cv-sheet > div {
+      width: 210mm !important;
+      gap: 12px !important;
+    }
+    .verified-cv-brand, .print-no-break {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+  }
+`;
+
 const CvOutputPage = ({userId}:{userId?:string}) => {
   const { id } = useParams();
 
@@ -77,37 +111,15 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const {isCvLoading, searchCvData,cvData,searchFullCvData } = useCvData();
 
-  // const handlePrint = useReactToPrint({
-  //   contentRef: pdfRef,
-  //   documentTitle: "My CV",
-  //   pageStyle, // inject the styles into print document
-  // });
+  const handlePrint = useReactToPrint({
+    contentRef: pdfRef,
+    documentTitle: `TruCV-${cvData?.personal.fullName || id || userId || "Resume"}`,
+    pageStyle: verifiedCvPrintStyles,
+    preserveAfterPrint: true,
+    onPrintError: () => toast.error("Unable to open the print dialog. Please try again."),
+  });
 
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
-//   const handlePrint = useReactToPrint({
-//   contentRef: pdfRef,
-//   documentTitle: "My CV",
-//   pageStyle: `
-//     @page {
-//       size: A4;
-//       margin: 10mm;
-//     }
-//     @media print {
-//       .print-no-break {
-//   break-inside: auto;
-//   page-break-inside: auto;
-// }
-//       .print-section {
-//         break-before: auto;
-//         page-break-before: auto;
-//       }
-//       body {
-//         -webkit-print-color-adjust: exact;
-//         print-color-adjust: exact;
-//       }
-//     }
-//   `,
-// });
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -202,26 +214,16 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
             <span>{copied ? "Copied!" : "Copy CV Link"}</span>
           </button>
 
-          {/* Download PDF */}
-          <PDFDownloadLink
-            document={
-              <CvPdfDocument
-                cvData={cvData}
-                qrDataUrl={qrDataUrl}
-                userId={id!=undefined?id:userId!}
-              />
-            }
-            fileName={`TruCV-${cvData.personal.fullName || id}.pdf`}
+          {/* Print / Save PDF */}
+          <button
+            type="button"
+            onClick={() => handlePrint()}
+            disabled={!qrDataUrl}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#006666] text-white hover:bg-[#006666]/85 transition-all duration-200 text-sm font-semibold disabled:cursor-wait disabled:opacity-60"
           >
-            {({ loading }) => (
-              <button
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#006666] text-white hover:bg-[#006666]/85 transition-all duration-200 text-sm font-semibold disabled:opacity-60"
-                disabled={loading}
-              >
-                {loading ? "Preparing PDF..." : "Download as PDF"}
-              </button>
-            )}
-          </PDFDownloadLink>
+            <Printer size={15} />
+            {qrDataUrl ? "Print / Save PDF" : "Preparing CV..."}
+          </button>
         </div>
       <div className="flex flex-col items-center gap-3 px-4 py-5 border-b border-gray-100">
         <div>
@@ -233,40 +235,26 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
       <div  className=" mt-2 max-w-6xl mx-auto w-full overflow-x-scroll">
         {/* main */}
 
-        <div ref={pdfRef} className="flex flex-col gap-3 md:gap-7 w-[1100px]">
-        <h1
-          className="text-xl md:text-2xl font-bold text-center ml-[300px]"
-          style={{
-            background: "linear-gradient(90deg, #03257e, #006666, #f14419)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}
-        >
-          Verified Curriculum Vitae (CV) on the Blockchain
-        </h1>
-
-        <div className="flex justify-center items-center flex-col ml-[300px]">
-          <EdubukQR url={`https://edubuktrucv.com/cv/${id?id:userId}`} />
-          <div className="flex flex-col gap-0.5 justify-center items-center">
-            <p className="text-lg text-[#03257e] tracking-wide">
-              <span className="font-bold">TruCV</span> powered by
-              <span
-                className="text-xl font-bold tracking-tight"
-                style={{
-                  background:
-                    "linear-gradient(90deg, #03257e, #006666, #f14419)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                {" "}
-                Edubuk
-              </span>
-            </p>
+        <div ref={pdfRef} className="verified-cv-sheet flex w-[1100px] flex-col gap-3 md:gap-5">
+        <header className="verified-cv-brand">
+          <div className="verified-cv-brand__logos">
+            <img src="/latest_edubuk_logo.png" alt="Edubuk" className="verified-cv-brand__edubuk" />
+            <i aria-hidden="true" />
+            <img src={truCvLogo} alt="TruCV" className="verified-cv-brand__trucv" />
           </div>
-        </div>
+          <div className="verified-cv-brand__title">
+            <h1>Verified Curriculum Vitae on Blockchain</h1>
+            <p>Trusted credentials. Verifiable professional identity.</p>
+          </div>
+          <a
+            href={`https://edubuktrucv.com/cv/${id ? id : userId}`}
+            className="verified-cv-brand__qr"
+            aria-label="Open this verified TruCV"
+          >
+            <span><strong>VERIFY TRUCV</strong><small>Scan to open profile</small></span>
+            {qrDataUrl && <img src={qrDataUrl} alt="QR code for this TruCV" />}
+          </a>
+        </header>
         <div className="flex gap-3 md:gap-7 w-[1100px] border  border-t ">
           {/* left sidebar */}
           <div
@@ -282,7 +270,9 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
                   className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 border-[#449298] object-cover"
                 />
               ) : (
-                <CircleUser className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 border-[#449298] text-white/60" />
+                <span className="verified-cv-monogram" aria-label={`${cvData.personal.fullName} initials`}>
+                  {getInitials(cvData.personal.fullName)}
+                </span>
               )}
               {/* <ShowVerifications
                 isAttested={true}
@@ -350,9 +340,9 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
 
                         {/* Duration */}
                         <p className="text-xs text-white/60 italic">
-                          {formatDate(education.duration?.from!)}
-                          {education.duration?.to
-                            ? ` – ${formatDate(education.duration.to!)}`
+                          {formatDate(education.duration.from)}
+                          {education.duration.to
+                            ? ` – ${formatDate(education.duration.to)}`
                             : ""}
                         </p>
 
@@ -746,9 +736,9 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
                                     )}
                                   </h3>
                                   <p className="text-[#006666] italic text-xs md:text-sm text-nowrap shrink-0">
-                                    {formatDate(award.duration?.from!)}
-                                    {award.duration?.to
-                                      ? ` – ${formatDate(award.duration.to!)}`
+                                    {formatDate(award.duration.from)}
+                                    {award.duration.to
+                                      ? ` – ${formatDate(award.duration.to)}`
                                       : ""}
                                   </p>
                                 </div>

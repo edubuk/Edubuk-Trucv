@@ -5,7 +5,6 @@ import ThreeDot from "../components/HomePageSections/ThreeDot";
 import VideoSection from "../components/HomePageSections/VideoSection";
 import Footer from "./Footer";
 import PartnerList from "@/components/HomePageSections/PartnerList";
-import EdubukPopup from "@/components/EdubukPopup";
 import TruCVIntroSections from "@/components/HomePageSections/TruCVIntroSections";
 
 const Home: React.FC = () => (
@@ -20,7 +19,6 @@ const Home: React.FC = () => (
     <ThreeDot />
     <OurAdvisor />
     <Footer />
-    <EdubukPopup />
   </div>
 );
 

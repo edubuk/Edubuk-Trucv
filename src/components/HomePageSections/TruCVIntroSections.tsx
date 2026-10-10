@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useUserData } from "@/context/AuthContext";
 
 type Cleanup = () => void;
 
@@ -293,6 +294,7 @@ const setupRefinedAnimations = (root: ShadowRoot): Cleanup => {
 const TruCVIntroSections = () => {
   const hostRef = useRef<HTMLDivElement>(null);
   const [loadError, setLoadError] = useState(false);
+  const { user } = useUserData();
 
   useEffect(() => {
     const host = hostRef.current;
@@ -309,6 +311,19 @@ const TruCVIntroSections = () => {
       .then((markup) => {
         if (controller.signal.aborted) return;
         shadow.innerHTML = markup;
+        const browseCta = shadow.querySelector<HTMLAnchorElement>(
+          '.hero .actions a[href*="/browse-cvs"]',
+        );
+        if (browseCta) {
+          if (user) {
+            browseCta.remove();
+          } else {
+            browseCta.id = "hero-register-cta";
+            browseCta.href = "/register/me";
+            browseCta.setAttribute("aria-label", "Register for TruCV");
+            browseCta.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Register</span>`;
+          }
+        }
         disposeAnimations = setupRefinedAnimations(shadow);
       })
       .catch((error: unknown) => {
@@ -320,7 +335,7 @@ const TruCVIntroSections = () => {
       controller.abort();
       disposeAnimations?.();
     };
-  }, []);
+  }, [user]);
 
   if (loadError) {
     return <div className="w-full bg-white px-6 py-20 text-center text-sm text-slate-500">The homepage introduction could not be loaded. Please refresh the page.</div>;
