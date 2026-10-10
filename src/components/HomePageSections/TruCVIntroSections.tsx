@@ -311,6 +311,11 @@ const TruCVIntroSections = () => {
       .then((markup) => {
         if (controller.signal.aborted) return;
         shadow.innerHTML = markup;
+        shadow
+          .querySelectorAll<HTMLAnchorElement>('a[href$="/create-cv"]')
+          .forEach((createCvCta) => {
+            createCvCta.setAttribute("href", "/create-cv");
+          });
         const browseCta = shadow.querySelector<HTMLAnchorElement>(
           '.hero .actions a[href*="/browse-cvs"]',
         );

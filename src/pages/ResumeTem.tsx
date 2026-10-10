@@ -168,7 +168,7 @@ const Resume: React.FC = () => {
           <div
             className="flex items-center gap-2 border-2 border-[#03257e] px-2 py-1 rounded cursor-pointer text-[#03257e] hover:text-[#006666]"
             onClick={() =>
-              copyResumeLink(`https://www.edubuktrucv.com/new-cv/${id}`)
+              copyResumeLink(`https://trucv-hackathon.edubuk.com/new-cv/${id}`)
             }
           >
             <FaCopy />
