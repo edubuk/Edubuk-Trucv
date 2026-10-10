@@ -151,7 +151,7 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
 
   useEffect(() => {
 
-  QRCode.toDataURL(`https://edubuktrucv.com/cv/${id??userId}`, {
+  QRCode.toDataURL(`https://trucv-hackathon.edubuk.com/cv/${id??userId}`, {
     width: 80,
     margin: 1,
     color: { dark: "#03257e", light: "#ffffff" },
@@ -206,7 +206,7 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
           {/* Copy Link */}
           <button
             onClick={() =>
-              copyResumeLink(`https://edubuktrucv.com/cv/${id?id:userId}`)
+              copyResumeLink(`https://trucv-hackathon.edubuk.com/cv/${id?id:userId}`)
             }
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#03257e]/30 text-[#03257e] hover:bg-[#03257e] hover:text-white transition-all duration-200 text-sm font-medium"
           >
@@ -247,7 +247,7 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
             <p>Trusted credentials. Verifiable professional identity.</p>
           </div>
           <a
-            href={`https://edubuktrucv.com/cv/${id ? id : userId}`}
+            href={`https://trucv-hackathon.edubuk.com/cv/${id ? id : userId}`}
             className="verified-cv-brand__qr"
             aria-label="Open this verified TruCV"
           >
@@ -786,9 +786,9 @@ const CvOutputPage = ({userId}:{userId?:string}) => {
               )}
 
                <p className="text-sm text-[#6B7280] text-center my-2">This is the PDF version of a Digital TruCV Profile of the Candidate. For Verification please click here: <br />
-                <a href={`https://edubuktrucv.com/cv/${id?id:userId}`}
+                <a href={`https://trucv-hackathon.edubuk.com/cv/${id?id:userId}`}
                 className="text-[#03257e] underline"
-                >{`https://edubuktrucv.com/cv/${id?id:userId}`}</a>
+                >{`https://trucv-hackathon.edubuk.com/cv/${id?id:userId}`}</a>
                 </p>
             </div>
           </div>

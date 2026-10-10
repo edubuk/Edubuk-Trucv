@@ -30,7 +30,7 @@ const CvTemplates = ({ template }: { template: CleanTemplate }) => {
   const [qrDataUrl, setQrDataUrl] = useState("");
   const { cvData, isCvLoading, searchFullCvData } = useCvData();
   const { user } = useUserData();
-  const publicUrl = user?._id ? `https://edubuktrucv.com/cv/${user._id}` : "https://edubuktrucv.com";
+  const publicUrl = user?._id ? `https://trucv-hackathon.edubuk.com/cv/${user._id}` : "https://trucv-hackathon.edubuk.com/";
 
   useEffect(() => {
     searchFullCvData();

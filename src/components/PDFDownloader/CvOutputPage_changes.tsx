@@ -21,7 +21,7 @@
 
 // useEffect(() => {
 //   if (!id) return;
-//   QRCode.toDataURL(`https://edubuktrucv.com/cv/${id}`, {
+//   QRCode.toDataURL(`https://trucv-hackathon.edubuk.com/cv/${id}`, {
 //     width: 80,
 //     margin: 1,
 //     color: { dark: "#03257e", light: "#ffffff" },
