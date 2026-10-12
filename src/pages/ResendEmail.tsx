@@ -41,8 +41,8 @@ const ResendEmail = ({
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [loading,setLoading] = useState<boolean | null>(null);
     const {getSubscription} = useSubscription();
-    const {submitDocument} = useContract();
-    const {address} = useAccount();
+    const {submitDocument, getSubmission} = useContract();
+    const { address, isConnected, status: walletStatus } = useAccount();
     //console.log("docId",docId);
     const form = useForm<TypeResendEmail>({
         resolver: zodResolver(ResendEmailDoc),
@@ -82,7 +82,7 @@ const ResendEmail = ({
             shouldValidate: true,
             shouldDirty: true,
           });
-        } catch (error) {
+        } catch {
           toast.error("something went wrong");
         } finally {
           setSelectedFileName(null);
@@ -94,36 +94,48 @@ const ResendEmail = ({
       const emailHandler = async(data:TypeResendEmail)=>{
         console.log("errors",errors); 
         console.log("project form values", data);
+
+        if (!isConnected || walletStatus !== "connected" || !address) {
+          toast.error("Please connect your wallet first");
+          return;
+        }
+
         try {
 
             setLoading(true);
             const docHash = getValues("docHash");
             const issuerEmailId = getValues("issuerEmailId");
+            const blockchainHash = `0x${docHash}` as `0x${string}`;
                 // Blockchain Registration
             if (docHash) {
-              const id = toast.loading("Submitting on chain...");
+              const id = toast.loading("Submitting and confirming on chain...");
               try {
                 await submitDocument({
                   name       : info.roleOrLevel,
-                  hashString : `0x${docHash}` as `0x${string}`,
+                  hashString : blockchainHash,
                   docType    : info.docType,
                   tokenUri   : "",
-                  currAddress: address as `0x${string}`,
+                  currAddress: address,
                 });
-                toast.dismiss(id);
+                toast.success("Transaction confirmed on chain.", { id });
               } catch (txError) {
                 const errMsg = parseContractError(txError);
 
                 if (errMsg === "This document has already been submitted.") {
-                  // Already on chain — skip and proceed to DB save
-                  toast.dismiss(id);
+                  // A previous confirmed transaction may have succeeded before
+                  // the API save failed. Only resume when this wallet owns it.
+                  const submission = await getSubmission(blockchainHash);
+                  if (!address || submission.submitter.toLowerCase() !== address.toLowerCase()) {
+                    toast.dismiss(id);
+                    throw new Error("This document is already registered by another wallet.");
+                  }
+
                   toast.custom(() => (
                     <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                      <p>Document already on chain. Retrying database save...</p>
+                      <p>Document already confirmed on chain. Retrying the email save...</p>
                     </div>
-                  ));
+                  ), { id });
                 } else {
-                  // Any other chain error — stop everything
                   toast.dismiss(id);
                   throw txError;
                 }
@@ -150,7 +162,7 @@ const ResendEmail = ({
                 getSubscription();
             }
         } catch (error) {
-            toast.error("something went wrong");
+            toast.error(parseContractError(error));
         }finally{
             setLoading(false);
         }
@@ -220,7 +232,10 @@ const ResendEmail = ({
                     name="docUri"
                       type="file"
                       accept=".jpg,.jpeg,.png,.pdf"
-                      onChange={(e) => uploadDocHandler(e.target.files?.[0]!)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void uploadDocHandler(file);
+                      }}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
 

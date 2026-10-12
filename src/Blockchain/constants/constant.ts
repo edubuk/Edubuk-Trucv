@@ -1,4 +1,6 @@
 
+import { baseSepolia, sepolia } from 'viem/chains';
+
 //Mainnet
 //export const CONTRACT_ADDRESS = "0x007aa7830d7E894C312d46389D1bD89144fCf076"
 //SKALE Mainnet
@@ -6,8 +8,23 @@
 //ENI-Testnet
 //export const TESTNET_CONTRACT_ADDRESS = "0xfE275537Fd0a56288A3BcDf5A41a2Ef546FedF6F"
 
-// ETH-Sepolia Testnet
-export const CONTRACT_ADDRESS = "0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0"
+// The contract was deployed at the same deterministic address on both testnets.
+// Contract state (issuer whitelist, submissions, and verifications) remains
+// independent on each network.
+export const CONTRACT_ADDRESS = "0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0" as const;
+
+export const CONTRACT_ADDRESSES = {
+	[sepolia.id]: CONTRACT_ADDRESS,
+	[baseSepolia.id]: CONTRACT_ADDRESS,
+} as const satisfies Record<number, `0x${string}`>;
+
+export const getContractAddress = (chainId?: number) =>
+	chainId ? CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES] : undefined;
+
+export const isContractChainSupported = (chainId?: number) =>
+	chainId !== undefined && chainId in CONTRACT_ADDRESSES;
+
+export const SUPPORTED_CONTRACT_NETWORKS = 'Ethereum Sepolia or Base Sepolia';
 
 export const ABI = [
 	{

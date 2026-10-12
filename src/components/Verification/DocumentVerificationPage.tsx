@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { CheckCircle, XCircle, FileText, ExternalLink } from "lucide-react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/api";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { useContract } from "@/Blockchain/hooks/useMyContract";
 import { parseContractError } from "@/Blockchain/utils/error";
+import { AxiosError } from "axios";
+import NetworkFirstConnectButton from "@/components/Wallet/NetworkFirstConnectButton";
 interface IDoc {
   emailId: string;
   level?: string;
@@ -35,31 +36,37 @@ const DocumentVerificationPage: React.FC = () => {
   const [popupStatus, setPopupStatus] = useState("Initializing verification…");
   const [isProcessing, setIsProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const [tab, setTab] = useState<"approve" | "reject">("approve");
-  const { approveDocument, rejectDocument } = useContract();
-  const { address } = useAccount();
-  const fetchMetaData = async () => {
+  const { approveDocument, rejectDocument, getSubmission } = useContract();
+  const fetchMetaData = useCallback(async () => {
     try {
       const res = await api.get(`/issuer/fetch-requested-doc/${token}`);
       if (res.data.success) {
         setMetaData(res.data.doc);
       }
       console.log("", res.data);
-    } catch (error) {
-      console.error("Error fetching metadata:", error);
+    } catch (fetchError) {
+      console.error("Error fetching metadata:", fetchError);
+      const apiMessage = fetchError instanceof AxiosError
+        ? (fetchError.response?.data as { message?: string } | undefined)?.message
+        : undefined;
       setError(
-        (error as any)?.response?.data?.message ||
-          "Failed to fetch document metadata",
+        apiMessage || "Failed to fetch document metadata",
       );
     }
-  };
+  }, [token]);
 
   useEffect(() => {
-    fetchMetaData();
-  }, []);
+    void fetchMetaData();
+  }, [fetchMetaData]);
 
   const onApprove = async () => {
+    if (!isConnected || !address) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
     try {
       setShowPopup(true);
       setTab("approve");
@@ -67,27 +74,34 @@ const DocumentVerificationPage: React.FC = () => {
       setPopupStatus("Starting document approval…");
       setError(null);
       setStatus("processing...");
+      if (!metadata?.docHash) {
+        throw new Error("Document hash is missing. Approval was not saved.");
+      }
       if (metadata?.docHash) {
-        const id = toast.loading("Submitting on chain...");
+        const blockchainHash = `0x${metadata.docHash}` as `0x${string}`;
+        const id = toast.loading("Submitting and confirming on chain...");
         try {
           await approveDocument(
-            `0x${metadata.docHash}`,
-            address as `0x${string}`,
+            blockchainHash,
+            address,
           );
-          toast.dismiss(id);
+          toast.success("Approval confirmed on chain.", { id });
         } catch (txError) {
           const errMsg = parseContractError(txError);
           console.log("err", errMsg);
           if (errMsg === "This document is no longer pending.") {
-            // Already on chain — skip and proceed to DB save
-            toast.dismiss(id);
+            const submission = await getSubmission(blockchainHash);
+            if (Number(submission.status) !== 1) {
+              toast.dismiss(id);
+              throw new Error("This document was not approved on chain.");
+            }
+
             toast.custom(() => (
               <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                <p>Document is no longer pending on chain. Retrying database save...</p>
+                <p>Approval already confirmed on chain. Retrying database save...</p>
               </div>
-            ));
+            ), { id });
           } else {
-            // Any other chain error — stop everything
             setError(errMsg);
             toast.dismiss(id);
             throw txError;
@@ -102,14 +116,18 @@ const DocumentVerificationPage: React.FC = () => {
         setPopupStatus("");
         setError(data.message || "Failed to approve document");
         setIsProcessing(false);
+        return;
       }
       setPopupStatus("Document approved successfully!");
       setIsProcessing(false);
-    } catch (error: any) {
-      console.error("Error approving document:", error);
-      const errMsg = parseContractError(error);
+    } catch (approvalError) {
+      console.error("Error approving document:", approvalError);
+      const errMsg = parseContractError(approvalError);
+      const apiMessage = approvalError instanceof AxiosError
+        ? (approvalError.response?.data as { message?: string } | undefined)?.message
+        : undefined;
       setPopupStatus("");
-      setError(errMsg||error.data?.message || "Something went wrong during approval.");
+      setError(apiMessage || errMsg || "Something went wrong during approval.");
       setIsProcessing(false);
     } finally {
       setIsProcessing(false);
@@ -117,33 +135,45 @@ const DocumentVerificationPage: React.FC = () => {
   };
 
   const onReject = async () => {
+    if (!isConnected || !address) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
     try {
       setTab("reject");
       setLoading(true);
       setShowPopup(true);
       setPopupStatus("Document rejection in progress...");
+      if (!metadata?.docHash) {
+        throw new Error("Document hash is missing. Rejection was not saved.");
+      }
       if (metadata?.docHash) {
-        const id = toast.loading("Submitting on chain...");
+        const blockchainHash = `0x${metadata.docHash}` as `0x${string}`;
+        const id = toast.loading("Submitting and confirming on chain...");
         try {
           await rejectDocument(
-            `0x${metadata.docHash}`,
-            address as `0x${string}`,
+            blockchainHash,
+            address,
             "False Document",
           );
-          toast.dismiss(id);
+          toast.success("Rejection confirmed on chain.", { id });
         } catch (txError) {
           const errMsg = parseContractError(txError);
 
           if (errMsg === "This document is no longer pending.") {
-            // Already on chain — skip and proceed to DB save
-            toast.dismiss(id);
+            const submission = await getSubmission(blockchainHash);
+            if (Number(submission.status) !== 2) {
+              toast.dismiss(id);
+              throw new Error("This document was not rejected on chain.");
+            }
+
             toast.custom(() => (
               <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                <p>Document is no longer pending on chain. Retrying database save...</p>
+                <p>Rejection already confirmed on chain. Retrying database save...</p>
               </div>
-            ));
+            ), { id });
           } else {
-            // Any other chain error — stop everything
             toast.dismiss(id);
             throw txError;
           }
@@ -153,6 +183,7 @@ const DocumentVerificationPage: React.FC = () => {
       if (!data.success) {
         setError(data.message || "Document rejection failed");
         setPopupStatus("");
+        return;
       }
       setPopupStatus("Document rejected successfully!");
       setIsProcessing(false);
@@ -175,10 +206,10 @@ const DocumentVerificationPage: React.FC = () => {
     <>
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="absolute top-4 right-4">
-          <ConnectButton />
+          <NetworkFirstConnectButton />
           {!isConnected && (
             <span className="inline-flex items-center rounded-full bg-[#f14419]/10 px-2 py-0.5 text-xs font-semibold text-[#f14419]">
-              Please connect your wallet to approve/reject
+              Please connect your wallet first
             </span>
           )}
         </div>

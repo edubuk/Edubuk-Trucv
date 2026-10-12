@@ -9,8 +9,8 @@ import { googleLogout } from "@react-oauth/google";
 import { API_BASE_URL } from "@/main";
 import { useUserData } from "@/context/AuthContext";
 import { ChevronDown, LogOut, Menu, UserRound, WalletCards } from "lucide-react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
+import NetworkFirstConnectButton from "@/components/Wallet/NetworkFirstConnectButton";
 import "./current-home.css";
 
 interface LinkItem {
@@ -196,7 +196,7 @@ const Navbar: React.FC = () => {
               <div className={`current-nav__account-menu ${isAccountMenuOpen ? "is-open" : ""}`} role="menu">
                 <div className="current-nav__account-label"><WalletCards size={15} />Wallet</div>
                 <div className="current-nav__wallet">
-                  <ConnectButton />
+                  <NetworkFirstConnectButton />
                 </div>
               </div>
             </div>
@@ -309,7 +309,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         ) : (
           <div className="current-sidebar__account">
             <div className="current-sidebar__wallet-label"><WalletCards size={16} />Wallet account</div>
-            <div className="current-sidebar__wallet"><ConnectButton /></div>
+            <div className="current-sidebar__wallet"><NetworkFirstConnectButton /></div>
             <button onClick={handlerLogout} className="current-sidebar__action" disabled={loading}>
               <LogOut size={16} />{loading ? "Signing out..." : "Logout"}
             </button>

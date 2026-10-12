@@ -3,6 +3,15 @@
 import { BaseError, ContractFunctionRevertedError } from "viem";
 
 export function parseContractError(err: unknown): string {
+  if (
+    err instanceof Error &&
+    (err.message.includes("Connector not connected") ||
+      err.message.includes("Connector not found") ||
+      err.message.includes("unavailable while reconnecting"))
+  ) {
+    return "Please connect your wallet first";
+  }
+
   // 1. Viem contract revert (require messages + custom errors)
   if (err instanceof BaseError) {
     const revert = err.walk((e) => e instanceof ContractFunctionRevertedError);
