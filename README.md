@@ -10,9 +10,10 @@ TruCV turns a traditional CV into a portable, verifiable professional identity. 
 | Live TruCV demo | [https://trucv-hackathon.edubuk.com](https://trucv-hackathon.edubuk.com) |
 | Demo video | `<ADD_DEMO_VIDEO_URL>` |
 | Frontend repository | [https://github.com/edubuk/Edubuk-Trucv](https://github.com/edubuk/Edubuk-Trucv) |
-| Backend repository | `https://github.com/edubuk/Edubuk-Trucv-Backend` |
+| Backend repository | [https://github.com/edubuk/Edubuk-Trucv-Backend](https://github.com/edubuk/Edubuk-Trucv-Backend)`` |
 | Smart-contract repository | `https://github.com/edubuk/Edubuk-Trucv/blob/main/src/Blockchain/contract/DocumentNFT.sol` |
-| Sepolia contract | [0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0](https://sepolia.etherscan.io/address/0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0) |
+| Ethereum Sepolia contract | [0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0](https://sepolia.etherscan.io/address/0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0) |
+| Base Sepolia contract | [0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0](https://sepolia.basescan.org/address/0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0) |
 
 ## Demo Access
 
@@ -36,6 +37,14 @@ Use a disposable wallet created only for this Sepolia demo. Verify that its addr
 ```text
 Network: Ethereum Sepolia
 Chain ID: 11155111
+Contract: 0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0
+Issuer wallet address: 0x0f8CEC8A67924ed96E4BD8BEA56C432bA5Ed494e
+Disposable Sepolia-only private key: 2ad3cbee5f7fa2a9f0de50124d4f574ca4afea356c076acf644eb15e5027e65d
+```
+
+```text
+Network: Base Sepolia
+Chain ID: 84532
 Contract: 0x27Ca78A18e8C23Aa116C89D9e85eD9f61474afC0
 Issuer wallet address: 0x0f8CEC8A67924ed96E4BD8BEA56C432bA5Ed494e
 Disposable Sepolia-only private key: 2ad3cbee5f7fa2a9f0de50124d4f574ca4afea356c076acf644eb15e5027e65d
