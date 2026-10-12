@@ -1,9 +1,16 @@
 import {
+  useChainId,
   useWriteContract,
   useReadContract,
   } from 'wagmi';
 import { stringToHex } from 'viem';
-import {ABI, CONTRACT_ADDRESS } from '../constants/constant';
+import {
+  ABI,
+  CONTRACT_ADDRESS,
+  getContractAddress,
+  isContractChainSupported,
+  SUPPORTED_CONTRACT_NETWORKS,
+} from '../constants/constant';
 import { usePublicClient } from "wagmi";
 
 
@@ -31,10 +38,33 @@ export type BlockchainDocument = {
 }
 
 export const useContract = () => {
-  const address = CONTRACT_ADDRESS;
-  const publicClient = usePublicClient();
+  const chainId = useChainId();
+  const address = getContractAddress(chainId) ?? CONTRACT_ADDRESS;
+  const isSupportedChain = isContractChainSupported(chainId);
+  const publicClient = usePublicClient({ chainId });
 
   const { writeContractAsync, isPending } = useWriteContract();
+
+  const assertSupportedChain = () => {
+    if (!isSupportedChain) {
+      throw new Error(`Please switch your wallet to ${SUPPORTED_CONTRACT_NETWORKS}.`);
+    }
+    if (!publicClient) throw new Error("Wallet not connected.");
+
+    return publicClient;
+  };
+
+  const waitForSuccessfulTransaction = async (
+    client: NonNullable<typeof publicClient>,
+    hash: `0x${string}`,
+  ) => {
+    const receipt = await client.waitForTransactionReceipt({ hash });
+    if (receipt.status !== 'success') {
+      throw new Error('The blockchain transaction failed. No data was saved.');
+    }
+
+    return receipt;
+  };
 
   
   //1. Submit Document
@@ -53,30 +83,43 @@ export const useContract = () => {
     currAddress: `0x${string}`;
   }) => {
     //const hashBytes32 = stringToHex(hashString, { size: 32 });
-      if (!publicClient) throw new Error("Wallet not connected.");
+    const client = assertSupportedChain();
     // Simulate first — reverts here before MetaMask opens
-    await publicClient.simulateContract({
+    await client.simulateContract({
       address,
       abi: ABI,
       functionName: "submitDocument",
       args: [name, hashString, docType, tokenUri],
       account:currAddress, // current user's address
     });
-    return await writeContractAsync({
+    const hash = await writeContractAsync({
+      chainId,
       address,
       abi: ABI,
       functionName: 'submitDocument',
       args: [name, hashString, docType, tokenUri],
     });
+
+    return await waitForSuccessfulTransaction(client, hash);
+  };
+
+  const getSubmission = async (hashString: `0x${string}`) => {
+    const client = assertSupportedChain();
+    return await client.readContract({
+      address,
+      abi: ABI,
+      functionName: 'getSubmission',
+      args: [hashString],
+    }) as Submission;
   };
 
   //2.1 Whitelist Issuer
 
 
 const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${string}`) => {
-  if (!publicClient) throw new Error("Wallet not connected.");
+  const client = assertSupportedChain();
   // Simulate first — reverts here before MetaMask opens
-  await publicClient.simulateContract({
+  await client.simulateContract({
     address,
     abi: ABI,
     functionName: "whitelistIssuer",
@@ -86,6 +129,7 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
 
   // Only reaches here if simulation passed
   return await writeContractAsync({
+    chainId,
     address,
     abi: ABI,
     functionName: "whitelistIssuer",
@@ -95,9 +139,9 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
 
   //2.2 Revoke Issuer
   const revokeIssuer = async (issuer: string,currAddress: `0x${string}`) => {
-  if (!publicClient) throw new Error("Wallet not connected.");
+  const client = assertSupportedChain();
   // Simulate first — reverts here before MetaMask opens
-  await publicClient.simulateContract({
+  await client.simulateContract({
     address,
     abi: ABI,
     functionName: "revokeIssuer",
@@ -105,6 +149,7 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
     account:currAddress, // current user's address
   });
     return await writeContractAsync({
+      chainId,
       address,
       abi: ABI,
       functionName: 'revokeIssuer',
@@ -119,6 +164,7 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
       abi: ABI,
       functionName: 'getAllIssuers',
       args: [offset, limit],
+      query: { enabled: isSupportedChain },
     });
     return {
       data,
@@ -130,21 +176,23 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
 
   //3. Approve Document
   const approveDocument = async (hashString: string,currAddress: `0x${string}`) => {
-    if (!publicClient) throw new Error("Wallet not connected.");
+    const client = assertSupportedChain();
     // Simulate first — reverts here before MetaMask opens
-    await publicClient.simulateContract({
+    await client.simulateContract({
       address,
       abi: ABI,
       functionName: "approveDocument",
       args: [hashString],
       account:currAddress, // current user's address
     });
-      return await writeContractAsync({
+      const hash = await writeContractAsync({
+        chainId,
         address,
         abi: ABI,
         functionName: 'approveDocument',
         args: [hashString],
       });
+      return await waitForSuccessfulTransaction(client, hash);
   };
 
   //4. Get User Submissions (READ)
@@ -154,6 +202,7 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
       abi: ABI,
       functionName: 'getUserSubmissions',
       args: [user],
+      query: { enabled: isSupportedChain },
     });
      
     return {
@@ -172,6 +221,7 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
       abi: ABI,
       functionName: 'getSubmission',
       args: [hashBytes32],
+      query: { enabled: isSupportedChain },
     });
 
     return {
@@ -184,27 +234,31 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
 
   //6. Reject document
   const rejectDocument = async (hashString: string,currAddress: `0x${string}`,reason: string) => {
-    if (!publicClient) throw new Error("Wallet not connected.");
+    const client = assertSupportedChain();
     // Simulate first — reverts here before MetaMask opens
-    await publicClient.simulateContract({
+    await client.simulateContract({
       address,
       abi: ABI,
       functionName: "rejectDocument",
       args: [hashString, reason],
       account:currAddress, // current user's address
     });
-    return await writeContractAsync({
+    const hash = await writeContractAsync({
+      chainId,
       address,
       abi: ABI,
       functionName: 'rejectDocument',
       args: [hashString, reason],
     });
+    return await waitForSuccessfulTransaction(client, hash);
   };
 
   //7. Revoke Document
   const revokeDocument = async (hashString: string) => {
+    assertSupportedChain();
     const hashBytes32 = stringToHex(hashString, { size: 32 });
     return await writeContractAsync({
+      chainId,
       address,
       abi: ABI,
       functionName: 'revokeDocument',
@@ -213,12 +267,13 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
   };
 
   //8.list all tokenIds owned by an address
-  const useGetUserTokens = async (user: string) => {
+  const useGetUserTokens = (user: string) => {
     const { data, isLoading, error, refetch } = useReadContract({
       address,
       abi: ABI,
       functionName: 'tokensOfOwner',
       args: [user],
+      query: { enabled: isSupportedChain },
     });
 
     return {
@@ -236,6 +291,7 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
     abi: ABI,
     functionName: 'verifyDocument',
     args: [hashString],
+    query: { enabled: isSupportedChain },
   });
 
   //destructure tuple safely
@@ -253,6 +309,7 @@ const whitelistIssuer = async (issuer: string, name: string,currAddress: `0x${st
   return {
     // write
     submitDocument,
+    getSubmission,
     whitelistIssuer,
     revokeIssuer,
     approveDocument,
